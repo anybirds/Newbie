@@ -1,0 +1,48 @@
+{
+    "Scene" : {
+        "girl_scene" : {
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Scenes\\girl_scene.json"
+        }
+    },
+    "Material" : {
+        "girl_material" : {
+            "vertexShader" : "girl_vert",
+            "fragmentShader" : "girl_frag",
+            "mainTexture" : "girl_tex"
+        }
+    },
+    "Mesh" : {
+        "square_mesh" : {
+            "model" : "square_model",
+            "index" : 0
+        },
+        "girl_mesh" : {
+            "model" : "girl_model",
+            "index" : 0
+        }
+    },
+    "Model" : {
+        "square_model" : {
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Models\\square_model.obj"
+        },
+        "girl_model" : {
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Models\\girl_model.obj"
+        }
+    },
+    "Shader" : {
+        "girl_vert" : {
+            "shaderType" : "vertex",
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Shaders\\unlit_vert.glsl"
+        },
+        "girl_frag" : {
+            "shaderType" : "fragment",
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Shaders\\unlit_frag.glsl"
+        }
+    },
+
+    "Texture" : {
+        "girl_tex" : {
+            "path" : "C:\\Users\\river\\Documents\\Newbie\\Custom\\Textures\\girl_texture.png"
+        }
+    }
+}
