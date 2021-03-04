@@ -1,5 +1,4 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once 
 
 #include <string>
 
@@ -7,9 +6,7 @@
 #include <GLFW/glfw3.h>
 
 /*
-Window
-
-Abstraction of a cross-platform window that appears in the monitor.
+Abstraction of a cross-platform window.
  */
 class Window final {
 public:
@@ -27,5 +24,3 @@ public:
     void SwapBuffers();
     void PollEvents();
 };
-
-#endif

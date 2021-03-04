@@ -15,6 +15,6 @@ target_compile_definitions(Engine PRIVATE ENGINE_LIBRARY)
 
 set_target_properties(
   Engine PROPERTIES
-  CXX_STANDARD 11
+  CXX_STANDARD 17
   CXX_STANDARD_REQUIRED ON
 )

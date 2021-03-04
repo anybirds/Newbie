@@ -1,3 +1,4 @@
+/*
 #ifndef ROTATE_SCRIPT_H
 #define ROTATE_SCRIPT_H
 
@@ -27,3 +28,4 @@ typedef typename concat<TYPE_LIST, RotateScript>::type TypeListRotateScript;
 #define TYPE_LIST TypeListRotateScript
 
 #endif
+*/

@@ -1,40 +1,40 @@
 # Newbie Engine
-Bare bone newbie-created game engine built upon OpenGL.
+Can one undergraduate student make a fully-functional game engine? Let's try answering to this question.
 
 ## Goal
-* Study materials discussed in [LearnOpenGL](https://learnopengl.com/).
-* Come up with abstractions(Object, Component, Renderer, Rigidbody, ...) that will help simplifying the implementation.
-* Mimic some of the features provided in commodity game engines like Unity or Unreal.
-* Provide an editor(GUI) that works in the front side of the engine.
-* Create a simple 3D game by using this engine. 
+* Study and research about how the game engine is built in general.
+* Come up with abstractions such as Project, Scene, GameObject, Renderer, Collider and many more.
+* Make a GUI editor that allows users to inspect and modify objects handily.
+* Create a simple 3D game with this engine. 
 
 ## Feature
 
 ## Build
-* Install [Visual Studio 2017](https://visualstudio.microsoft.com/) Community version.
-* Install [CMake](https://cmake.org/) latest version.
-* Install [Git](https://git-scm.com/) Windows 64-bit version. 
-* Install [vcpkg](https://github.com/Microsoft/vcpkg).
-  * Open **Windows PowerShell**
+* Install [Visual Studio](https://visualstudio.microsoft.com/).
+* Install [CMake](https://cmake.org/).
+* Install [Git](https://git-scm.com/). 
+* Install [vcpkg](https://github.com/icrosoft/vcpkg).
+  * Open **Windows Command Prompt** with administrator privilege
   * Goto **C Drive** 
   * Type **git clone https://github.com/Microsoft/vcpkg.git**
-  * Type **cd .\vcpkg**
-  * Type **.\vcpkg.exe integrate install**
-  * Register the environment variable **VCPKG_DEFAULT_TRIPLET** to be **x64-windows**
-* Install packages GLFW3 / GLEW / GLM / Assimp / SOIL.
-  * Type **.\vcpkg.exe install glew**
-  * Type **.\vcpkg.exe install glfw3**
-  * Type **.\vcpkg.exe install glm**
-  * Type **.\vcpkg.exe install assimp:x64-windows**
-  * Type **.\vcpkg.exe install soil:x64-windows**
+  * Type **cd vcpkg**
+  * Type **vcpkg integrate install**
+  * Register the environment variable **VCPKG_DEFAULT_TRIPLET** to match the target, for example **x64-windows**
+* Install packages GLFW3 / GLEW / GLM / Assimp / SOIL2.
+  * Reopen **Windows Command Prompt** with administrator privilege
+  * Type **vcpkg install glew**
+  * Type **vcpkg install glfw3**
+  * Type **vcpkg install glm**
+  * Type **vcpkg install assimp**
+  * Type **vcpkg install soil2**
 * Clone this project inside the directory you want to build.
 * Generate build system from source files.
   * Open **CMake**
   * Type in the source path
   * Type in the build path
   * Press **Configure** button
-  * Select **Visual Studio 15 2017** as generator
-  * Select **x64** as an optional platform for generator
+  * Select **Visual Studio** as generator
+  * Select the optional platform for generator to match the target
   * Press **Finish** button
   * Press **Build** button
 * Run solution file
@@ -42,9 +42,8 @@ Bare bone newbie-created game engine built upon OpenGL.
   * Set **Application** as **Startup Project**
   * Build and Run
 
-
 ## Documentation
-All descriptions are directly written to the code itself.
+All descriptions are directly written to the code itself. [Github Wiki](https://github.com/anybirds/Newbie/wiki) is also available.
 
 ## Copyright
-Copyright © 2019 Hajun Kim, Undergraduate student in KAIST. All rights reserved. 
+Copyright © 2021 Hajun Kim, Undergraduate student in KAIST. All rights reserved. 
