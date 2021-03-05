@@ -1,3 +1,17 @@
+#pragma once
+
+#include <Entity.hpp>
+
+namespace Engine {
+    /*
+    Base class for all the resources like Model, Mesh, Material, Shader, Texture and etc.
+    */
+    class ENGINE_EXPORT Resource : public Entity {
+        
+    };
+}
+
+/*
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
@@ -9,9 +23,6 @@ namespace Engine {
 
     SER_DECL(ENGINE_EXPORT, Resource)
 
-    /*
-    Base class for all the resources like Model, Mesh, Material, Shader, Texture and etc.
-    */
     class ENGINE_EXPORT Resource : public Object {
         TYPE_DECL(Resource)
 
@@ -39,3 +50,4 @@ typedef typename concat<TYPE_LIST, Engine::Resource>::type TypeListResource;
 #define TYPE_LIST TypeListResource
 
 #endif
+*/

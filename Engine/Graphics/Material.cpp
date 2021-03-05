@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <Graphics/Material.hpp>
 #include <Graphics/Shader.hpp>
 #include <Graphics/Texture.hpp>
@@ -6,20 +8,15 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(Material)
-    SER_DEF(Material, Resource,
-    MEMBER_SER | MEMBER_SHOW, Shader *, vertexShader,
-    MEMBER_SER | MEMBER_SHOW, Shader *, fragmentShader,
-    MEMBER_SER | MEMBER_SHOW, Texture *, mainTexture
-    )
+Material::~Material() {
+    glDeleteProgram(program);
+    /*
+    Resource::OnDestroy();
+    */
 }
 
-Material::Material(const string &name, Type *type) : Resource(name, type) {
-
-}
-
-void Material::OnInit() {
+void Material::Init() {
+    /*
     if (!vertexShader->loaded) {
         vertexShader->OnInit();
     }
@@ -29,12 +26,11 @@ void Material::OnInit() {
     if (mainTexture && !mainTexture->loaded) {
         mainTexture->OnInit();
     }
+    */
 
     if (vertexShader->shaderType != "vertex" ||
         fragmentShader->shaderType != "fragment") {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " shader type mismatch";
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch";
         throw std::exception();
     }
 
@@ -48,13 +44,9 @@ void Material::OnInit() {
     GLint location = glGetUniformLocation(program, "_MAIN_TEX");
     glUniform1i(location, 0);
 
+    /*
     Resource::OnInit();
-}
-
-void Material::OnDestroy() {
-    glDeleteProgram(program);
-
-    Resource::OnDestroy();
+    */
 }
 
 int Material::GetInteger(const char *name) const {
@@ -65,6 +57,7 @@ int Material::GetInteger(const char *name) const {
     }
     return ret;
 }
+
 vector<int> Material::GetIntegerArray(const char *name) const {
     vector<int> ret;
     GLint location;

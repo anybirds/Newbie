@@ -1,3 +1,15 @@
+#pragma once
+
+namespace Engine {
+    /*
+    Scene is a unit of loading resources and groups.
+    */
+    class ENGINE_EXPORT Scene final {
+        
+    };
+}
+
+/*
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -27,9 +39,6 @@ namespace Engine {
 
     SER_DECL(ENGINE_EXPORT, Scene)
 
-    /*
-    Tracks objects and components that comprise the scene.
-    */
     class ENGINE_EXPORT Scene final : public Object {
         TYPE_DECL(Scene)
 
@@ -71,3 +80,4 @@ typedef typename concat<TYPE_LIST, Engine::Scene>::type TypeListScene;
 #define TYPE_LIST TypeListScene
 
 #endif
+*/

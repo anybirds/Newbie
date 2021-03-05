@@ -1,3 +1,18 @@
+#pragma once
+
+#include <glm/glm.hpp>
+
+#include <EngineExport.hpp>
+#include <Entity.hpp>
+
+namespace Engine {
+    class ENGINE_EXPORT Camera : public Component {
+    private:
+        
+    };
+}
+
+/*
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -91,3 +106,4 @@ typedef typename concat<TYPE_LIST, Engine::Camera>::type TypeListCamera;
 #define TYPE_LIST TypeListCamera
 
 #endif
+*/

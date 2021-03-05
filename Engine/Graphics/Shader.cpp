@@ -1,4 +1,3 @@
-#include <exception>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -8,19 +7,14 @@
 using namespace std;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(Shader)
-    SER_DEF(Shader, Resource,
-    MEMBER_SER | MEMBER_SHOW, std::string, path,
-    MEMBER_SER | MEMBER_SHOW, std::string, shaderType
-    )
+Shader::~Shader() {
+    glDeleteShader(id);
+    /*
+    loaded = false;
+    */
 }
 
-Shader::Shader(const string &name, Type *type) : Resource(name, type) {
-
-}
-
-void Shader::OnInit() {
+void Shader::Init() {
     if (shaderType == "vertex") {
         id = glCreateShader(GL_VERTEX_SHADER);
     } else if (shaderType == "fragment") {
@@ -28,17 +22,13 @@ void Shader::OnInit() {
     }
 
     if (!id) {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << endl;
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << endl;
         throw exception();
     }
 
     ifstream file(path);
     if (!file.is_open()) {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << path << endl;
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << path << endl;
         glDeleteShader(id);
         throw exception();
     }
@@ -53,18 +43,13 @@ void Shader::OnInit() {
     GLint status = 0;
     glGetShaderiv(id, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << path << endl;
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << path << endl;
         glDeleteShader(id);
         throw exception();
     }
 
+    /*
     loaded = true;
     // shouldLoad = false;
-}
-
-void Shader::OnDestroy() {
-    glDeleteShader(id);
-    loaded = false;
+    */
 }

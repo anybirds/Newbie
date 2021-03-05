@@ -1,37 +1,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <Common/GameObject.hpp>
-#include <Common/Scene.hpp>
-#include <Common/Transform.hpp>
+#include <Transform.hpp>
 
 using namespace std;
 using namespace glm;
 using namespace Engine;
-
-namespace Engine {
-    TYPE_DEF(Transform)
-    SER_DEF(Transform, Component,
-    MEMBER_SER | MEMBER_SHOW, glm::vec3, localPosition,
-    MEMBER_SER | MEMBER_SHOW, glm::vec3, localEulerAngles,
-    MEMBER_SER | MEMBER_SHOW, glm::vec3, localScale,
-    MEMBER_SER, Transform *, parent,
-    MEMBER_SER, std::vector<Transform *>, children
-    )
-
-    void Destroy(Transform *transform) {
-        Destroy(static_cast<Object *>(transform));
-        GameObject *go = transform->GetGameObject();
-        Destroy(static_cast<Object *>(go));
-        for (auto p : go->GetComponents()) {
-            Destroy(static_cast<Object *>(p.second));
-        }
-    }
-}
-
-Transform::Transform(const string &name, Type *type) : Component(name, type), updated(false) {
-
-}
 
 void Transform::PropagateUpdate() {
     if (!updated) {
@@ -44,7 +18,7 @@ void Transform::PropagateUpdate() {
     }
 }
 
-void Transform::OnInit() {
+void Transform::Init() {
     localRotation = quat(radians(localEulerAngles));
     localToWorldMatrix = GetLocalToWorldMatrix();
 }

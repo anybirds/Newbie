@@ -1,3 +1,34 @@
+#pragma once
+
+#include <string> 
+#include <GL/glew.h>
+
+#include <EngineExport.hpp>
+#include <Resource.hpp>
+
+namespace Engine {
+    class ENGINE_EXPORT Shader : public Resource {
+    private:
+        GLuint id;
+        std::string path;
+        std::string shaderType;
+        
+    public:
+        virtual ~Shader() override;
+        
+        virtual void Init() override;
+
+        const std::string &GetPath() const { return path; }
+        const std::string &GetShaderType() const { return shaderType; }
+
+        void SetPath(const std::string &path) { this->path = path; }
+        void SetShaderType(const std::string &shaderType) { this->shaderType = shaderType; }
+
+        friend class Material;
+    };
+}
+
+/*
 #ifndef SHADER_H
 #define SHADER_H
 
@@ -36,3 +67,4 @@ typedef typename concat<TYPE_LIST, Engine::Shader>::type TypeListShader;
 
 
 #endif
+*/

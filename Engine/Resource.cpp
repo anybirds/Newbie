@@ -1,3 +1,4 @@
+/*
 #include <Common/Project.hpp>
 #include <Common/Resource.hpp>
 
@@ -23,3 +24,4 @@ Resource::Resource(const string &name, Type *type) : Object(name, type), loaded(
 Resource::~Resource() {
     Project::resset.erase(this);
 }
+*/

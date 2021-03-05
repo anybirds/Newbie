@@ -6,22 +6,26 @@
 using namespace std;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(Mesh)
-    SER_DEF(Mesh, Resource,
-    MEMBER_SER | MEMBER_SHOW, Model *, model,
-    MEMBER_SER | MEMBER_SHOW, int, index
-    )
+Mesh::~Mesh() {
+    if (icnt > 0) {
+        // indexed wireframe
+        glDeleteBuffers(1, &ebo);
+    }
+    // delete
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+
+    /*
+    Resource::OnDestroy();
+    */
 }
 
-Mesh::Mesh(const string &name, Type *type) : Resource(name, type) {
-
-}
-
-void Mesh::OnInit() {
+void Mesh::Init() {
+    /*
     if (!model->loaded) {
         model->OnInit();
     }
+    */
 
     const aiScene *scene = model->importer->GetScene();
     aiMesh *aimesh = scene->mMeshes[index];
@@ -115,23 +119,11 @@ void Mesh::OnInit() {
     delete[] attrib;
     delete[] idx;
 
-#ifdef DEBUG
-    cout << '[' << __FUNCTION__ << ']'
+    cerr << '[' << __FUNCTION__ << ']'
         << "{vertex: " << vcnt << " attribute: " << acnt << " index: " << icnt << '}'
         <<" Mesh created." << endl;
-#endif
 
+    /*
     Resource::OnInit();
-}
-
-void Mesh::OnDestroy() {
-    if (icnt > 0) {
-        // indexed wireframe
-        glDeleteBuffers(1, &ebo);
-    }
-    // delete
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-
-    Resource::OnDestroy();
+    */
 }

@@ -1,3 +1,63 @@
+#pragma once
+
+#include <vector>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+
+#include <EngineExport.hpp>
+#include <Resource.hpp>
+
+namespace Engine {
+
+    class Shader;
+    class Texture;
+
+    class ENGINE_EXPORT Material : public Resource {
+    private:
+        GLuint program;
+
+        Shader *vertexShader;
+        Shader *fragmentShader;
+        Texture *mainTexture;
+    
+    public:
+        virtual ~Material() override;
+        
+        virtual void Init() override;
+
+        int GetInteger(const char *name) const;
+        std::vector<int> GetIntegerArray(const char *name) const;
+        float GetFloat(const char *name) const;
+        std::vector<float> GetFloatArray(const char *name) const;
+        glm::vec4 GetVector(const char *name) const;
+        std::vector<glm::vec4> GetVectorArray(const char *name) const;
+        glm::mat4 GetMatrix(const char *name) const;
+        std::vector<glm::mat4> GetMatrixArray(const char *name) const;
+
+        void SetInteger(const char *name, int value);
+        void SetIntegerArray(const char *name, const int *value, int length);
+        void SetFloat(const char *name, float value);
+        void SetFloatArray(const char *name, const float *value, int length);
+        void SetVector(const char *name, const glm::vec4 &value);
+        void SetVectorArray(const char *name, const glm::vec4 *value, int length);
+        void SetMatrix(const char *name, const glm::mat4 &value);
+        void SetMatrixArray(const char *name, const glm::mat4 *value, int length);
+
+        void UseTextures();
+
+        Shader *const GetVertexShader() const { return vertexShader; }
+        Shader *const GetFragmentShader() const { return fragmentShader; }
+        Texture *const GetMainTexture() const { return mainTexture; }
+        
+        void SetVertexShader(Shader *vertexShader) { this->vertexShader = vertexShader; } 
+        void SetFragmentShader(Shader *fragmentShader) { this->fragmentShader = fragmentShader; }
+        void SetMainTexture(Texture *mainTexture) { this->mainTexture = mainTexture; }
+
+        friend class Camera;
+    };
+}
+
+/*
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
@@ -63,3 +123,4 @@ typedef typename concat<TYPE_LIST, Engine::Material>::type TypeListMaterial;
 #define TYPE_LIST TypeListMaterial
 
 #endif
+*/

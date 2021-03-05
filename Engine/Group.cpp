@@ -1,3 +1,17 @@
+#include <Group.hpp>
+
+using namespace std;
+using namespace Engine;
+
+Group::Group() {
+
+}
+
+Group::~Group() {
+
+}
+
+/*
 #include <Common/Component.hpp>
 #include <Common/GameObject.hpp>
 #include <Common/Scene.hpp>
@@ -23,3 +37,4 @@ Component::~Component() {
         gameObject->components.erase(GetType(this)->GetName());
     }
 }
+*/

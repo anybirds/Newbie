@@ -1,4 +1,11 @@
-#ifndef GAMEOBJECT_H
+#pragma once
+
+#include <string>
+#include <unordered_map> 
+
+#include <Entity.hpp>
+
+/*#ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
 #include <string>
@@ -63,3 +70,4 @@ typedef typename concat<TYPE_LIST, Engine::GameObject>::type TypeListGameObject;
 #define TYPE_LIST TypeListGameObject
 
 #endif
+*/

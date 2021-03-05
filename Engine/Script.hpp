@@ -1,25 +1,17 @@
-#ifndef SCRIPT_H
-#define SCRIPT_H
+#pragma once
 
 #include <unordered_set>
-#include <engine_global.hpp>
+
+#include <EngineExport.hpp>
+#include <Entity.hpp>
 
 namespace Engine {
-    class ENGINE_EXPORT Script {
-    private:
-        static std::unordered_set<Script *> scriptset;
-
+    /*
+    Base class of all user-defined scripts
+    */
+    class ENGINE_EXPORT Script : public Entity {
     public:
-        static void Start();
-        static void Update();
-
-    public:
-        Script();
-        virtual ~Script();
-
-        virtual void OnStart() {}
-        virtual void OnUpdate() {}
+        virtual void Start() {}
+        virtual void Update() {}
     };
 }
-
-#endif

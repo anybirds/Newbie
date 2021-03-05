@@ -1,26 +1,19 @@
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+#pragma once 
 
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include <Common/Component.hpp>
-
-#include <engine_global.hpp>
+#include <EngineExport.hpp>
+#include <Entity.hpp>
 
 namespace Engine {	
 
-    SER_DECL(ENGINE_EXPORT, Transform)
-
-    void ENGINE_EXPORT Destroy(Transform *transform);
-
     /*
-    GameObject's position, rotation, scale and hierarchical parent information.
+    Represents a single frame in 3D space that has position, rotation, scale and hierarchical parent information.
     */
-    class ENGINE_EXPORT Transform final : public Component {
-        TYPE_DECL(Transform)
-
+    class ENGINE_EXPORT Transform final : public Entity {
+    private:
         glm::vec3 localPosition;
         glm::quat localRotation;
         glm::vec3 localScale;
@@ -35,15 +28,13 @@ namespace Engine {
         void PropagateUpdate();
 
     public:
-        Transform(const std::string &name, Type *type = Transform::type);
+        virtual void Init() override;
 
-        virtual void OnInit() override;
-
-        GET(glm::vec3, LocalPosition, localPosition)
-        GET(glm::quat, LocalRotation, localRotation)
-        GET(glm::vec3, LocalScale, localScale)
-        GET(glm::vec3, LocalEulerAngles, localEulerAngles)
-        GET(Transform *, Parent, parent)
+        const glm::vec3 &GetLocalPosition() const { return localPosition; }
+        const glm::quat &GetLocalRotation() const { return localRotation; }
+        const glm::vec3 &GetLocalScale() const { return localScale; }
+        const glm::vec3 &GetLocalEulerAngles() const { return localEulerAngles; }
+        Transform *GetParent() const { return parent; }
 
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;
@@ -65,9 +56,3 @@ namespace Engine {
         friend void Destroy(Transform *);
 	};
 }
-
-typedef typename concat<TYPE_LIST, Engine::Transform>::type TypeListTransform;
-#undef TYPE_LIST
-#define TYPE_LIST TypeListTransform
-
-#endif

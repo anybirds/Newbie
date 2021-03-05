@@ -1,3 +1,39 @@
+#pragma once
+
+#include <GL/glew.h>
+
+#include <EngineExport.hpp>
+#include <Resource.hpp>
+
+namespace Engine {
+    
+    class Model;
+
+    /*
+    Represents a wireframe that exists in the object space. 
+    */
+    class ENGINE_EXPORT Mesh : public Resource {
+    private:
+        Model *model;
+        int index;
+
+		unsigned vcnt;
+		unsigned icnt;
+
+		GLuint vao;
+		GLuint vbo;
+		GLuint ebo;
+
+    public:
+        virtual ~Mesh() override;
+
+        virtual void Init() override;
+
+        friend class Camera;
+    };
+}
+
+/*
 #ifndef MESH_H
 #define MESH_H
 
@@ -13,12 +49,6 @@ namespace Engine {
 
     SER_DECL(ENGINE_EXPORT, Mesh)
 
-    /*
-	Represents a wireframe that exists in the object space. 
-	Users must define a MeshDetail object and pass it as an argument in order to create a Mesh.
-    Mesh object can consist points in 2D and 3D space,
-	can have multiple attributes for each vertex and can represent indexed wireframe. 
-	*/
     class ENGINE_EXPORT Mesh final : public Resource {
         TYPE_DECL(Mesh)
 
@@ -48,3 +78,4 @@ typedef typename concat<TYPE_LIST, Engine::Mesh>::type TypeListMesh;
 #define TYPE_LIST TypeListMesh
 
 #endif
+*/

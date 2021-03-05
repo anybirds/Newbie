@@ -1,31 +1,24 @@
 #include <iostream>
 
-#include <SOIL/SOIL.h>
+#include <SOIL2/SOIL2.h>
 
-#include <Common/Debug.hpp>
 #include <Graphics/Texture.hpp>
 
 using namespace std;
-using namespace Engine;
+using namespace Engine;`
 
-namespace Engine {
-    TYPE_DEF(Texture)
-    SER_DEF(Texture, Resource,
-    MEMBER_SER | MEMBER_SHOW, std::string, path
-    )
+Texture::~Texture() {
+    glDeleteTextures(1, &id);
+    /*
+    Resource::OnDestroy();
+    */
 }
 
-Texture::Texture(const string &name, Type *type) : Resource(name, type) {
-
-}
-
-void Texture::OnInit() {
+void Texture::Init() {
     int width, height, channel;
     unsigned char *image = SOIL_load_image(path.c_str(), &width, &height, &channel, SOIL_LOAD_AUTO);
     if (!image) {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " cannot load image file: " << path << '\n';
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << path << '\n';
         throw exception();
     }
 
@@ -51,11 +44,7 @@ void Texture::OnInit() {
 
     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
     SOIL_free_image_data(image);
-
+    /*
     Resource::OnInit();
-}
-
-void Texture::OnDestroy() {
-    glDeleteTextures(1, &id);
-    Resource::OnDestroy();
+    */
 }

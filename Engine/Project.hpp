@@ -1,3 +1,17 @@
+#pragma once
+
+#include <EngineExport.hpp>
+
+namespace Engine {
+    /*
+    Static class that manages project loading and saving. 
+    Project should manage custom module(.dll) loading and unloading
+    */
+    class ENGINE_EXPORT Project final {
+
+    };
+}
+/*
 #ifndef PROJECT_H
 #define PROJECT_H
 
@@ -11,12 +25,6 @@ namespace Engine {
     class Scene;
     class Resource;
 
-    /*
-    Static class that manages project loading and saving.
-
-    TODO: Project should manage custom module(.dll) loading and unloading,
-    which would involve clearing all Types from the custom module.
-    */
     class ENGINE_EXPORT Project final {
     private:
         static std::string path;
@@ -34,3 +42,4 @@ namespace Engine {
     };
 }
 #endif
+*/

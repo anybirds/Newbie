@@ -1,3 +1,4 @@
+/*
 #include <fstream>
 #include <GL/glew.h>
 
@@ -194,3 +195,4 @@ void Scene::Save() {
 
     sfs << js.dump(4);
 }
+*/

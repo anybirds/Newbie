@@ -1,42 +1,29 @@
-#include <map>
+#include <iostream>
 
-#include <Common/Project.hpp>
 #include <Graphics/Model.hpp>
 
 using namespace std;
 using namespace Assimp;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(Model)
-
-    SER_DEF(Model, Resource,
-    MEMBER_SER | MEMBER_SHOW, std::string, path
-    )
+Model::~Model() {
+    delete importer;
+    /*
+    loaded = false;
+    */
 }
 
-bool Model::sceneLoad;
-
-Model::Model(const std::string &name, Type *type) : Resource(name, type) {
-
-}
-
-void Model::OnInit() {
+void Model::Init() {
     importer = new Assimp::Importer();
     const aiScene *scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " cannot open file: " << path << '\n';
-#endif
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << path << '\n';
         throw exception();
     }
 
+    /*
     loaded = true;
     // shouldLoad = false;
-}
-
-void Model::OnDestroy() {
-    delete importer;
-    loaded = false;
+    */
 }
