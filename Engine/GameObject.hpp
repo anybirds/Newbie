@@ -3,7 +3,13 @@
 #include <string>
 #include <unordered_map> 
 
+#include <EngineExport.hpp>
 #include <Entity.hpp>
+#include <Transform.hpp>
+
+namespace Engine {
+
+}
 
 /*#ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
@@ -25,10 +31,6 @@ namespace Engine {
 
     void ENGINE_EXPORT Destroy(GameObject *go);
 
-    /*
-    An atraction of a gameobject in the scene.
-    Has components that can describe the gameobject behavior.
-    */
     class ENGINE_EXPORT GameObject final : public Object {
         TYPE_DECL(GameObject)
 

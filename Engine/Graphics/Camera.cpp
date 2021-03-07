@@ -1,9 +1,9 @@
+#include <iostream>
 #include <glm/gtx/transform.hpp>
 
-#include <Common/Debug.hpp>
-#include <Common/GameObject.hpp>
-#include <Common/Scene.hpp>
-#include <Common/Transform.hpp>
+#include <GameObject.hpp>
+#include <Scene.hpp>
+#include <Transform.hpp>
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
@@ -13,39 +13,7 @@ using namespace glm;
 using namespace std;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(Camera)
-    SER_DEF(Camera, Component,
-    MEMBER_SER | MEMBER_SHOW, bool, orthographic,
-    MEMBER_SER | MEMBER_SHOW, float, fovy,
-    MEMBER_SER | MEMBER_SHOW, float, width,
-    MEMBER_SER | MEMBER_SHOW, float, height,
-    MEMBER_SER | MEMBER_SHOW, float, near,
-    MEMBER_SER | MEMBER_SHOW, float, far,
-    MEMBER_SER | MEMBER_SHOW, float, left,
-    MEMBER_SER | MEMBER_SHOW, float, right,
-    MEMBER_SER | MEMBER_SHOW, float, bottom,
-    MEMBER_SER | MEMBER_SHOW, float, top
-    )
-}
-
-unordered_set<Renderer *> Camera::rendset;
-
-Camera *Camera::GetMainCamera() {
-    return Find<SceneSetting>("RenderSetting")->GetMainCamera();
-}
-
-void Camera::SetMainCamera(Camera *camera) {
-    Find<SceneSetting>("RenderSetting")->SetMainCamera(camera);
-}
-
-Camera::Camera(const std::string &name, Type *type) : Component(name, type) {
-
-}
-
-Camera::~Camera() {
-
-}
+Camera *Camera::mainCamera;
 
 void Camera::ComputeNormalization() {
     if (orthographic) {
@@ -55,7 +23,7 @@ void Camera::ComputeNormalization() {
     }
 }
 
-void Camera::OnInit() {
+void Camera::Init() {
     ComputeNormalization();
 }
 

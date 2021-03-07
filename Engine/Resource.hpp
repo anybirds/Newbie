@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <Entity.hpp>
 
 namespace Engine {
@@ -9,6 +11,9 @@ namespace Engine {
     class ENGINE_EXPORT Resource : public Entity {
         
     };
+
+    void to_json(nlohmann::json &js, const shared_ptr<Resource> &resource);
+    void from_json(nlohmann::json &js, shared_ptr<Resource> &resource);
 }
 
 /*

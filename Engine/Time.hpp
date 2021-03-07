@@ -1,7 +1,6 @@
-#ifndef TIME_H
-#define TIME_H
+#pragma once
 
-#include <engine_global.hpp>
+#include <EngineExport.hpp>
 
 namespace Engine {
     /*
@@ -9,17 +8,19 @@ namespace Engine {
 	*/
     class ENGINE_EXPORT Time final {
 	public:
+        static Time &GetInstance() { static Time time; return time; }
         static void Init();
 		static void Tick();
-        static float DeltaTime() { return static_cast<float>(dt); }
+        static float DeltaTime() { return static_cast<float>(GetInstance().dt); }
 
 	private:
-        static double dt;
-        static double prev;
+        Time() {}
+        
+        double dt;
+        double prev;
 
 	public:
-        Time() = delete;
+        Time(const Time &) = delete;
+        void operator=(const Time &) = delete;
 	};
 }
-
-#endif

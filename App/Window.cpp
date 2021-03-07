@@ -5,7 +5,10 @@
 using namespace std;
 
 Window::Window(const std::string &name) {
-    glfwInit();
+    if (!glfwInit()) {
+        cerr << '[' << __FUNCTION__ << ']' << " glfw init failed."  << '\n';
+        throw exception();
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -17,23 +20,35 @@ Window::Window(const std::string &name) {
     height = mode->height;
 
     window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
+    if (!window) {
+        cerr << '[' << __FUNCTION__ << ']' << " window creation failed."  << '\n';
+        throw exception();
+    }
     glfwMakeContextCurrent(window);
     glfwMaximizeWindow(window);
 }
 
 Window::Window(const std::string &name, int width, int height)
 	: name(name), width(width), height(height) {
-    glfwInit();
+    if (!glfwInit()) {
+        cerr << '[' << __FUNCTION__ << ']' << " glfw init failed."  << '\n';
+        throw exception();
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    this->window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
-	glfwMakeContextCurrent(this->window);
+    window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
+    if (!window) {
+        cerr << '[' << __FUNCTION__ << ']' << " window creation failed."  << '\n';
+        throw exception();
+    }
+	glfwMakeContextCurrent(window);
 }
 
 Window::~Window() {
 	glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 bool Window::ShouldClose() {
