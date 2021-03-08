@@ -1,75 +1,81 @@
 #pragma once
 
 #include <string>
-#include <unordered_map> 
+#include <vector>
 
-#include <EngineExport.hpp>
 #include <Entity.hpp>
-#include <Transform.hpp>
+#include <Type.hpp>
+#include <Script.hpp>
+#include <Graphics/Renderer.hpp>
 
 namespace Engine {
-
-}
-
-/*#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
-
-#include <string>
-#include <typeinfo>
-#include <unordered_map>
-
-#include <Common/Object.hpp>
-#include <Common/Transform.hpp>
-
-#include <engine_global.hpp>
-
-namespace Engine {
-
+    
+    class Group;
     class Component;
+    class Transform;
 
-    SER_DECL(ENGINE_EXPORT, GameObject)
-
-    void ENGINE_EXPORT Destroy(GameObject *go);
-
-    class ENGINE_EXPORT GameObject final : public Object {
-        TYPE_DECL(GameObject)
-
-    public:
-        typedef std::unordered_map<std::string, Component *> ComponentMap;
+    /*
+    Abstraction of an object in the scene.
+    */
+    class ENGINE_EXPORT GameObject final : public Entity {
+        TYPE(GameObject);
 
     private:
-        PROPERTY(Transform *, Transform, transform)
-        ComponentMap components;
-
+        bool enabled;
+        std::string name;
+        Group *group;
+        Transform *transform;
+        std::vector<Component *> components;
+    
     public:
-        GameObject(const std::string &name, Type *type = GameObject::type);
-        virtual ~GameObject() override;
+        ~GameObject();
 
-        const ComponentMap &GetComponents() { return components; }
+        bool IsEnabled() const { return enabled; }
+        const std::string &GetName() const { return name; }
+        Group *GetGroup() const { return group; }
 
-        template <typename T>
-        T *GetComponent() const;
-        template <typename T>
-        T *AddComponent();
+        void SetEnabled() { enabled = true; }
+        void SetName(const std::string &name) { this->name = name; }
 
-        friend class Component;
-        friend void Destroy(GameObject *);
+        template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
+        T *GetComponent() const {
+            for (Component *component : components) {
+                T *t = dynamic_cast<T *>(component);
+                if (t && !(t->IsRemoved())) {
+                    return t;
+                }
+            }
+            return nullptr;
+        }
+        template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
+        T *AddComponent() const {
+            T *component = new T();
+            component->gameObject = this;
+            components.push_back(component);
+            if (std::is_base_of_v<Renderer, T>) {
+                group->renderers.push_back(component);   
+            } else if (std::is_base_of_v<Script, T>) {
+                group->scripts.push_back(component);
+            }
+            return component;
+        }
+        bool RemoveComponent(Component *component) const {
+            component->SetRemoved();
+            return true;
+        }
+        template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
+        bool RemoveComponent() const {
+            for (Component *component : components) {
+                T *t = dynamic_cast<T *>(component);
+                if (t && !(t->IsRemoved())) {
+                    t->SetRemoved();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        friend class Group;
+        friend class Scene;
     };
-
-    template <typename T>
-    T *GameObject::GetComponent() const {
-
-    }
-
-    template <typename T>
-    T *GameObject::AddComponent() {
-
-    }
 }
-
-typedef typename concat<TYPE_LIST, Engine::GameObject>::type TypeListGameObject;
-#undef TYPE_LIST
-#define TYPE_LIST TypeListGameObject
-
-#endif
-*/

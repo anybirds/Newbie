@@ -1,9 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <unordered_map>
 
 #include <Project.hpp>
-#include <Resource.hpp>
 #include <Scene.hpp>
 #include <Type.hpp>
 
@@ -46,8 +44,8 @@ bool Project::Load(const string &name) {
     project.init();
 
     // open json file
-    ifstream pfs(name);
-    if (pfs.fail()) {
+    ifstream fs(name);
+    if (fs.fail()) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << name << '\n';
         return false;
     }
@@ -55,10 +53,10 @@ bool Project::Load(const string &name) {
     try {
         // read json object
         json js;
-        pfs >> js;
+        fs >> js;
         
         // read project setting
-        ProjectSetting::type->Deserialize(js["ProjectSetting"], project.setting);
+        ProjectSetting::type->Deserialize(js[ProjectSetting::type->GetName()], project.setting);
         
         // read scenes
         project.scenes = js["Scene"];
@@ -92,8 +90,8 @@ bool Project::Save() {
     Project &project = Project::GetInstance();
 
     // open json file
-    ofstream pfs(project.name);
-    if (pfs.fail()) {
+    ofstream fs(project.name);
+    if (fs.fail()) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << project.name << '\n';
         return false;
     }
@@ -102,7 +100,7 @@ bool Project::Save() {
         json js;
         
         // write project setting
-        ProjectSetting::type->Serialize(js["ProjectSetting"], project.setting);
+        ProjectSetting::type->Serialize(js[ProjectSetting::type->GetName()], project.setting);
 
         // write scenes
         js["Scene"] = project.scenes;
@@ -114,15 +112,13 @@ bool Project::Save() {
                 delete it->second;
                 it = project.assets.erase(it);
             } else {
+                Type *type = it->second->GetType();
+                type->Serialize(assets[type->GetName()][to_string(it->first)], it->second);
                 it++;
             }
         }
-        for (auto &p : project.assets) {
-            Type *type = p.second->GetType();
-            type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
-        }
         
-        pfs << js;
+        fs << js;
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << project.name << '\n';
         return false;

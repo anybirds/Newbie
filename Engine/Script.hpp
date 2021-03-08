@@ -2,14 +2,13 @@
 
 #include <unordered_set>
 
-#include <EngineExport.hpp>
-#include <Entity.hpp>
+#include <Component.hpp>
 
 namespace Engine {
     /*
-    Base class of all user-defined scripts
+    Abstract base class of all user-defined scripts
     */
-    class ENGINE_EXPORT Script : public Entity {
+    class ENGINE_EXPORT Script : public Component {
     public:
         virtual void Start() {}
         virtual void Update() {}

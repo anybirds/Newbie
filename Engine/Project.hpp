@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include <nlohmann/json.hpp>
 
-#include <EngineExport.hpp>
 #include <Entity.hpp>
 #include <Asset.hpp>
 #include <Type.hpp>
@@ -96,7 +95,7 @@ namespace Engine {
             }
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
-        T *GetAsset(uint64_t serial) {
+        T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);
             if (it != assets.end() && !(it->second->IsRemoved())) {
                 return dynamic_cast<T *>(*(it->second));

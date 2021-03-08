@@ -5,14 +5,17 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include <EngineExport.hpp>
-#include <Entity.hpp>
+#include <Component.hpp>
+#include <Type.hpp>
 
 namespace Engine {	
 
     /*
     Represents a single frame in 3D space that has position, rotation, scale and hierarchical parent information.
     */
-    class ENGINE_EXPORT Transform final : public Entity {
+    class ENGINE_EXPORT Transform final : public Component {
+        TYPE(Transform)
+
     private:
         glm::vec3 localPosition;
         glm::quat localRotation;

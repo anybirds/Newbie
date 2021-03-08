@@ -1,199 +1,151 @@
-
-/*
+#include <iostream>
 #include <fstream>
-#include <GL/glew.h>
 
-#include <nlohmann/json.hpp>
+#include <Project.hpp>
+#include <Group.hpp>
+#include <GameObject.hpp>
+#include <Component.hpp>
+#include <Scene.hpp>
+#include <Type.hpp>
 
-#include <Common/Component.hpp>
-#include <Common/Debug.hpp>
-#include <Common/GameObject.hpp>
-#include <Common/Project.hpp>
-#include <Common/Resource.hpp>
-#include <Common/Scene.hpp>
-#include <Graphics/Camera.hpp>
-#include <Graphics/Model.hpp>
-
-using namespace std;
 using json = nlohmann::json;
+using namespace std;
 using namespace Engine;
 
-namespace Engine {
-    TYPE_DEF(SceneSetting)
-    SER_DEF(SceneSetting, Object,
-    MEMBER_SER | MEMBER_SHOW, Camera *, mainCamera
-    )
-
-    TYPE_DEF(Scene)
-    SER_DEF(Scene, Object,
-    MEMBER_SER | MEMBER_SHOW, std::string, path
-    )
-}
-
-SceneSetting::SceneSetting(const std::string &name, Type *type) : Object(name, type) {
-    Scene::curr->settingset.insert(this);
-}
-
-SceneSetting::~SceneSetting() {
-    Scene::curr->settingset.erase(this);
-}
-
-Scene *Scene::curr;
-
-Scene::Scene(const std::string &name, Type *type) : Object(name, type) {
-    // glew init
-    GLenum glew_error = glewInit();
-    if (glew_error != GLEW_OK) {
-        // Initializing GLEW failed
-        cout << '[' << __FUNCTION__ << ']' << " message: " << glewGetErrorString(glew_error) << '\n';
-        exit(1);
-    }
-
-    Project::sceneset.insert(this);
-}
-
-Scene::~Scene() {
-    Project::sceneset.erase(this);
-}
-
-void Scene::Clear() {
-    if (!IsValid(curr)) {
-        return;
-    }
-
-    unordered_set<SceneSetting *> settingset(curr->settingset);
-    unordered_set<GameObject *> goset(curr->goset);
-    unordered_set<Component *> compset(curr->compset);
-
-    for (SceneSetting *setting : settingset) {
-        delete setting;
-    }
-    for (GameObject *go : goset) {
-        delete go;
-    }
-    for (Component *comp : compset) {
-        delete comp;
-    }
-    curr = nullptr;
-}
-
 bool Scene::Load(const string &name) {
-    Scene *prev = curr;
-
-    Scene *scene = Find<Scene>(name);
-    curr = scene;
-
-    if (!IsValid(scene)) {
-        curr = prev;
-        return false;
-    }
-
-    // read json file
-    ifstream sfs(scene->GetPath());
-    if (sfs.fail()) {
-        curr = prev;
-        return false;
-    }
+    Scene &scene = Scene::GetInstance();
+    // close project
+    Scene::Close();
 
     try {
+        // get scene file path
+        const string &path = Project::GetInstance().GetScene(name);
+
+        // open json file
+        ifstream fs(name);
+        if (fs.fail()) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
+            return false;
+        }
+
+        // read json object
         json js;
-        sfs >> js;
-
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " read scene file: " << scene->GetPath() << " done ..." << endl;
-#endif
-
-        // pre-deserialization
-        for (json::iterator i = js.begin(); i != js.end(); i++) {
-            Type *type = Type::Find(i.key());
+        fs >> js;
+        
+        // read scene setting
+        SceneSetting::type->Deserialize(js[SceneSetting::type->GetName()], scene.setting);
+        
+        // read entities
+        json &entities = js["Entity"];
+        for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+            const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                type->Instantiate(j.key());
+                Entity *entity = type->Instantiate();
+                Entity::temp.insert({stoll(j.key()), entity});
             }
         }
-
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " pre-deserialization done ..." << endl;
-#endif
-
-        // deserialization
-        // mark all the resources used by makring shouldLoad to true
-        for (Resource *res : Project::resset) {
-            res->shouldLoad = false;
-        }
-
-        Resource::sceneLoad = true;
-        for (json::iterator i = js.begin(); i != js.end(); i++) {
-            Type *type = Type::Find(i.key());
+        for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+            const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                type->Deserialize(j.value(), Find<Object>(j.key()));
+                type->Deserialize(j.value(), Entity::temp.at(stoll(j.key())));
             }
         }
-        Resource::sceneLoad = false;
-
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " deserialization done ..." << endl;
-#endif
-
-         for (Resource *res : Project::resset) {
-             if (!res->loaded && res->shouldLoad) {
-                 // mark shouldLoad to true recursively (there should be no cyclic dependencies between resources)
-                 res->OnInit();
-             }
-         }
-         // remove all resources that are not in use (including Model, Shader ...)
-         for (Resource *res : Project::resset) {
-             if (res->loaded && !res->shouldLoad) {
-                 res->OnDestroy();
-             }
-         }
-
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " loading resource done ..." << endl;
-#endif
-
-        for (Component *comp : scene->compset) {
-            comp->OnInit();
-        }
-        for (GameObject *go : scene->goset) {
-            go->OnInit();
-        }
-        for (SceneSetting *setting : scene->settingset) {
-            setting->OnInit();
-        }
-
-#ifdef DEBUG
-        cout << '[' << __FUNCTION__ << ']' << " post-deserialization done ..." << endl;
-#endif
-    } catch (...) {
-        curr = prev;
+        Entity::temp.clear();
+    } catch(...) {
+        Scene::Close();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << name << '\n';
         return false;
     }
-
-
+    
+    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << name << " done.\n";
     return true;
 }
 
-void Scene::Save() {
-    if (!IsValid(Scene::curr)) {
-        return;
+bool Scene::Save() {
+    Scene &scene = Scene::GetInstance();
+    
+    // open json file
+    ofstream fs(scene.name);
+    if (fs.fail()) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << scene.name << '\n';
+        return false;
+    }
+    
+    try {
+        json js;
+
+        // write scene setting
+        SceneSetting::type->Serialize(js[SceneSetting::type->GetName()], scene.setting);
+
+        // write entities
+        json& entities = js["Entity"];
+        for (Group *group : scene.groups) {
+            Group::type->Serialize(
+                entities[Group::type->GetName()][to_string(reinterpret_cast<uint64_t>(group))], 
+                group);
+            for (auto i = group->gameObjects.begin(); i != group->gameObjects.end(); ) {
+                GameObject *gameObject = i->second;
+                if (gameObject->IsRemoved()) {
+                    delete gameObject;
+                    i = group->gameObjects.erase(i);
+                } else {
+                    GameObject::type->Serialize(
+                        entities[GameObject::type->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+                        gameObject);
+                    for (auto j = gameObject->components.begin(); j != gameObject->components.end(); ) {
+                        Component *component = *j;
+                        if (component->IsRemoved()) {
+                            delete component;
+                            j = gameObject->components.erase(j);
+                        } else {
+                            Type *type = component->GetType();
+                            type->Serialize(
+                                entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))], 
+                                component);
+                            j++;
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
+        
+        fs << js;
+    } catch(...) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << scene.name << '\n';
+        return false;
     }
 
-    ofstream sfs(Scene::curr->path);
-    json js;
-
-    for (SceneSetting *setting : Scene::curr->settingset) {
-        js["SceneSetting"][setting->GetName()] = *setting;
-    }
-
-    for (GameObject *go : Scene::curr->goset) {
-        js["GameObject"][go->GetName()] = *go;
-    }
-
-    for (Component *comp : Scene::curr->compset) {
-        Type *type = GetType(comp);
-        type->Serialize(js[type->GetName()][comp->GetName()], comp);
-    }
-
-    sfs << js.dump(4);
+    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << scene.name << "done.\n";
+    return true;
 }
-*/
+
+void Scene::Close() {
+    Scene &scene = Scene::GetInstance();
+    scene.name.clear();
+    delete scene.setting;
+    for (Group *group : scene.groups) {
+        delete group;
+    }
+    scene.groups.clear();
+}
+
+Group *Scene::AddGroup() {
+    Group *group = new Group();
+    groups.insert(group);
+    return group;
+}
+
+void Scene::RemoveGroup(Group *group) {
+    delete group;
+    groups.erase(group);
+}
+
+GameObject *Scene::GetGameObject(const string &name) {
+    for (Group *group : groups) {
+        if (GameObject *gameObject = group->GetGameObject(name)) {
+            return gameObject;
+        }
+    }
+    return nullptr;
+}

@@ -2,13 +2,15 @@
 
 #include <memory>
 
-#include <EngineExport.hpp>
 #include <Entity.hpp>
 
 namespace Engine {
 
     class Resource;
 
+    /*
+    Menifest to how to instantiate the Resource object.
+    */
     class ENGINE_EXPORT Asset : public Entity {
     private:
         uint64_t serial;
