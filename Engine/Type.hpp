@@ -7,6 +7,12 @@
 
 #include <EngineExport.hpp>
 
+#define TYPE(T) \
+    public: \
+    static Type *type; \
+    virtual Type *GetType() const override { return T::type; } \
+    private:
+    
 /*
 Serializing and deserializing possible for glm vector and matrix types
 */

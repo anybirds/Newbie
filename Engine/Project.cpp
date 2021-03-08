@@ -1,9 +1,3 @@
-#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-#include <Windows.h>
-#else
-#include <dlfcn.h>
-#endif
-
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
@@ -18,35 +12,56 @@ using namespace std;
 using namespace Engine;
 
 bool Project::Load(const string &name) {
+    Project &project = GetInstance();
+
+    // close project
+    Project::Close();
+
     // load shared library
-    
+#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    project.lib = LoadLibrary((name + ".dll").c_str());
+    if (!project.lib) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << name << '\n';
+        return false;
+    }
+    project.init = reinterpret_cast<func>(GetProcAddress(project.lib, "type_init"));
+    project.clear = reinterpret_cast<func>(GetProcAddress(project.lib, "type_clear"));
+#else
+    project.lib = dlopen((name + ".so").c_str(), RTLD_LAZY);
+    if (!project.lib) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << name << '\n';
+        return false;
+    }
+    project.init = reinterpret_cast<func>(dlsym(project.lib, "type_init"));
+    project.clear = reinterpret_cast<func>(dlsym(project.lib, "type_clear"));
+#endif    
+    if (!project.init) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_init function symbol: " << name << '\n';
+        return false;
+    }
+    if (!project.clear) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_clear function symbol: " << name << '\n';
+        return false;
+    }
+    project.init();
 
     // open json file
     ifstream pfs(name);
     if (pfs.fail()) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << name << '\n';
         return false;
     }
 
     try {
-        // clear project
-        Project::Clear();
-
         // read json object
         json js;
         pfs >> js;
-
-        Project &project = GetInstance();
         
         // read project setting
         ProjectSetting::type->Deserialize(js["ProjectSetting"], project.setting);
         
         // read scenes
-        json &scenes = js["Scene"];
-        for (json::iterator i = scenes.begin(); i != scenes.end(); i++) {
-            AScene *ascene = new AScene();
-            AScene::type->Deserialize(*i, ascene);
-            project.scenes.insert({ascene->name, ascene});
-        }
+        project.scenes = js["Scene"];
 
         // read assets
         json &assets = js["Asset"];
@@ -64,13 +79,12 @@ bool Project::Load(const string &name) {
             }
         }
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read project file: " << name << '\n';
-
-        Project::Clear();
+        Project::Close();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read project: " << name << '\n';
         return false;
     }
     
-    cerr << '[' << __FUNCTION__ << ']' << " read project file: " << name << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " read project: " << name << " done.\n";
     return true;
 }
 
@@ -80,6 +94,7 @@ bool Project::Save() {
     // open json file
     ofstream pfs(project.name);
     if (pfs.fail()) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << project.name << '\n';
         return false;
     }
 
@@ -90,34 +105,64 @@ bool Project::Save() {
         ProjectSetting::type->Serialize(js["ProjectSetting"], project.setting);
 
         // write scenes
-        json &scenes = js["Scene"];
-        for (auto &p : project.scenes) {
-            AScene::type->Serialize(scenes[p.first], p.second);
-        }
+        js["Scene"] = project.scenes;
 
         // write assets
         json &assets = js["Asset"];
-        // think about how to get the serialize function from the object.
+        for (auto it = project.assets.begin(); it != project.assets.end(); ) {
+            if (it->second->IsRemoved()) {
+                delete it->second;
+                it = project.assets.erase(it);
+            } else {
+                it++;
+            }
+        }
+        for (auto &p : project.assets) {
+            Type *type = p.second->GetType();
+            type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
+        }
         
         pfs << js;
     } catch(...) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << project.name << '\n';
         return false;
     }
 
+    cerr << '[' << __FUNCTION__ << ']' << " save project: " << project.name << "done.\n";
     return true;
 }
 
-void Project::Clear() {
-    Scene::Clear();
+void Project::Close() {
+    // close scene
+    Scene::Close();
+
+    // clear out members
     Project &project = GetInstance();
     project.name.clear();
     delete project.setting;
-    for (auto &p : project.scenes) {
-        delete p.second;
-    }
     project.scenes.clear();
     for (auto &p : project.assets) {
         delete p.second;
     }
     project.assets.clear(); 
+
+    // clear out lib and types
+    project.clear();
+#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    FreeLibrary((HMODULE)project.lib);
+#else
+    dlclose(project.lib);
+#endif
+}
+
+const string &Project::GetScene(const string &name) const {
+    return scenes.at(name).get<string>();
+}
+
+void Project::AddScene(const string &name, const string &path) {
+    scenes[name] = path;
+}
+
+void Project::RemoveScene(const string &name) {
+    scenes.erase(name);
 }

@@ -1,11 +1,52 @@
 #pragma once
 
+#include <string>
+#include <unordered_set>
+
+#include <EngineExport.hpp>
+#include <Entity.hpp>
+#include <Asset.hpp>
+#include <Type.hpp>
+
 namespace Engine {
+
+    class Camera;
+    class Group;
+
+    class ENGINE_EXPORT SceneSetting final : public Entity {
+        TYPE(SceneSetting)
+
+    private:
+        Camera *mainCamera;
+        
+    public:
+        Camera *GetMainCamera() const { return mainCamera; }
+        void SetMainCamera(Camera *camera) { mainCamera = camera; }
+    };
+
     /*
-    Scene is a unit of loading resources and groups.
+    Abstraction of a scene that has multiple Groups of GameObjects.
     */
     class ENGINE_EXPORT Scene final {
+    public:
+        static Scene &GetInstance() { static Scene scene; return scene; }  
+        static bool Load(const std::string &name);
+        static bool Save();
+        static void Close();
+
+    private:
+        Scene() {}
+
+        std::string name;
+        SceneSetting *setting;
+        std::unordered_set<Group *> groups;
         
+    public:
+        Scene(const Scene &) = delete;
+        void operator=(const Scene &) = delete;
+
+        Group *AddGroup();
+        void RemoveGroup(Group *group);
     };
 }
 

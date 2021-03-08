@@ -7,12 +7,22 @@
 
 namespace Engine {
     
+    class Type;
+
     /*
     Base class for all serializable types
     */
     class ENGINE_EXPORT Entity {
     public:
         static std::unordered_map<uint64_t, Entity *> temp;
+
+    private:
+        bool removed;
+
+    public:
+        bool IsRemoved() const { return removed; }
+        void SetRemoved() { removed = true; }
+        virtual Type *GetType() const = 0;
     };    
     
     void to_json(nlohmann::json &js, const Entity *entity);

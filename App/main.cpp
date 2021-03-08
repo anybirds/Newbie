@@ -10,6 +10,9 @@ using namespace glm;
 using namespace Engine;
 
 int main(int argc, char **argv) { 
+    // type init
+    type_init();
+    
     // get the name of the Project
     string name;
     for (const auto &file : filesystem::directory_iterator(".")) {
