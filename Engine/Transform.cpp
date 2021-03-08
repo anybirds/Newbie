@@ -18,11 +18,6 @@ void Transform::PropagateUpdate() {
     }
 }
 
-void Transform::Init() {
-    localRotation = quat(radians(localEulerAngles));
-    localToWorldMatrix = GetLocalToWorldMatrix();
-}
-
 mat4 Transform::GetLocalToWorldMatrix() const {
     if (!updated) {
         updated = true;

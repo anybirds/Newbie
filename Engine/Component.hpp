@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Entity.hpp>
+#include <IEnable.hpp>
 
 namespace Engine {
 
@@ -15,10 +16,10 @@ namespace Engine {
         GameObject *gameObject;
     
     public:
-        bool IsEnabled() const { return enabled; }
+        bool IsEnabled() const;
         GameObject *GetGameObject() const { return gameObject; }
 
-        void SetEnabled() { enabled = true; }
+        bool SetEnabled();
         void SetGameObject(GameObject *gameObject) { this->gameObject = gameObject; }
     };
 }

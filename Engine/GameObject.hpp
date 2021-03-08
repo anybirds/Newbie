@@ -5,8 +5,10 @@
 
 #include <Entity.hpp>
 #include <Type.hpp>
-#include <Script.hpp>
-#include <Graphics/Renderer.hpp>
+#include <Transform.hpp>
+#include <IBehavior.hpp>
+#include <IEnable.hpp>
+#include <IRender.hpp>
 
 namespace Engine {
     
@@ -21,7 +23,6 @@ namespace Engine {
         TYPE(GameObject);
 
     private:
-        bool enabled;
         std::string name;
         Group *group;
         Transform *transform;
@@ -30,11 +31,12 @@ namespace Engine {
     public:
         ~GameObject();
 
-        bool IsEnabled() const { return enabled; }
+        bool IsEnabled() const { return transform->IsEnabled(); }
         const std::string &GetName() const { return name; }
         Group *GetGroup() const { return group; }
+        Transform *GetTransform() const { return transform; }
 
-        void SetEnabled() { enabled = true; }
+        bool SetEnabled() { transform->SetEnabled(); return transform->IsEnabled(); }
         void SetName(const std::string &name) { this->name = name; }
 
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
@@ -48,20 +50,28 @@ namespace Engine {
             return nullptr;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
-        T *AddComponent() const {
+        T *AddComponent() {
             T *component = new T();
             component->gameObject = this;
-            components.push_back(component);
-            if (std::is_base_of_v<Renderer, T>) {
-                group->renderers.push_back(component);   
-            } else if (std::is_base_of_v<Script, T>) {
-                group->scripts.push_back(component);
+            components.push_back(component); 
+            if (std::is_base_of_v<IBehavior, T>) {
+                group->ibehaviors.push_back(component);
+            }
+            if (std::is_base_of_v<IEnable, T>) {
+                group->ienables.push_back(component);
+            }
+            if (std::is_base_of_v<IRender, T>) {
+                group->irenders.push_back(component);   
             }
             return component;
         }
         bool RemoveComponent(Component *component) const {
-            component->SetRemoved();
-            return true;
+            if (this == component->GetGameObject()) {
+                component->SetRemoved();
+                return true;
+            } else {
+                return false;
+            }
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
         bool RemoveComponent() const {

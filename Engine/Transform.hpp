@@ -7,6 +7,7 @@
 #include <EngineExport.hpp>
 #include <Component.hpp>
 #include <Type.hpp>
+#include <IEnable.hpp>
 
 namespace Engine {	
 
@@ -31,8 +32,6 @@ namespace Engine {
         void PropagateUpdate();
 
     public:
-        virtual void Init() override;
-
         const glm::vec3 &GetLocalPosition() const { return localPosition; }
         const glm::quat &GetLocalRotation() const { return localRotation; }
         const glm::vec3 &GetLocalScale() const { return localScale; }

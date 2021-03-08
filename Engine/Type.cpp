@@ -31,6 +31,10 @@ namespace glm {
         };
     }
 
+    void to_json(json &js, const glm::quat &q) {
+        js = json{q.x, q.y, q.z, q.w};
+    }
+
     void from_json(const json &js, glm::vec3 &v) {
         v = vec3(js[0].get<float>(), js[1].get<float>(), js[2].get<float>());
     }
@@ -54,6 +58,10 @@ namespace glm {
         js[2][0].get<float>(), js[2][1].get<float>(), js[2][2].get<float>(), js[2][3].get<float>(),
         js[3][0].get<float>(), js[3][1].get<float>(), js[3][2].get<float>(), js[3][3].get<float>()
         );
+    }
+
+    void from_json(const json &js, glm::quat &q) {
+        q = quat(js[0].get<float>(), js[1].get<float>(), js[2].get<float>(), js[3].get<float>());
     }
 }
 

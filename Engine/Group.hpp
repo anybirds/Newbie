@@ -10,24 +10,29 @@
 namespace Engine {
 
     class GameObject;
-    class Renderer;
-    class Script;
+    class IBehavior;
+    class IEnable;
+    class IRender;
 
+    /*
+    Unit of destruction. 
+    */
     class ENGINE_EXPORT Group final : public Entity {
         TYPE(Group)
 
     private:
         std::unordered_map<std::string, GameObject *> gameObjects;
         std::vector<GameObject *> garbages;
-        std::vector<Renderer *> renderers;
-        std::vector<Script *> scripts;
+        std::vector<IBehavior *> ibehaviors;
+        std::vector<IEnable *> ienables;
+        std::vector<IRender *> irenders;
 
     public:
         ~Group();
 
         GameObject *GetGameObject(const std::string &name) const;
         GameObject *AddGameObject(const std::string &name);
-        bool RemoveGameObject(const std::string &name);
+        bool RemoveGameObject(const std::string &name) const;
 
         friend class GameObject;
         friend class Scene;

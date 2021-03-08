@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
 #include <EngineExport.hpp>
@@ -21,10 +22,12 @@ namespace glm {
     void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::vec4 &v);
     void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::mat3 &m);
     void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::mat4 &m);
+    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::quat &q);
     void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::vec3 &v);
     void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::vec4 &v);
     void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::mat3 &m);
     void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::mat4 &m);
+    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::quat &q);
 }
 
 namespace Engine {
