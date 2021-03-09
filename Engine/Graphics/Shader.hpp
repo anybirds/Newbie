@@ -3,68 +3,43 @@
 #include <string> 
 #include <GL/glew.h>
 
-#include <EngineExport.hpp>
+#include <Asset.hpp>
 #include <Resource.hpp>
+#include <Type.hpp>
 
 namespace Engine {
+
+    class ENGINE_EXPORT AShader : public Asset {
+        TYPE(AShader)
+
+    private:
+        std::string path;
+        uint32_t shaderType;
+
+    public:
+        virtual std::shared_ptr<Resource> GetResource() override;
+        const std::string &GetPath() const { return path; }
+        uint32_t GetShaderType() const { return shaderType; }
+
+        void SetPath(const std::string &path) { this->path = path; }
+        void SetShaderType(uint32_t shaderType) { this->shaderType = shaderType; }
+    };
+
     class ENGINE_EXPORT Shader : public Resource {
     private:
         GLuint id;
-        std::string path;
-        std::string shaderType;
         
     public:
-        virtual ~Shader() override;
-        
-        virtual void Init() override;
+        enum { VERTEX = GL_VERTEX_SHADER, FRAGMENT = GL_FRAGMENT_SHADER };
 
-        const std::string &GetPath() const { return path; }
-        const std::string &GetShaderType() const { return shaderType; }
+        Shader(AShader *ashader);
+        virtual ~Shader();
 
-        void SetPath(const std::string &path) { this->path = path; }
-        void SetShaderType(const std::string &shaderType) { this->shaderType = shaderType; }
+        virtual void Apply() override;
+
+        const std::string &GetPath() const { AShader *ashader = (AShader *)asset; return ashader->GetPath(); }
+        uint32_t GetShaderType() const { AShader *ashader = (AShader *)asset; return ashader->GetShaderType(); }
 
         friend class Material;
     };
 }
-
-/*
-#ifndef SHADER_H
-#define SHADER_H
-
-#include <GL/glew.h>
-
-#include <Common/Resource.hpp>
-
-#include <engine_global.hpp>
-
-namespace Engine {
-
-    SER_DECL(ENGINE_EXPORT, Shader)
-
-    class ENGINE_EXPORT Shader final : public Resource {
-        TYPE_DECL(Shader)
-
-        PROPERTY(std::string, Path, path)
-        PROPERTY_GET(std::string, ShaderType, shaderType)
-
-    private:
-        GLuint id;
-
-    public:
-        Shader(const std::string &name, Type *type = Shader::type);
-
-        virtual void OnInit() override;
-        virtual void OnDestroy() override;
-
-        friend class Material;
-    };
-}
-
-typedef typename concat<TYPE_LIST, Engine::Shader>::type TypeListShader;
-#undef TYPE_LIST
-#define TYPE_LIST TypeListShader
-
-
-#endif
-*/

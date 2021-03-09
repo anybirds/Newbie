@@ -1,22 +1,19 @@
 #pragma once
 
+#include <gl/glew.h>
 #include <glm/glm.hpp>
 
-#include <EngineExport.hpp>
-#include <Entity.hpp>
+#include <Component.hpp>
+#include <Type.hpp>
+#include <IRender.hpp>
 
 namespace Engine {
     /*
     Featured by its normalization matrix.
     Specify camera properties that affect the normalization matrix.
     */
-    class ENGINE_EXPORT Camera : public Entity {
-    private:
-        static Camera *mainCamera;
-    
-    public:
-        static const Camera *GetMainCamera() { return mainCamera; }
-        static void SetMainCamera(Camera *mainCamera) { Camera::mainCamera = mainCamera; }
+    class ENGINE_EXPORT Camera : public Component, public IRender {
+        TYPE(Camera)
 
     private:
         glm::mat4 normalization;
@@ -33,8 +30,6 @@ namespace Engine {
         float top;
     
     public:
-        virtual void Init() override;
-        
         void ComputeNormalization();
 
         bool IsOrthographic() const { return orthographic; }
@@ -46,6 +41,7 @@ namespace Engine {
         float GetLeft() const { return left; }
         float GetRight() const { return bottom; }
         float GetTop() const { return top; }
+        const glm::mat4 &GetNormalization() { return normalization; }
 
         void SetOrthographic() { orthographic = true; ComputeNormalization(); }
         void SetPerspective() { orthographic = false; ComputeNormalization(); }
@@ -59,7 +55,7 @@ namespace Engine {
         void SetTop(float top);
         void SetBottom(float bottom);
 
-        void Render();
+        virtual void Render() override;
 
         friend class Renderer;
     };

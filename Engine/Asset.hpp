@@ -14,10 +14,12 @@ namespace Engine {
     class ENGINE_EXPORT Asset : public Entity {
     private:
         uint64_t serial;
+
+    protected:
         std::weak_ptr<Resource> resource;
 
     public:
-        virtual std::weak_ptr<Resource> &GetResource() = 0;
+        virtual std::shared_ptr<Resource> GetResource() = 0;
 
         friend class Project;
     };

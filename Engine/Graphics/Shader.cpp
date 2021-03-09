@@ -7,28 +7,35 @@
 using namespace std;
 using namespace Engine;
 
-Shader::~Shader() {
-    glDeleteShader(id);
-    /*
-    loaded = false;
-    */
+shared_ptr<Resource> AShader::GetResource() {
+    shared_ptr<Resource> sp = make_shared<Shader>(this);
+    if (resource.expired()) {
+        resource = sp;
+    }
+    return sp;
 }
 
-void Shader::Init() {
-    if (shaderType == "vertex") {
-        id = glCreateShader(GL_VERTEX_SHADER);
-    } else if (shaderType == "fragment") {
-        id = glCreateShader(GL_FRAGMENT_SHADER);
-    }
+Shader::Shader(AShader *ashader) : Resource(ashader) {
+    Apply();
+}
+
+Shader::~Shader() {
+    glDeleteShader(id);
+}
+
+void Shader::Apply() {
+    glDeleteShader(id);
+
+    id = glCreateShader(GetShaderType());
 
     if (!id) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << endl;
         throw exception();
     }
 
-    ifstream file(path);
+    ifstream file(GetPath());
     if (!file.is_open()) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << path << endl;
+        cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << endl;
         glDeleteShader(id);
         throw exception();
     }
@@ -43,13 +50,8 @@ void Shader::Init() {
     GLint status = 0;
     glGetShaderiv(id, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << path << endl;
+        cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << GetPath() << endl;
         glDeleteShader(id);
         throw exception();
     }
-
-    /*
-    loaded = true;
-    // shouldLoad = false;
-    */
 }

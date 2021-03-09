@@ -13,6 +13,7 @@ namespace Engine {
     class IBehavior;
     class IEnable;
     class IRender;
+    class IDraw;
 
     /*
     Unit of destruction. 
@@ -26,6 +27,7 @@ namespace Engine {
         std::vector<IBehavior *> ibehaviors;
         std::vector<IEnable *> ienables;
         std::vector<IRender *> irenders;
+        std::vector<IDraw *> idraws;
 
     public:
         ~Group();
@@ -36,5 +38,6 @@ namespace Engine {
 
         friend class GameObject;
         friend class Scene;
+        friend class Camera;
     };
 }

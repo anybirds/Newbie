@@ -5,20 +5,31 @@
 #include <Graphics/Texture.hpp>
 
 using namespace std;
-using namespace Engine;`
+using namespace Engine;
+
+shared_ptr<Resource> ATexture::GetResource() {
+    shared_ptr<Resource> sp = make_shared<Texture>(this);
+    if (resource.expired()) {
+        resource = sp;
+    }
+    return sp;
+}
+
+Texture::Texture(ATexture *atexture) : Resource(atexture) {
+    Apply();
+}
 
 Texture::~Texture() {
     glDeleteTextures(1, &id);
-    /*
-    Resource::OnDestroy();
-    */
 }
 
-void Texture::Init() {
+void Texture::Apply() {
+    glDeleteTextures(1, &id);
+
     int width, height, channel;
-    unsigned char *image = SOIL_load_image(path.c_str(), &width, &height, &channel, SOIL_LOAD_AUTO);
+    unsigned char *image = SOIL_load_image(GetPath().c_str(), &width, &height, &channel, SOIL_LOAD_AUTO);
     if (!image) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << path << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << GetPath() << '\n';
         throw exception();
     }
 
@@ -44,7 +55,4 @@ void Texture::Init() {
 
     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
     SOIL_free_image_data(image);
-    /*
-    Resource::OnInit();
-    */
 }

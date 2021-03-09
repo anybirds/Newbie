@@ -6,6 +6,18 @@
 using namespace std;
 using namespace Engine;
 
+shared_ptr<Resource> AMesh::GetResource() {
+    shared_ptr<Resource> sp = make_shared<Mesh>(this);
+    if (resource.expired()) {
+        resource = sp;
+    }
+    return sp;
+}
+
+Mesh::Mesh(AMesh *amesh) : Resource(amesh) {
+    Apply();
+}
+
 Mesh::~Mesh() {
     if (icnt > 0) {
         // indexed wireframe
@@ -14,21 +26,19 @@ Mesh::~Mesh() {
     // delete
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
-
-    /*
-    Resource::OnDestroy();
-    */
 }
 
-void Mesh::Init() {
-    /*
-    if (!model->loaded) {
-        model->OnInit();
+void Mesh::Apply() {
+    if (icnt > 0) {
+        // indexed wireframe
+        glDeleteBuffers(1, &ebo);
     }
-    */
+    // delete
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
 
-    const aiScene *scene = model->importer->GetScene();
-    aiMesh *aimesh = scene->mMeshes[index];
+    const aiScene *scene = GetModel()->importer->GetScene();
+    aiMesh *aimesh = scene->mMeshes[GetIndex()];
     unsigned base;
 
     unsigned acnt = 3;
@@ -122,8 +132,9 @@ void Mesh::Init() {
     cerr << '[' << __FUNCTION__ << ']'
         << "{vertex: " << vcnt << " attribute: " << acnt << " index: " << icnt << '}'
         <<" Mesh created." << endl;
+}
 
-    /*
-    Resource::OnInit();
-    */
+shared_ptr<Model> Mesh::GetModel() const { 
+    AMesh *amesh = (AMesh *)asset; 
+    return dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource()); 
 }

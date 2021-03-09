@@ -2,21 +2,37 @@
 
 #include <GL/glew.h>
 
-#include <EngineExport.hpp>
+#include <Asset.hpp>
 #include <Resource.hpp>
+#include <Type.hpp>
 
 namespace Engine {
     
+    class AModel;
     class Model;
 
+    class ENGINE_EXPORT AMesh : public Asset {
+        TYPE(AMesh)
+
+    private:
+        AModel *amodel;
+        uint32_t index;
+    
+    public:
+        virtual std::shared_ptr<Resource> GetResource() override;
+
+        AModel *GetModel() const { return amodel; }
+        uint32_t GetIndex() const { return index; }
+
+        void SetModel(AModel *amodel) { this->amodel = amodel; }
+        void SetIndex(uint32_t index) { this->index = index; }
+    };
+
     /*
-    Represents a wireframe that exists in the object space. 
+    Represents a wireframe in the object space.
     */
     class ENGINE_EXPORT Mesh : public Resource {
     private:
-        Model *model;
-        int index;
-
 		unsigned vcnt;
 		unsigned icnt;
 
@@ -25,57 +41,16 @@ namespace Engine {
 		GLuint ebo;
 
     public:
-        virtual ~Mesh() override;
+        Mesh(AMesh *amesh);
+        virtual ~Mesh();
+        
+        virtual void Apply() override;
 
-        virtual void Init() override;
+        unsigned GetVertexCount() const { return vcnt; }
+        unsigned GetFaceCount() const { return icnt / 3; }
+        std::shared_ptr<Model> GetModel() const;
+        uint32_t GetIndex() const { AMesh *amesh = (AMesh *)asset; return amesh->GetIndex(); }
 
-        friend class Camera;
+        friend class Renderer;
     };
 }
-
-/*
-#ifndef MESH_H
-#define MESH_H
-
-#include <GL/glew.h>
-
-#include <Common/Resource.hpp>
-
-#include <engine_global.hpp>
-
-namespace Engine {
-
-    class Model;
-
-    SER_DECL(ENGINE_EXPORT, Mesh)
-
-    class ENGINE_EXPORT Mesh final : public Resource {
-        TYPE_DECL(Mesh)
-
-	private:
-        Model *model;
-        int index;
-
-		unsigned vcnt;
-		unsigned icnt;
-
-		GLuint vao;
-		GLuint vbo;
-		GLuint ebo;
-		
-    public:
-        Mesh(const std::string &name, Type *type = Mesh::type);
-
-        virtual void OnInit() override;
-        virtual void OnDestroy() override;
-
-        friend class Camera;
-	};
-}
-
-typedef typename concat<TYPE_LIST, Engine::Mesh>::type TypeListMesh;
-#undef TYPE_LIST
-#define TYPE_LIST TypeListMesh
-
-#endif
-*/

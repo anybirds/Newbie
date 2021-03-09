@@ -8,28 +8,29 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
-Material::~Material() {
-    glDeleteProgram(program);
-    /*
-    Resource::OnDestroy();
-    */
+shared_ptr<Resource> AMaterial::GetResource() {
+    shared_ptr<Resource> sp = make_shared<Material>(this);
+    if (resource.expired()) {
+        resource = sp;
+    }
+    return sp;
 }
 
-void Material::Init() {
-    /*
-    if (!vertexShader->loaded) {
-        vertexShader->OnInit();
-    }
-    if (!fragmentShader->loaded) {
-        fragmentShader->OnInit();
-    }
-    if (mainTexture && !mainTexture->loaded) {
-        mainTexture->OnInit();
-    }
-    */
+Material::Material(AMaterial *amaterial) : Resource(amaterial) {
+    Apply();
+}
 
-    if (vertexShader->shaderType != "vertex" ||
-        fragmentShader->shaderType != "fragment") {
+Material::~Material() {
+    glDeleteProgram(program);
+}
+
+void Material::Apply() {
+    shared_ptr<Shader> vertexShader = GetVertexShader();
+    shared_ptr<Shader> fragmentShader = GetFragmentShader();
+    glDeleteProgram(program);
+
+    if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
+        fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
         cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch";
         throw std::exception();
     }
@@ -43,10 +44,6 @@ void Material::Init() {
     // sampler uniform values
     GLint location = glGetUniformLocation(program, "_MAIN_TEX");
     glUniform1i(location, 0);
-
-    /*
-    Resource::OnInit();
-    */
 }
 
 int Material::GetInteger(const char *name) const {
@@ -190,5 +187,20 @@ void Material::SetMatrixArray(const char *name, const mat4 *value, int length) {
 
 void Material::UseTextures() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mainTexture->id);
+    glBindTexture(GL_TEXTURE_2D, GetMainTexture()->id);
+}
+
+shared_ptr<Shader> Material::GetVertexShader() const {
+    AMaterial *amaterial = (AMaterial *)asset; 
+    return dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
+}
+
+shared_ptr<Shader> Material::GetFragmentShader() const {
+    AMaterial *amaterial = (AMaterial *)asset; 
+    return dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
+}
+
+shared_ptr<Texture> Material::GetMainTexture() const {
+    AMaterial *amaterial = (AMaterial *)asset; 
+    return dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());
 }

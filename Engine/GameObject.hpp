@@ -9,6 +9,7 @@
 #include <IBehavior.hpp>
 #include <IEnable.hpp>
 #include <IRender.hpp>
+#include <IDraw.hpp>
 
 namespace Engine {
     
@@ -62,6 +63,9 @@ namespace Engine {
             }
             if (std::is_base_of_v<IRender, T>) {
                 group->irenders.push_back(component);   
+            }
+            if (std::is_base_of_v<IDraw, T>) {
+                group->idraws.push_back(component);
             }
             return component;
         }
