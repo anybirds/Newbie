@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Entity.hpp>
-#include <IEnable.hpp>
 
 namespace Engine {
 
@@ -20,6 +19,5 @@ namespace Engine {
         GameObject *GetGameObject() const { return gameObject; }
 
         bool SetEnabled();
-        void SetGameObject(GameObject *gameObject) { this->gameObject = gameObject; }
     };
 }

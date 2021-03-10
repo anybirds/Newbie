@@ -80,8 +80,8 @@ void Camera::Render() {
     glCullFace(GL_BACK);
 
     for (IDraw *idraw : GetGameObject()->GetGroup()->idraws) {
-        Entity *entity = (Entity *)idraw;
-        if (!entity->IsRemoved()) {
+        Component *entity = (Component *)idraw;
+        if (!entity->IsRemoved() && entity->IsEnabled()) {
             idraw->Draw(this);
         }
     }

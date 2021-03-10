@@ -8,8 +8,11 @@ using namespace std;
 using namespace Engine;
 
 shared_ptr<Resource> ATexture::GetResource() {
-    shared_ptr<Resource> sp = make_shared<Texture>(this);
-    if (resource.expired()) {
+    shared_ptr<Resource> sp;
+    if (!(sp = resource.lock())) {
+        try {
+            sp = make_shared<Texture>(this);
+        } catch(...) { }
         resource = sp;
     }
     return sp;

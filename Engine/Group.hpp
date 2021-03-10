@@ -11,7 +11,6 @@ namespace Engine {
 
     class GameObject;
     class IBehavior;
-    class IEnable;
     class IRender;
     class IDraw;
 
@@ -22,10 +21,8 @@ namespace Engine {
         TYPE(Group)
 
     private:
-        std::unordered_map<std::string, GameObject *> gameObjects;
-        std::vector<GameObject *> garbages;
+        std::vector<GameObject *> gameObjects;
         std::vector<IBehavior *> ibehaviors;
-        std::vector<IEnable *> ienables;
         std::vector<IRender *> irenders;
         std::vector<IDraw *> idraws;
 
@@ -34,7 +31,6 @@ namespace Engine {
 
         GameObject *GetGameObject(const std::string &name) const;
         GameObject *AddGameObject(const std::string &name);
-        bool RemoveGameObject(const std::string &name) const;
 
         friend class GameObject;
         friend class Scene;

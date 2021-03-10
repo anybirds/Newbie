@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
+#include <functional>
 
 #include <Project.hpp>
 #include <Group.hpp>
 #include <GameObject.hpp>
+#include <Transform.hpp>
 #include <Component.hpp>
 #include <Scene.hpp>
 #include <Type.hpp>
@@ -79,35 +81,58 @@ bool Scene::Save() {
 
         // write entities
         json& entities = js["Entity"];
+        function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
+            Transform *transform = gameObject->GetTransform();
+            size_t j = 0;
+            for (size_t i=0; i<transform->children.size(); i++) {
+                GameObject *child = transform->children[i]->GetGameObject();
+                if (!child->IsRemoved()) {
+                    recurse(child);
+                    swap(transform->children[j], transform->children[i]);
+                    j++;
+                }
+            }
+            vector<Transform *> tempg(transform->children.begin() + j, transform->children.end());
+            transform->children.resize(j);
+
+            j = 0;
+            for (size_t i=0; i<gameObject->components.size(); i++) {
+                Component *component = gameObject->components[i];
+                if (!component->IsRemoved()) {
+                    Type *type = component->GetType();
+                    type->Serialize(
+                        entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))], 
+                        component);
+                    swap(gameObject->components[j], gameObject->components[i]);
+                    j++;
+                }
+            }
+            vector<Component *> tempc(gameObject->components.begin() + j, gameObject->components.end());
+            gameObject->components.resize(j);
+
+            GameObject::type->Serialize(
+                entities[GameObject::type->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+                gameObject);
+            transform->children.insert(transform->children.end(), tempg.begin(), tempg.end());
+            gameObject->components.insert(gameObject->components.end(), tempc.begin(), tempc.end());
+        };
         for (Group *group : scene.groups) {
+            size_t j = 0;
+            for (size_t i=0; i<group->gameObjects.size(); i++) {
+                GameObject *gameObject = group->gameObjects[i];
+                if (!gameObject->IsRemoved()) {
+                    recurse(gameObject);
+                    swap(group->gameObjects[j], group->gameObjects[i]);
+                    j++;
+                }
+            }
+            vector<GameObject *> temp(group->gameObjects.begin() + j, group->gameObjects.end());
+            group->gameObjects.resize(j);
+
             Group::type->Serialize(
                 entities[Group::type->GetName()][to_string(reinterpret_cast<uint64_t>(group))], 
                 group);
-            for (auto i = group->gameObjects.begin(); i != group->gameObjects.end(); ) {
-                GameObject *gameObject = i->second;
-                if (gameObject->IsRemoved()) {
-                    delete gameObject;
-                    i = group->gameObjects.erase(i);
-                } else {
-                    GameObject::type->Serialize(
-                        entities[GameObject::type->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
-                        gameObject);
-                    for (auto j = gameObject->components.begin(); j != gameObject->components.end(); ) {
-                        Component *component = *j;
-                        if (component->IsRemoved()) {
-                            delete component;
-                            j = gameObject->components.erase(j);
-                        } else {
-                            Type *type = component->GetType();
-                            type->Serialize(
-                                entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))], 
-                                component);
-                            j++;
-                        }
-                    }
-                    i++;
-                }
-            }
+            group->gameObjects.insert(group->gameObjects.end(), temp.begin(), temp.end());
         }
         
         fs << js;

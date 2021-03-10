@@ -8,8 +8,11 @@ using namespace std;
 using namespace Engine;
 
 shared_ptr<Resource> AShader::GetResource() {
-    shared_ptr<Resource> sp = make_shared<Shader>(this);
-    if (resource.expired()) {
+    shared_ptr<Resource> sp;
+    if (!(sp = resource.lock())) {
+        try {
+            sp = make_shared<Shader>(this);
+        } catch(...) { }
         resource = sp;
     }
     return sp;

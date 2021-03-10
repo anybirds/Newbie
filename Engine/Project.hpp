@@ -63,6 +63,7 @@ namespace Engine {
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
         
+        ProjectSetting *GetSetting() const { return setting; }
         const std::string &GetScene(const std::string &name) const;
         void AddScene(const std::string &name, const std::string &path);
         void RemoveScene(const std::string &name);
@@ -72,27 +73,6 @@ namespace Engine {
             asset->serial = setting->GetSerial();
             assets.insert({asset->serial, asset});
             return asset;
-        }
-        bool RemoveAsset(Asset *asset) {
-            if (asset->resource.expired()) {
-                asset->SetRemoved();
-                return true;
-            } else {
-                return false;
-            }
-        }
-        bool RemoveAsset(uint64_t serial) {
-            auto it = assets.find(serial);
-            if (it != assets.end()) {
-                if (it->second->resource.expired()) {
-                    it->second->SetRemoved();   
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {

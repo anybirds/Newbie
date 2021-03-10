@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <Entity.hpp>
 
@@ -14,13 +15,17 @@ namespace Engine {
     class ENGINE_EXPORT Asset : public Entity {
     private:
         uint64_t serial;
+        std::string name;
 
     protected:
         std::weak_ptr<Resource> resource;
 
     public:
         virtual std::shared_ptr<Resource> GetResource() = 0;
-
+        
+        const std::string &GetName() const { return name; }
+        void SetName(const std::string &name) { this->name = name; }
+        
         friend class Project;
     };
 

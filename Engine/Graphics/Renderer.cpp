@@ -1,3 +1,4 @@
+#include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -8,10 +9,19 @@
 #include <Graphics/Mesh.hpp>
 #include <Graphics/Material.hpp>
 
+using namespace std;
 using namespace glm;
 using namespace Engine;
 
 void Renderer::Draw(Camera *camera) {
+    if (!mesh) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing Mesh in GameObject:" << GetGameObject()->GetName() << '\n';
+        throw exception();
+    }
+    if (!material) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing Material in GameObject:" << GetGameObject()->GetName() << '\n';
+        throw exception();
+    }
     glBindVertexArray(mesh->vao);
 
     glUseProgram(material->program);

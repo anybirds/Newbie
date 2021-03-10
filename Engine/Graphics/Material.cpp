@@ -9,8 +9,11 @@ using namespace glm;
 using namespace Engine;
 
 shared_ptr<Resource> AMaterial::GetResource() {
-    shared_ptr<Resource> sp = make_shared<Material>(this);
-    if (resource.expired()) {
+    shared_ptr<Resource> sp;
+    if (!(sp = resource.lock())) {
+        try {
+            sp = make_shared<Material>(this);
+        } catch(...) { }
         resource = sp;
     }
     return sp;
@@ -27,12 +30,21 @@ Material::~Material() {
 void Material::Apply() {
     shared_ptr<Shader> vertexShader = GetVertexShader();
     shared_ptr<Shader> fragmentShader = GetFragmentShader();
+    if (!vertexShader) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material:" << GetName() << '\n';
+        throw exception();
+    }
+    if (!fragmentShader) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material:" << GetName() << '\n';
+        throw exception();
+    }
+
     glDeleteProgram(program);
 
     if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
         fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
         cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch";
-        throw std::exception();
+        throw exception();
     }
 
     // attach shaders and link

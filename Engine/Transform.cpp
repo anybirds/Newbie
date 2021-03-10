@@ -2,10 +2,22 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <Transform.hpp>
+#include <GameObject.hpp>
 
 using namespace std;
 using namespace glm;
 using namespace Engine;
+
+void Transform::SetRemoved() {
+    if (IsRemoved()) {
+        return;
+    }
+    Entity::SetRemoved();
+    GetGameObject()->SetRemoved();
+    for (Transform *t : children) {
+        t->SetRemoved();
+    }
+}
 
 void Transform::PropagateUpdate() {
     if (!updated) {
@@ -77,6 +89,11 @@ void Transform::SetPosition(const glm::vec3 &position) {
 void Transform::SetScale(const glm::vec3 &scale) {
     this->localScale = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * scale;
     PropagateUpdate();
+}
+
+void Transform::SetParent(Transform *parent) {
+    updated = false;
+    this->parent = parent;
 }
 
 void Transform::Rotate(const glm::vec3 &eulerAngles) {

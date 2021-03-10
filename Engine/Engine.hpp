@@ -16,3 +16,7 @@
 
 #include <Transform.hpp>
 #include <Script.hpp>
+
+#include <IBehavior.hpp>
+#include <IDraw.hpp>
+#include <IRender.hpp>

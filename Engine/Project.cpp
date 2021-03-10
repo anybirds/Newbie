@@ -89,6 +89,11 @@ bool Project::Load(const string &name) {
 bool Project::Save() {
     Project &project = Project::GetInstance();
 
+    // save scene
+    if (!Scene::Save()) {
+        return false;
+    }
+
     // open json file
     ofstream fs(project.name);
     if (fs.fail()) {

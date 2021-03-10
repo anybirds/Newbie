@@ -7,8 +7,11 @@ using namespace std;
 using namespace Engine;
 
 shared_ptr<Resource> AMesh::GetResource() {
-    shared_ptr<Resource> sp = make_shared<Mesh>(this);
-    if (resource.expired()) {
+    shared_ptr<Resource> sp;
+    if (!(sp = resource.lock())) {
+        try {
+            sp = make_shared<Mesh>(this);
+        } catch(...) { }
         resource = sp;
     }
     return sp;
@@ -29,6 +32,12 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Apply() {
+    shared_ptr<Model> model = GetModel();
+    if (!model) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh:" << GetName() << '\n';
+        throw exception();
+    }
+
     if (icnt > 0) {
         // indexed wireframe
         glDeleteBuffers(1, &ebo);
@@ -129,9 +138,7 @@ void Mesh::Apply() {
     delete[] attrib;
     delete[] idx;
 
-    cerr << '[' << __FUNCTION__ << ']'
-        << "{vertex: " << vcnt << " attribute: " << acnt << " index: " << icnt << '}'
-        <<" Mesh created." << endl;
+    cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }
 
 shared_ptr<Model> Mesh::GetModel() const { 

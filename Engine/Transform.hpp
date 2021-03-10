@@ -7,7 +7,6 @@
 #include <EngineExport.hpp>
 #include <Component.hpp>
 #include <Type.hpp>
-#include <IEnable.hpp>
 
 namespace Engine {	
 
@@ -32,11 +31,14 @@ namespace Engine {
         void PropagateUpdate();
 
     public:
+        virtual void SetRemoved() override;
+
         const glm::vec3 &GetLocalPosition() const { return localPosition; }
         const glm::quat &GetLocalRotation() const { return localRotation; }
         const glm::vec3 &GetLocalScale() const { return localScale; }
         const glm::vec3 &GetLocalEulerAngles() const { return localEulerAngles; }
         Transform *GetParent() const { return parent; }
+        const std::vector<Transform *> &GetChildren() const { return children; }
 
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;
@@ -51,10 +53,11 @@ namespace Engine {
         void SetPosition(const glm::vec3 &position);
         // void SetRotation(const glm::quat &rotation);
         void SetScale(const glm::vec3 &scale);
+        void SetParent(Transform *parent);
 
         void Rotate(const glm::vec3 &eulerAngles);
         void RotateAround(const glm::vec3 &axis, float angle);
 
-        friend void Destroy(Transform *);
+        friend class Scene;
 	};
 }

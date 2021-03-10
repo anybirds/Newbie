@@ -5,16 +5,21 @@
 using namespace Engine;
 
 bool Component::IsEnabled() const {
+    return enabled;
+}
+
+bool Component::SetEnabled() {
+    localEnabled = true;
+    Transform *transform = gameObject->GetTransform();
+    for ()
+    
+
     bool enabled = this->enabled;
     Transform *transform = gameObject->GetTransform();
     while (enabled && transform) {
         enabled = enabled && transform->enabled;
         transform = transform->GetParent();
     }
-    return enabled;
-}
-
-bool Component::SetEnabled() {
     enabled = true;
     return IsEnabled();
 }

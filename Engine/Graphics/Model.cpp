@@ -7,8 +7,11 @@ using namespace Assimp;
 using namespace Engine;
 
 shared_ptr<Resource> AModel::GetResource() {
-    shared_ptr<Resource> sp = make_shared<Model>(this);
-    if (resource.expired()) {
+    shared_ptr<Resource> sp;
+    if (!(sp = resource.lock())) {
+        try {
+            sp = make_shared<Model>(this);
+        } catch(...) { }
         resource = sp;
     }
     return sp;

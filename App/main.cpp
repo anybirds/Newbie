@@ -12,7 +12,7 @@ using namespace Engine;
 int main(int argc, char **argv) { 
     // type init
     type_init();
-    
+
     // get the name of the Project
     string name;
     for (const auto &file : filesystem::directory_iterator(".")) {
@@ -29,8 +29,9 @@ int main(int argc, char **argv) {
     }
     
     // create OpenGL context and Window
+    Window *window;
     try {
-        Window window(name);
+        window = new Window(name);
     } catch(...) {
         return 0;
     }
@@ -42,21 +43,21 @@ int main(int argc, char **argv) {
     
     // load the start Scene
     Project &project = Project::GetInstance();
-    if (!Scene::Load(project.setting.GetStartSceneName())) {
+    if (!Scene::Load(project.GetSetting()->GetStartSceneName())) {
         return 0;
     }
     
     // game loop
     Time::Init();
     Scene::Start();
-    while (!window.ShouldClose()) {
+    while (!window->ShouldClose()) {
         Time::Tick();
         
         Scene::Update();
         Scene::Render();
 
-		window.SwapBuffers();
-        window.PollEvents();
+		window->SwapBuffers();
+        window->PollEvents();
     }
 
     return 0;
