@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #include <Engine.hpp>
-#include <Window.hpp>
+#include <Graphics/Window.hpp>
 
 using namespace std;
 using namespace glm;

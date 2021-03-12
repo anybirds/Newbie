@@ -5,6 +5,7 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 project(App LANGUAGES CXX)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT App)
 
 set(Engine_DIR "C:/Newbie/Build/Engine")
 find_package(Engine REQUIRED)

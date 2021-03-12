@@ -12,7 +12,7 @@ find_package(Engine REQUIRED)
 file(GLOB_RECURSE USER_SOURCE "*.hpp" "*.cpp")
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_SOURCE})
 
-add_executable(User ${USER_SOURCE})
+add_library(User SHARED ${USER_SOURCE})
 
 target_link_libraries(User PRIVATE Engine)
 target_include_directories(User
