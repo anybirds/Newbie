@@ -29,20 +29,16 @@ int main(int argc, char **argv) {
     }
     
     // create OpenGL context and Window
-    Window *window;
-    try {
-        window = new Window(name);
-    } catch(...) {
-        return 0;
-    }
+    Window &window = Window::GetInstance();
 
     // load the Project
     if (!Project::Load(name)) {
         return 0;
     }
-    
-    // load the start Scene
     Project &project = Project::GetInstance();
+    window.SetName(project.GetName());
+
+    // load the start Scene
     if (!Scene::Load(project.GetSetting()->GetStartSceneName())) {
         return 0;
     }
@@ -51,14 +47,14 @@ int main(int argc, char **argv) {
     // game loop
     Time::Init();
     scene.Start();
-    while (!window->ShouldClose()) {
+    while (!window.ShouldClose()) {
         Time::Tick();
         
         scene.Update();
         scene.Render();
 
-		window->SwapBuffers();
-        window->PollEvents();
+		window.SwapBuffers();
+        window.PollEvents();
     }
 
     return 0;

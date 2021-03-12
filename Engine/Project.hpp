@@ -26,7 +26,7 @@ namespace Engine {
         std::string startSceneName;
         
     public:
-        uint64_t GetSerial() { return serial++; }
+        uint64_t GetSerial() { return ++serial; }
         const std::string &GetStartSceneName() const { return startSceneName; }
         void SetStartSceneName(const std::string &name) { startSceneName = name; }
         
@@ -63,15 +63,16 @@ namespace Engine {
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
         
+        const std::string &GetName() const { return name; }
         ProjectSetting *GetSetting() const { return setting; }
         const std::string &GetScene(const std::string &name) const;
         void AddScene(const std::string &name, const std::string &path);
         void RemoveScene(const std::string &name);
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
-        T *AddAsset() {
+        T *AddAsset(const std::string &name) {
             T *asset = new T();
-            asset->serial = setting->GetSerial();
-            assets.insert({asset->serial, asset});
+            asset->SetName(name);
+            assets.insert({setting->GetSerial(), asset});
             return asset;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>

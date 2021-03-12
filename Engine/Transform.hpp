@@ -31,6 +31,8 @@ namespace Engine {
         void PropagateUpdate();
 
     public:
+        Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)) {}
+
         virtual void SetRemoved() override;
 
         const glm::vec3 &GetLocalPosition() const { return localPosition; }

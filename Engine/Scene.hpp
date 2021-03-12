@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
+#include <list>
 
 #include <Entity.hpp>
 #include <Asset.hpp>
@@ -39,7 +39,7 @@ namespace Engine {
 
         std::string name;
         SceneSetting *setting;
-        std::unordered_set<Group *> groups;
+        std::list<Group *> groups;
         
     public:
         Scene(const Scene &) = delete;

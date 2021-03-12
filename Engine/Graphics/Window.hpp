@@ -11,14 +11,26 @@ namespace Engine {
     */
     class Window final {
     public:
+        static Window &GetInstance() { static Window window; return window; }
+
+    private:
+        Window();
+
         GLFWwindow *window;
         std::string name;
         int width;
         int height;
 
     public:
-        Window(const std::string &name);
-        Window(const std::string &name, int width, int height);
+        Window(const Window &) = delete;
+        void operator=(const Window &) = delete;
+
+        const std::string &GetName() const { return name; }
+        int GetWidth() const { return width; }
+        int GetHeight() const { return height; }
+        
+        void SetName(const std::string &name);
+        
         ~Window();
 
         bool ShouldClose();

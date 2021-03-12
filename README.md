@@ -10,15 +10,15 @@ Can one undergraduate student make a fully-functional game engine? Let's try ans
 ## Feature
 
 ## Build
-* Install [Visual Studio 2019](https://visualstudio.microsoft.com/).
-* Install [CMake](https://cmake.org/).
-* Install [Git](https://git-scm.com/). 
+* Install [Visual Studio 2019](https://visualstudio.microsoft.com/)
+* Install [CMake](https://cmake.org/)
+* Install [Git](https://git-scm.com/)
 * Open **Windows Command Prompt**
-* Type **cd c:/**/**cd /** in Windows/Unix.
+* Type **cd c:/** in Windows. Type **cd /** in Unix.
 * Type **git clone https://github.com/anybirds/Newbie**
 * Type **cd Newbie**
-* Type **setup.bat**/**setup.sh** in Windows/Unix.
-* Open **c:/Newbie/Build/Editor/Editor.sln**/**/Newbie/Build/Editor/Editor.sln** in Windows/Unix.
+* Type **setup.bat** in Windows. Type **setup.sh** in Unix.
+* Open **c:/Newbie/Build/Editor/Editor.sln** in Windows. Open **/Newbie/Build/Editor/Editor.sln** in Unix.
 * Run in **Release** mode.
 
 ## Documentation

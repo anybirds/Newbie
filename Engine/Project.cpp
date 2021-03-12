@@ -112,9 +112,10 @@ bool Project::Save() {
 
         // write assets
         json &assets = js["Asset"];
+        unordered_map<uint64_t, Asset *> temp;
         for (auto it = project.assets.begin(); it != project.assets.end(); ) {
             if (it->second->IsRemoved()) {
-                delete it->second;
+                temp.insert(*it);
                 it = project.assets.erase(it);
             } else {
                 Type *type = it->second->GetType();
@@ -122,9 +123,11 @@ bool Project::Save() {
                 it++;
             }
         }
-        
+        project.assets.insert(temp.begin(), temp.end());
+
         fs << js;
     } catch(...) {
+        Project::Close();
         cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << project.name << '\n';
         return false;
     }

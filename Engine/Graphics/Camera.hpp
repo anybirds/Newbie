@@ -6,6 +6,7 @@
 #include <Component.hpp>
 #include <Type.hpp>
 #include <IRender.hpp>
+#include <Graphics/Window.hpp>
 
 namespace Engine {
     /*
@@ -30,6 +31,10 @@ namespace Engine {
         float top;
     
     public:
+        Camera() : fovy(60.0f), 
+        width(Window::GetInstance().GetWidth()), height(Window::GetInstance().GetHeight()), 
+        near(0.1f), far(1000.0f) { ComputeNormalization(); }
+
         void ComputeNormalization();
 
         bool IsOrthographic() const { return orthographic; }

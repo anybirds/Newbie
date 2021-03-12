@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <functional>
+#include <algorithm>
 
 #include <Project.hpp>
 #include <Group.hpp>
@@ -159,13 +160,13 @@ void Scene::Close() {
 
 Group *Scene::AddGroup() {
     Group *group = new Group();
-    groups.insert(group);
+    groups.push_back(group);
     return group;
 }
 
 void Scene::RemoveGroup(Group *group) {
     delete group;
-    groups.erase(group);
+    groups.erase(find(groups.begin(), groups.end(), group));
 }
 
 GameObject *Scene::GetGameObject(const string &name) {

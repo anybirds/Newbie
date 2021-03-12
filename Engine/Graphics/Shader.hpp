@@ -14,15 +14,15 @@ namespace Engine {
 
     private:
         std::string path;
-        uint32_t shaderType;
+        uint16_t shaderType;
 
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
         const std::string &GetPath() const { return path; }
-        uint32_t GetShaderType() const { return shaderType; }
+        uint16_t GetShaderType() const { return shaderType; }
 
         void SetPath(const std::string &path) { this->path = path; }
-        void SetShaderType(uint32_t shaderType) { this->shaderType = shaderType; }
+        void SetShaderType(uint16_t shaderType) { this->shaderType = shaderType; }
     };
 
     class ENGINE_EXPORT Shader : public Resource {
@@ -38,7 +38,7 @@ namespace Engine {
         virtual void Apply() override;
 
         const std::string &GetPath() const { AShader *ashader = (AShader *)asset; return ashader->GetPath(); }
-        uint32_t GetShaderType() const { AShader *ashader = (AShader *)asset; return ashader->GetShaderType(); }
+        uint16_t GetShaderType() const { AShader *ashader = (AShader *)asset; return ashader->GetShaderType(); }
 
         friend class Material;
     };

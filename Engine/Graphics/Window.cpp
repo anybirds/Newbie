@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Engine;
 
-Window::Window(const std::string &name) {
+Window::Window() {
     if (!glfwInit()) {
         cerr << '[' << __FUNCTION__ << ']' << " glfw init failed."  << '\n';
         throw exception();
@@ -29,27 +29,14 @@ Window::Window(const std::string &name) {
     glfwMaximizeWindow(window);
 }
 
-Window::Window(const std::string &name, int width, int height)
-	: name(name), width(width), height(height) {
-    if (!glfwInit()) {
-        cerr << '[' << __FUNCTION__ << ']' << " glfw init failed."  << '\n';
-        throw exception();
-    }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
-    if (!window) {
-        cerr << '[' << __FUNCTION__ << ']' << " window creation failed."  << '\n';
-        throw exception();
-    }
-	glfwMakeContextCurrent(window);
-}
-
 Window::~Window() {
 	glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+void Window::SetName(const string &name) {
+    this->name = name;
+    glfwSetWindowTitle(window, name.c_str());
 }
 
 bool Window::ShouldClose() {

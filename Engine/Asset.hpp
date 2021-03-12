@@ -14,7 +14,6 @@ namespace Engine {
     */
     class ENGINE_EXPORT Asset : public Entity {
     private:
-        uint64_t serial;
         std::string name;
 
     protected:
@@ -25,8 +24,6 @@ namespace Engine {
         
         const std::string &GetName() const { return name; }
         void SetName(const std::string &name) { this->name = name; }
-        
-        friend class Project;
     };
 
     void to_json(nlohmann::json &js, const Asset *asset);
