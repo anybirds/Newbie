@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include <SOIL2/SOIL2.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #include <Graphics/Texture.hpp>
 
@@ -30,7 +31,7 @@ void Texture::Apply() {
     glDeleteTextures(1, &id);
 
     int width, height, channel;
-    unsigned char *image = SOIL_load_image(GetPath().c_str(), &width, &height, &channel, SOIL_LOAD_AUTO);
+    unsigned char *image = stbi_load(GetPath().c_str(), &width, &height, &channel, 0);
     if (!image) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << GetPath() << '\n';
         throw exception();
@@ -57,5 +58,5 @@ void Texture::Apply() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-    SOIL_free_image_data(image);
+    stbi_image_free(image);
 }

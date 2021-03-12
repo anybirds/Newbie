@@ -4,10 +4,9 @@
 #include <nlohmann/json.hpp>
 
 #include <EngineExport.hpp>
+#include <Asset.hpp>
 
 namespace Engine {
-
-    class Asset;
 
     /*
     Base class for all the resources like Model, Mesh, Material, Shader, Texture and etc.

@@ -48,5 +48,9 @@ namespace Engine {
         Group *AddGroup();
         void RemoveGroup(Group *group);
         GameObject *GetGameObject(const std::string &name);
+        
+        void Start();
+        void Update();
+        void Render();
     };
 }

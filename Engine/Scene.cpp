@@ -9,6 +9,8 @@
 #include <Component.hpp>
 #include <Scene.hpp>
 #include <Type.hpp>
+#include <IBehavior.hpp>
+#include <IRender.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -173,4 +175,34 @@ GameObject *Scene::GetGameObject(const string &name) {
         }
     }
     return nullptr;
+}
+
+void Scene::Start() {
+    for (Group *group : groups) {
+        for (IBehavior *ibehavior : group->ibehaviors) {
+            try {
+                ibehavior->Start();
+            } catch(...) {}
+        }
+    } 
+}
+
+void Scene::Update() {
+    for (Group *group : groups) {
+        for (IBehavior *ibehavior : group->ibehaviors) {
+            try {
+                ibehavior->Update();
+            } catch(...) {}
+        }
+    }
+}
+
+void Scene::Render() {
+    for (Group *group : groups) {
+        for (IRender *irender : group->irenders) {
+            try {
+                irender->Render();
+            } catch(...) {}
+        }
+    }
 }

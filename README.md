@@ -26,7 +26,7 @@ Can one undergraduate student make a fully-functional game engine? Let's try ans
   * Type **vcpkg install glfw3**
   * Type **vcpkg install glm**
   * Type **vcpkg install assimp**
-  * Type **vcpkg install soil2**
+  * Type **vcpkg install stb**
 * Clone this project inside the directory you want to build.
 * Generate build system from source files.
   * Open **CMake**

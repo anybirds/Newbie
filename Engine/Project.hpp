@@ -78,7 +78,7 @@ namespace Engine {
         T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);
             if (it != assets.end() && !(it->second->IsRemoved())) {
-                return dynamic_cast<T *>(*(it->second));
+                return dynamic_cast<T *>(it->second);
             } else {
                 return nullptr;
             }

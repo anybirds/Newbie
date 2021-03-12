@@ -46,15 +46,16 @@ int main(int argc, char **argv) {
     if (!Scene::Load(project.GetSetting()->GetStartSceneName())) {
         return 0;
     }
-    
+    Scene &scene = Scene::GetInstance();
+
     // game loop
     Time::Init();
-    Scene::Start();
+    scene.Start();
     while (!window->ShouldClose()) {
         Time::Tick();
         
-        Scene::Update();
-        Scene::Render();
+        scene.Update();
+        scene.Render();
 
 		window->SwapBuffers();
         window->PollEvents();

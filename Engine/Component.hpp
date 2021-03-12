@@ -19,5 +19,7 @@ namespace Engine {
         GameObject *GetGameObject() const { return gameObject; }
 
         bool SetEnabled();
+
+		friend class GameObject;
     };
 }

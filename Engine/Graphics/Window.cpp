@@ -1,8 +1,9 @@
 #include <iostream>
 
-#include <Window.hpp>
+#include <Graphics/Window.hpp>
 
 using namespace std;
+using namespace Engine;
 
 Window::Window(const std::string &name) {
     if (!glfwInit()) {

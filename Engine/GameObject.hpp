@@ -9,6 +9,7 @@
 #include <IBehavior.hpp>
 #include <IRender.hpp>
 #include <IDraw.hpp>
+#include <Group.hpp>
 
 namespace Engine {
     
@@ -57,13 +58,13 @@ namespace Engine {
             component->gameObject = this;
             components.push_back(component); 
             if (std::is_base_of_v<IBehavior, T>) {
-                group->ibehaviors.push_back(component);
+                group->ibehaviors.push_back((IBehavior *)component);
             }
             if (std::is_base_of_v<IRender, T>) {
-                group->irenders.push_back(component);   
+                group->irenders.push_back((IRender *)component);   
             }
             if (std::is_base_of_v<IDraw, T>) {
-                group->idraws.push_back(component);
+                group->idraws.push_back((IDraw *)component);
             }
             return component;
         }
