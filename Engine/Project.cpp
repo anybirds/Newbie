@@ -56,7 +56,7 @@ bool Project::Load(const string &name) {
         fs >> js;
         
         // read project setting
-        ProjectSetting::type->Deserialize(js[ProjectSetting::type->GetName()], project.setting);
+        ProjectSetting::StaticType()->Deserialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
         
         // read scenes
         project.scenes = js["Scene"];
@@ -105,7 +105,7 @@ bool Project::Save() {
         json js;
         
         // write project setting
-        ProjectSetting::type->Serialize(js[ProjectSetting::type->GetName()], project.setting);
+        ProjectSetting::StaticType()->Serialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
 
         // write scenes
         js["Scene"] = project.scenes;

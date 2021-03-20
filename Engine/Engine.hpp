@@ -1,22 +1,25 @@
-#include <EngineExport.hpp>
-
-#include <Time.hpp>
-
-#include <Type.hpp>
-#include <Entity.hpp>
-
-#include <Component.hpp>
-#include <GameObject.hpp>
-#include <Group.hpp>
-#include <Scene.hpp>
-#include <Project.hpp>
-
+#pragma once
 #include <Asset.hpp>
-#include <Resource.hpp>
-
-#include <Transform.hpp>
-#include <Script.hpp>
-
+#include <Component.hpp>
+#include <EngineExport.hpp>
+#include <Entity.hpp>
+#include <GameObject.hpp>
+#include <Graphics/Camera.hpp>
+#include <Graphics/Material.hpp>
+#include <Graphics/Mesh.hpp>
+#include <Graphics/Model.hpp>
+#include <Graphics/Renderer.hpp>
+#include <Graphics/Shader.hpp>
+#include <Graphics/Texture.hpp>
+#include <Graphics/Window.hpp>
+#include <Group.hpp>
 #include <IBehavior.hpp>
 #include <IDraw.hpp>
 #include <IRender.hpp>
+#include <Project.hpp>
+#include <Resource.hpp>
+#include <Scene.hpp>
+#include <Script.hpp>
+#include <Time.hpp>
+#include <Transform.hpp>
+#include <Type.hpp>

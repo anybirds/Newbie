@@ -16,7 +16,7 @@ namespace Engine {
         }
     }
 
-    void from_json(json &js, Asset *&asset) {
+    void from_json(const json &js, Asset *&asset) {
         uint64_t key = js.get<uint64_t>();
         if (key) {
             Project &project = Project::GetInstance();

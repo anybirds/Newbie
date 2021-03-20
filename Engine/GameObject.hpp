@@ -20,7 +20,7 @@ namespace Engine {
     /*
     Abstraction of an object in the scene.
     */
-    class ENGINE_EXPORT GameObject final : public Entity {
+    class ENGINE_EXPORT [[Serialize]] GameObject final : public Entity {
         TYPE(GameObject);
 
     private:
@@ -58,13 +58,13 @@ namespace Engine {
             component->gameObject = this;
             components.push_back(component); 
             if (std::is_base_of_v<IBehavior, T>) {
-                group->ibehaviors.push_back((IBehavior *)component);
+                group->ibehaviors.push_back((Component *)component);
             }
             if (std::is_base_of_v<IRender, T>) {
-                group->irenders.push_back((IRender *)component);   
+                group->irenders.push_back((Component *)component);   
             }
             if (std::is_base_of_v<IDraw, T>) {
-                group->idraws.push_back((IDraw *)component);
+                group->idraws.push_back((Component *)component);
             }
             return component;
         }

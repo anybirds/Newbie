@@ -18,7 +18,7 @@
 
 namespace Engine {
 
-    class ENGINE_EXPORT ProjectSetting final : public Entity {
+    class ENGINE_EXPORT [[Serialize]] ProjectSetting final : public Entity {
         TYPE(ProjectSetting)
 
     private:

@@ -9,7 +9,7 @@
 #include <Type.hpp>
 
 namespace Engine {
-    class ENGINE_EXPORT AModel : public Asset {
+    class ENGINE_EXPORT [[Serialize]] AModel : public Asset {
         TYPE(AModel)
     
     private:

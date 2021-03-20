@@ -1,5 +1,5 @@
 # Newbie Engine
-Can one undergraduate student make a fully-functional game engine? Let's try answering to this question.
+Can one undergraduate student make a fully-functional game engine? Let's do this.
 
 ## Goal
 * Study and research about how the game engine is built in general.
@@ -9,17 +9,18 @@ Can one undergraduate student make a fully-functional game engine? Let's try ans
 
 ## Feature
 
-## Build
+## Install
 * Install [Visual Studio 2019](https://visualstudio.microsoft.com/)
 * Install [CMake](https://cmake.org/)
 * Install [Git](https://git-scm.com/)
-* Open **Windows Command Prompt**
-* Type **cd c:/** in Windows. Type **cd /** in Unix.
-* Type **git clone https://github.com/anybirds/Newbie**
-* Type **cd Newbie**
-* Type **setup.bat** in Windows. Type **setup.sh** in Unix.
-* Open **c:/Newbie/Build/Editor/Editor.sln** in Windows. Open **/Newbie/Build/Editor/Editor.sln** in Unix.
-* Run in **Release** mode.
+* Append `c:/Newbie` to the environment variable `path`.
+* Open `Windows PowerShell`
+* Type `cd c:/` in Windows. Type `cd /` in Unix.
+* Type `git clone https://github.com/anybirds/Newbie`
+* Type `cd Newbie`
+* Type `setup.bat` in Windows. Type `setup.sh` in Unix.
+* Open `c:/Newbie/Build/Editor/Editor.sln` in Windows. Open `/Newbie/Build/Editor/Editor.sln` in Unix.
+* Run in `Release` mode.
 
 ## Documentation
 All descriptions are directly written to the code itself. [Github Wiki](https://github.com/anybirds/Newbie/wiki) is also available.

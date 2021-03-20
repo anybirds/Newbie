@@ -17,7 +17,6 @@ namespace Engine {
         static std::unordered_map<uint64_t, Entity *> temp;
 
     private:
-        [[NoSerialize]]
         bool removed;
 
     public:
@@ -27,5 +26,5 @@ namespace Engine {
     };
     
     void to_json(nlohmann::json &js, const Entity *entity);
-    void from_json(nlohmann::json &js, Entity *&entity);
+    void from_json(const nlohmann::json &js, Entity *&entity);
 }

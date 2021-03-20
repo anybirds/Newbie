@@ -38,7 +38,7 @@ bool Scene::Load(const string &name) {
         fs >> js;
         
         // read scene setting
-        SceneSetting::type->Deserialize(js[SceneSetting::type->GetName()], scene.setting);
+        SceneSetting::StaticType()->Deserialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
         
         // read entities
         json &entities = js["Entity"];
@@ -80,7 +80,7 @@ bool Scene::Save() {
         json js;
 
         // write scene setting
-        SceneSetting::type->Serialize(js[SceneSetting::type->GetName()], scene.setting);
+        SceneSetting::StaticType()->Serialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
 
         // write entities
         json& entities = js["Entity"];
@@ -113,8 +113,8 @@ bool Scene::Save() {
             vector<Component *> tempc(gameObject->components.begin() + j, gameObject->components.end());
             gameObject->components.resize(j);
 
-            GameObject::type->Serialize(
-                entities[GameObject::type->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+            GameObject::StaticType()->Serialize(
+                entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
                 gameObject);
             transform->children.insert(transform->children.end(), tempg.begin(), tempg.end());
             gameObject->components.insert(gameObject->components.end(), tempc.begin(), tempc.end());
@@ -132,8 +132,8 @@ bool Scene::Save() {
             vector<GameObject *> temp(group->gameObjects.begin() + j, group->gameObjects.end());
             group->gameObjects.resize(j);
 
-            Group::type->Serialize(
-                entities[Group::type->GetName()][to_string(reinterpret_cast<uint64_t>(group))], 
+            Group::StaticType()->Serialize(
+                entities[Group::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(group))], 
                 group);
             group->gameObjects.insert(group->gameObjects.end(), temp.begin(), temp.end());
         }
@@ -180,9 +180,9 @@ GameObject *Scene::GetGameObject(const string &name) {
 
 void Scene::Start() {
     for (Group *group : groups) {
-        for (IBehavior *ibehavior : group->ibehaviors) {
+        for (Component *ibehavior : group->ibehaviors) {
             try {
-                ibehavior->Start();
+                ((IBehavior *)ibehavior)->Start();
             } catch(...) {}
         }
     } 
@@ -190,9 +190,9 @@ void Scene::Start() {
 
 void Scene::Update() {
     for (Group *group : groups) {
-        for (IBehavior *ibehavior : group->ibehaviors) {
+        for (Component *ibehavior : group->ibehaviors) {
             try {
-                ibehavior->Update();
+                ((IBehavior *)ibehavior)->Update();
             } catch(...) {}
         }
     }
@@ -200,9 +200,9 @@ void Scene::Update() {
 
 void Scene::Render() {
     for (Group *group : groups) {
-        for (IRender *irender : group->irenders) {
+        for (Component *irender : group->irenders) {
             try {
-                irender->Render();
+                ((IRender *)irender)->Render();
             } catch(...) {}
         }
     }

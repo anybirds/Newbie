@@ -15,9 +15,9 @@ using namespace Engine;
 
 void Camera::ComputeNormalization() {
     if (orthographic) {
-        normalization = ortho(left, right, bottom, top, near, far);
+        normalization = ortho(left, right, bottom, top, nr, fr);
     } else {
-        normalization = perspective(radians(fovy), width / height, near, far);
+        normalization = perspective(radians(fovy), width / height, nr, fr);
     }
 }
 
@@ -31,13 +31,13 @@ void Camera::SetWidth(float width) {
     ComputeNormalization();
 }
 
-void Camera::SetNear(float near) {
-    this->near = near;
+void Camera::SetNear(float nr) {
+    this->nr = nr;
     ComputeNormalization();
 }
 
-void Camera::SetFar(float far) {
-    this->far = far;
+void Camera::SetFar(float fr) {
+    this->fr = fr;
     ComputeNormalization();
 }
 
@@ -79,10 +79,9 @@ void Camera::Render() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    for (IDraw *idraw : GetGameObject()->GetGroup()->idraws) {
-        Component *entity = (Component *)idraw;
-        if (!entity->IsRemoved() && entity->IsEnabled()) {
-            idraw->Draw(this);
+    for (Component *idraw : GetGameObject()->GetGroup()->idraws) {
+        if (!idraw->IsRemoved() && idraw->IsEnabled()) {
+            ((IDraw *)idraw)->Draw(this);
         }
     }
 

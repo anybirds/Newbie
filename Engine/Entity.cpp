@@ -17,7 +17,7 @@ namespace Engine {
         }
     }
 
-    void from_json(json &js, Entity *&entity) {
+    void from_json(const json &js, Entity *&entity) {
         uint64_t key = js.get<uint64_t>();
         if (key) {
             entity = reinterpret_cast<Entity *>(Entity::temp.at(key));

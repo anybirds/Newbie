@@ -1,3 +1,6 @@
+# Run cmake -G "Visual Studio 15 2017" -A x64 -B ../build/Engine
+# Run cmake --build ../build/Engine --config Release
+
 cmake_minimum_required(VERSION 3.8)
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -11,18 +14,23 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(Assimp REQUIRED)
-find_package(stb REQUIRED)
+find_package(Stb REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+
+add_custom_command(
+  OUTPUT generated.cpp 
+  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} Engine > generated.cpp
+)
 
 file(GLOB_RECURSE ENGINE_HEADER "*.hpp")
 file(GLOB_RECURSE ENGINE_SOURCE "*.cpp")
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_HEADER} ${ENGINE_SOURCE})
 
-add_library(Engine SHARED ${ENGINE_HEADER} ${ENGINE_SOURCE})
+add_library(Engine SHARED ${ENGINE_HEADER} ${ENGINE_SOURCE} generated.cpp)
 
 target_compile_definitions(Engine PRIVATE ENGINE_LIBRARY)
-target_link_libraries(Engine PUBLIC glfw GLEW::GLEW ${OPENGL_LIBRARY} glm assimp::assimp nlohmann_json nlohmann_json::nlohmann_json)
+target_link_libraries(Engine PUBLIC glfw GLEW::GLEW ${OPENGL_LIBRARY} assimp::assimp nlohmann_json nlohmann_json::nlohmann_json)
 target_include_directories(Engine
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   INTERFACE

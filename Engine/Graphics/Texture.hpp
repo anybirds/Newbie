@@ -9,7 +9,7 @@
 
 namespace Engine {
     
-    class ENGINE_EXPORT ATexture : public Asset {
+    class ENGINE_EXPORT [[Serialize]] ATexture : public Asset {
         TYPE(ATexture)
     
     private:

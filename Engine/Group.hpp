@@ -10,21 +10,19 @@
 namespace Engine {
 
     class GameObject;
-    class IBehavior;
-    class IRender;
-    class IDraw;
+    class Component;
 
     /*
     Unit of destruction. 
     */
-    class ENGINE_EXPORT Group final : public Entity {
+    class ENGINE_EXPORT [[Serialize]] Group final : public Entity {
         TYPE(Group)
 
     private:
         std::vector<GameObject *> gameObjects;
-        std::vector<IBehavior *> ibehaviors;
-        std::vector<IRender *> irenders;
-        std::vector<IDraw *> idraws;
+        std::vector<Component *> ibehaviors;
+        std::vector<Component *> irenders;
+        std::vector<Component *> idraws;
 
     public:
         ~Group();

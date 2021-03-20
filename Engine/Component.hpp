@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Entity.hpp>
+#include <Type.hpp>
 
 namespace Engine {
 
@@ -9,7 +10,9 @@ namespace Engine {
     /*
     Components that organizes the GameObject.
     */
-    class ENGINE_EXPORT Component : public Entity {
+    class ENGINE_EXPORT [[Serialize]] Component : public Entity {
+        TYPE(Component)
+
     private:
         bool enabled;
         GameObject *gameObject;

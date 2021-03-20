@@ -13,7 +13,7 @@ namespace Engine {
     class Group;
     class GameObject;
 
-    class ENGINE_EXPORT SceneSetting final : public Entity {
+    class ENGINE_EXPORT [[Serialize]] SceneSetting final : public Entity {
         TYPE(SceneSetting)
 
     private:

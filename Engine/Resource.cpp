@@ -17,7 +17,7 @@ namespace Engine {
         }
     }
 
-    void from_json(json &js, shared_ptr<Resource> &resource) {
+    void from_json(const json &js, shared_ptr<Resource> &resource) {
         uint64_t key = js.get<uint64_t>();
         if (key) {
             Project &project = Project::GetInstance();

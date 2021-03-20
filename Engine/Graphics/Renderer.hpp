@@ -14,7 +14,7 @@ namespace Engine {
 	/*
 	Responsible for rendering objects that have Mesh and Material.
 	*/
-	class ENGINE_EXPORT Renderer final : public Component, public IDraw {
+	class ENGINE_EXPORT [[Serialize]] Renderer final : public Component, public IDraw {
 		TYPE(Renderer)
 
 	private:

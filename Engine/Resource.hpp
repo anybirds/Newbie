@@ -25,5 +25,12 @@ namespace Engine {
     };
 
     void to_json(nlohmann::json &js, const std::shared_ptr<Resource> &resource);
-    void from_json(nlohmann::json &js, std::shared_ptr<Resource> &resource);
+    void from_json(const nlohmann::json &js, std::shared_ptr<Resource> &resource);
+
+    template <typename T, std::enable_if_t<std::is_base_of_v<Resource, T>, bool> = true>
+    void from_json(const nlohmann::json &js, std::shared_ptr<T> &t) {
+        std::shared_ptr<Resource> resource;
+        from_json(js, resource);
+        t = dynamic_pointer_cast<T>(resource);
+    }
 }
