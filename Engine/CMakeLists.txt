@@ -18,16 +18,17 @@ find_package(Stb REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-add_custom_command(
-  OUTPUT generated.cpp 
-  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} Engine > generated.cpp
-)
-
 file(GLOB_RECURSE ENGINE_HEADER "*.hpp")
 file(GLOB_RECURSE ENGINE_SOURCE "*.cpp")
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_HEADER} ${ENGINE_SOURCE})
 
-add_library(Engine SHARED ${ENGINE_HEADER} ${ENGINE_SOURCE} generated.cpp)
+add_custom_command(
+  OUTPUT generated.cpp 
+  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} Engine > generated.cpp
+  DEPENDS ${ENGINE_HEADER}
+)
+
+add_library(Engine SHARED ${ENGINE_SOURCE} generated.cpp)
 
 target_compile_definitions(Engine PRIVATE ENGINE_LIBRARY)
 target_link_libraries(Engine PUBLIC glfw GLEW::GLEW ${OPENGL_LIBRARY} assimp::assimp nlohmann_json nlohmann_json::nlohmann_json)
@@ -45,9 +46,6 @@ set_target_properties(
 
 install(TARGETS Engine EXPORT Engine DESTINATION lib)
 install(FILES ${ENGINE_HEADER} DESTINATION include)
-
-include(InstallRequiredSystemLibraries)
-include(CPack)
 
 install(EXPORT Engine
   FILE Engine.cmake

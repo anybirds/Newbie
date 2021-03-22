@@ -11,7 +11,7 @@ namespace Engine {
     */
     class ENGINE_EXPORT [[Serialize]] Script : public Component, public IBehavior {
     public:
-        virtual void Start() override {}
-        virtual void Update() override {}
+        virtual void Start() override;
+        virtual void Update() override;
     };
 }

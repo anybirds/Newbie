@@ -12,27 +12,22 @@ using namespace Engine;
 int main(int argc, char **argv) { 
     // type init
     type_init();
-
-    // get the name of the Project
-    string name;
-    for (const auto &file : filesystem::directory_iterator(".")) {
-		const string &str = file.path().filename().string();
-		std::string::size_type i = str.rfind('.');
-		if (i != std::string::npos && !str.substr(i + 1).compare("json")) {
-            name = str;
+    
+    // find the project file 
+    string pdir(".."); // relative path to the project file is fixed
+    string pfile;
+    for (auto &p : filesystem::directory_iterator(pdir)) {
+        if (p.path().extension().string() == ".json") {
+            pfile = p.path().string();
             break;
-		}
-	}
-    if (name.empty()) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to find project file."  << '\n';
-        return 0;
+        }
     }
     
     // create OpenGL context and Window
     Window &window = Window::GetInstance();
-
+    
     // load the Project
-    if (!Project::Load(name)) {
+    if (!Project::Load(pfile)) {
         return 0;
     }
     Project &project = Project::GetInstance();

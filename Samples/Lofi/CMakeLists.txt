@@ -1,3 +1,6 @@
+# Run cmake -G "Visual Studio 15 2017" -A x64 -B ../../build/Samples/Lofi
+# Run cmake --build ../../build/Samples/Lofi --config Release
+
 cmake_minimum_required(VERSION 3.8)
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -6,14 +9,31 @@ endif()
 
 project(User LANGUAGES CXX)
 
-set(Engine_DIR "C:/Newbie/Build/Engine")
+find_package(OpenGL REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(Assimp REQUIRED)
+find_package(Stb REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+
+set(Engine_DIR "C:/Newbie/build/Engine")
 find_package(Engine REQUIRED)
 
-file(GLOB_RECURSE USER_SOURCE "*.hpp" "*.cpp")
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_SOURCE})
+file(GLOB_RECURSE USER_HEADER "*.hpp")
+file(GLOB_RECURSE USER_SOURCE "*.cpp")
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_HEADER} ${USER_SOURCE})
 
-add_library(User SHARED ${USER_SOURCE})
+add_custom_command(
+  OUTPUT generated.cpp 
+  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} User > generated.cpp
+  DEPENDS ${USER_HEADER}
+)
 
+add_library(User SHARED ${USER_SOURCE} generated.cpp)
+
+target_compile_definitions(User PRIVATE USER_LIBRARY)
 target_link_libraries(User PRIVATE Engine)
 target_include_directories(User
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -24,6 +44,4 @@ set_target_properties(
   CXX_STANDARD_REQUIRED ON
 )
 
-add_custom_command(TARGET User POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Engine> $<TARGET_FILE_DIR:User>
-)
+add_custom_command(TARGET User POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:User> ${CMAKE_CURRENT_SOURCE_DIR} )

@@ -10,16 +10,13 @@
 
 #define TYPE(T) \
     public: \
-    static Type *StaticType(Type *t = nullptr) { static Type *type; type = t ? t : type; return type; } \
-    virtual Type *GetType() const override { return T::StaticType(); } \
+    static Engine::Type *StaticType(Engine::Type *t = nullptr) { static Engine::Type *type; type = t ? t : type; return type; } \
+    virtual Engine::Type *GetType() const override { return T::StaticType(); } \
     private: \
-    template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T>, bool>> \
-    friend void serialize(nlohmann::json &, const Entity *); \
-    template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T>, bool>> \
-    friend void deserialize(const nlohmann::json &, Entity *);
-
-/* type_init function that creates Type object for all types. */
-void type_init();
+    template <typename T, std::enable_if_t<std::is_base_of_v<Engine::Entity, T>, bool>> \
+    friend void Engine::serialize(nlohmann::json &, const Engine::Entity *); \
+    template <typename T, std::enable_if_t<std::is_base_of_v<Engine::Entity, T>, bool>> \
+    friend void Engine::deserialize(const nlohmann::json &, Engine::Entity *);
 
 /* serializing and deserializing possible for glm vector and matrix types */
 namespace glm {
@@ -41,8 +38,8 @@ namespace Engine {
 
     /* instantiate function that creates the object of the type. */
     template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T>, bool> = true>
-    Engine::Entity *instantiate() {
-    return new T();
+    Entity *instantiate() {
+        return (Entity *)new T();
     }
 
     /* serialize function that serializes the object. */

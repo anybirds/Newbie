@@ -39,7 +39,7 @@ namespace Engine {
     class ENGINE_EXPORT Project final {
     public:
         static Project &GetInstance() { static Project project; return project; }
-        static bool Load(const std::string &name);
+        static bool Load(const std::string &path);
         static bool Save();
         static void Close();
         
@@ -54,7 +54,10 @@ namespace Engine {
     #endif
         func init;
         func clear;
+        std::string path;
         std::string name;
+        std::string directory;
+        std::string libpath;
         ProjectSetting *setting;
         nlohmann::json scenes;
         std::unordered_map<uint64_t, Asset *> assets;
@@ -64,6 +67,7 @@ namespace Engine {
         void operator=(const Project &) = delete;
         
         const std::string &GetName() const { return name; }
+        const std::string &GetDirectoy() const { return directory; }
         ProjectSetting *GetSetting() const { return setting; }
         const std::string &GetScene(const std::string &name) const;
         void AddScene(const std::string &name, const std::string &path);

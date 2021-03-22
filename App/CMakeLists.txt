@@ -7,7 +7,16 @@ endif()
 project(App LANGUAGES CXX)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT App)
 
-set(Engine_DIR "C:/Newbie/Build/Engine")
+find_package(OpenGL REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(Assimp REQUIRED)
+find_package(Stb REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+
+set(Engine_DIR "C:/Newbie/build/Engine")
 find_package(Engine REQUIRED)
 
 file(GLOB_RECURSE APP_SOURCE "*.hpp" "*.cpp")
@@ -25,6 +34,6 @@ set_target_properties(
   CXX_STANDARD_REQUIRED ON
 )
 
-add_custom_command(TARGET App POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Engine> $<TARGET_FILE_DIR:App>
-)
+# add_custom_command(TARGET App POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Engine> $<TARGET_FILE_DIR:App> )
+# install(CODE [[file(GET_RUNTIME_DEPENDENCIES EXECUTABLES "C:/Newbie/build/App/Release/App.exe")]])
+# install(TARGETS App DESTINATION bin)
