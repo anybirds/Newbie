@@ -56,6 +56,7 @@ bool Project::Load(const string &path) {
         cerr << '[' << __FUNCTION__ << ']' << " type_init failed: " << project.name << '\n';
         return false;
     }
+    cerr << '[' << __FUNCTION__ << ']' << " loading shared library: " << project.libpath << " done.\n";
 
     // open json file
     ifstream fs(project.path);
@@ -69,12 +70,9 @@ bool Project::Load(const string &path) {
         json js;
         fs >> js;
         
-        // read project setting
-        ProjectSetting::StaticType()->Deserialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
-        
         // read scenes
-        project.scenes = js["Scene"];
-
+        project.scenes = js["Scene"].get<unordered_map<string, string>>();
+        
         // read assets
         json &assets = js["Asset"];
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
@@ -84,12 +82,18 @@ bool Project::Load(const string &path) {
                 project.assets.insert({stoll(j.key()), dynamic_cast<Asset *>(entity)});
             }
         }
+        
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 type->Deserialize(j.value(), project.assets.at(stoll(j.key())));
             }
         }
+        
+        // read project setting
+        project.setting = (ProjectSetting *)ProjectSetting::StaticType()->Instantiate();
+        ProjectSetting::StaticType()->Deserialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
+
     } catch(...) {
         Project::Close();
         cerr << '[' << __FUNCTION__ << ']' << " cannot read project: " << project.name << '\n';
@@ -179,10 +183,11 @@ void Project::Close() {
 #endif
         project.lib = nullptr;
     }
+    cerr << '[' << __FUNCTION__ << ']' << " close projece done.\n";
 }
 
 const string &Project::GetScene(const string &name) const {
-    return scenes.at(name).get<string>();
+    return scenes.at(name);
 }
 
 void Project::AddScene(const string &name, const string &path) {

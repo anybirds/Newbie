@@ -16,7 +16,7 @@
     template <typename T, std::enable_if_t<std::is_base_of_v<Engine::Entity, T>, bool>> \
     friend void Engine::serialize(nlohmann::json &, const Engine::Entity *); \
     template <typename T, std::enable_if_t<std::is_base_of_v<Engine::Entity, T>, bool>> \
-    friend void Engine::deserialize(const nlohmann::json &, Engine::Entity *);
+    friend void Engine::deserialize(nlohmann::json &, Engine::Entity *);
 
 /* serializing and deserializing possible for glm vector and matrix types */
 namespace glm {
@@ -48,7 +48,7 @@ namespace Engine {
 
     /* deserialize function that deserializes the object. */
     template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T>, bool> = true>
-    void deserialize(const nlohmann::json &js, Entity *entity);
+    void deserialize(nlohmann::json &js, Entity *entity);
 
     /*
     Type information needed for object serialization and deserialization.
@@ -57,7 +57,7 @@ namespace Engine {
     public:
         typedef Entity *(*FInstantiate)();
         typedef void (*FSerialize)(nlohmann::json &, const Entity *);
-        typedef void (*FDeserialize)(const nlohmann::json &, Entity *);
+        typedef void (*FDeserialize)(nlohmann::json &, Entity *);
 
     private:
         static std::unordered_map<std::string, const Type *> types;
@@ -84,6 +84,6 @@ namespace Engine {
         const std::string &GetName() const { return name; }
         Entity *Instantiate() const { return instantiate(); }
         void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
-        void Deserialize(const nlohmann::json &js, Entity *entity) const { deserialize(js, entity); }
+        void Deserialize(nlohmann::json &js, Entity *entity) const { deserialize(js, entity); }
     };
 }

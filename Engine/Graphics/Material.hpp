@@ -15,7 +15,7 @@ namespace Engine {
     class Shader;
     class Texture;
 
-    class ENGINE_EXPORT [[Serialize]] AMaterial : public Asset {
+    class ENGINE_EXPORT [[Serialize]] AMaterial : [[Serialize]] public Asset {
         TYPE(AMaterial)
     
     private:

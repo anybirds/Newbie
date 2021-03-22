@@ -9,7 +9,7 @@
 #include <Type.hpp>
 
 namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] AModel : public Asset {
+    class ENGINE_EXPORT [[Serialize]] AModel : [[Serialize]] public Asset {
         TYPE(AModel)
     
     private:
@@ -32,7 +32,7 @@ namespace Engine {
 
         virtual void Apply() override;
 
-        const std::string &GetPath() const { AModel *amodel = (AModel *)amodel; return amodel->GetPath(); }
+        const std::string &GetPath() const { AModel *amodel = (AModel *)asset; return amodel->GetPath(); }
 
         friend class Scene;
         friend class Mesh;

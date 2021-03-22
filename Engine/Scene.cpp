@@ -25,9 +25,9 @@ bool Scene::Load(const string &name) {
     try {
         // get scene file path
         const string &path = Project::GetInstance().GetScene(name);
-
+        
         // open json file
-        ifstream fs(name);
+        ifstream fs(path);
         if (fs.fail()) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
             return false;
@@ -36,9 +36,6 @@ bool Scene::Load(const string &name) {
         // read json object
         json js;
         fs >> js;
-        
-        // read scene setting
-        SceneSetting::StaticType()->Deserialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
         
         // read entities
         json &entities = js["Entity"];
@@ -49,12 +46,18 @@ bool Scene::Load(const string &name) {
                 Entity::temp.insert({stoll(j.key()), entity});
             }
         }
+
         for (json::iterator i = entities.begin(); i != entities.end(); i++) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 type->Deserialize(j.value(), Entity::temp.at(stoll(j.key())));
             }
         }
+        
+        // read scene setting
+        scene.setting = (SceneSetting *)SceneSetting::StaticType()->Instantiate();
+        SceneSetting::StaticType()->Deserialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
+        
         Entity::temp.clear();
     } catch(...) {
         Scene::Close();

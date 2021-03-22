@@ -17,7 +17,7 @@ shared_ptr<Resource> AModel::GetResource() {
     return sp;
 }
 
-Model::Model(AModel *amodel) : Resource(amodel) {
+Model::Model(AModel *amodel) : Resource(amodel), importer(nullptr) {
     Apply();
 }
 
@@ -32,7 +32,6 @@ void Model::Apply() {
 
     importer = new Assimp::Importer();
     const aiScene *scene = importer->ReadFile(GetPath(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
-
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << GetPath() << '\n';
         throw exception();

@@ -4,23 +4,23 @@
         "Main" : "C:/Newbie/Samples/Lofi/Scenes/Main.json"
     },
     "Asset" : {
-        "Material" : {
+        "AMaterial" : {
             "8" : [ "girl", 5, 6, 7 ]
         },
-        "Mesh" : {
+        "AMesh" : {
             "1" : [ "square", 3, 0 ],
             "2" : [ "girl", 4, 0 ]
         },
-        "Model" : {
+        "AModel" : {
             "3" : [ "square", "C:/Newbie/Samples/Lofi/Models/square.obj" ],
             "4" : [ "girl", "C:/Newbie/Samples/Lofi/Models/girl.obj" ]
         },
-        "Shader" : {
-            "5" : [ "unlit_vert", 35633, "C:/Newbie/Samples/Lofi/Shaders/unlit_vert.glsl" ],
-            "6" : [ "unlit_frag", 35632, "C:/Newbie/Samples/Lofi/Shaders/unlit_frag.glsl" ]
+        "AShader" : {
+            "5" : [ "unlit_vert", "C:/Newbie/Samples/Lofi/Shaders/unlit_vert.glsl", 35633 ],
+            "6" : [ "unlit_frag", "C:/Newbie/Samples/Lofi/Shaders/unlit_frag.glsl", 35632 ]
         },
     
-        "Texture" : {
+        "ATexture" : {
             "7" : [ "girl", "C:/Newbie/Samples/Lofi/Textures/girl.png" ]
         }
     }

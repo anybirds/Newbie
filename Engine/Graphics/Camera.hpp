@@ -13,7 +13,7 @@ namespace Engine {
     Featured by its normalization matrix.
     Specify camera properties that affect the normalization matrix.
     */
-    class ENGINE_EXPORT [[Serialize]] Camera : public Component, public IRender {
+    class ENGINE_EXPORT [[Serialize]] Camera : [[Serialize]] public Component, public IRender {
         TYPE(Camera)
 
     private:

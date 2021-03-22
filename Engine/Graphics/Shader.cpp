@@ -18,7 +18,7 @@ shared_ptr<Resource> AShader::GetResource() {
     return sp;
 }
 
-Shader::Shader(AShader *ashader) : Resource(ashader) {
+Shader::Shader(AShader *ashader) : Resource(ashader), id(0) {
     Apply();
 }
 
@@ -28,9 +28,7 @@ Shader::~Shader() {
 
 void Shader::Apply() {
     glDeleteShader(id);
-
     id = glCreateShader(GetShaderType());
-
     if (!id) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << endl;
         throw exception();

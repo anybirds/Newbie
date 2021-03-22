@@ -18,6 +18,8 @@ namespace Engine {
         GameObject *gameObject;
     
     public:
+        Component() : enabled(false) {}
+        
         bool IsEnabled() const;
         GameObject *GetGameObject() const { return gameObject; }
 

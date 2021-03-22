@@ -11,7 +11,7 @@ namespace Engine {
     class AModel;
     class Model;
 
-    class ENGINE_EXPORT [[Serialize]] AMesh : public Asset {
+    class ENGINE_EXPORT [[Serialize]] AMesh : [[Serialize]] public Asset {
         TYPE(AMesh)
 
     private:

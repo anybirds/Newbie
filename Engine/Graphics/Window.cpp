@@ -27,6 +27,14 @@ Window::Window() {
     }
     glfwMakeContextCurrent(window);
     glfwMaximizeWindow(window);
+
+    // glew init
+    GLenum glew_error = glewInit();
+    if (glew_error != GLEW_OK) {
+        // Initializing GLEW failed
+        cerr << '[' << __FUNCTION__ << ']' << " message: " << glewGetErrorString(glew_error) << '\n';
+        throw exception();
+    }
 }
 
 Window::~Window() {

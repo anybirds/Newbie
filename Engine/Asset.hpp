@@ -23,7 +23,7 @@ namespace Engine {
         std::weak_ptr<Resource> resource;
 
     public:
-        virtual std::shared_ptr<Resource> GetResource() { return nullptr; };
+        virtual std::shared_ptr<Resource> GetResource() { return nullptr; }
         
         const std::string &GetName() const { return name; }
         void SetName(const std::string &name) { this->name = name; }

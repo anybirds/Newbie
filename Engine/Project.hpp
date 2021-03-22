@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <cstdint>
 #include <string>
 #include <type_traits>
@@ -59,7 +60,7 @@ namespace Engine {
         std::string directory;
         std::string libpath;
         ProjectSetting *setting;
-        nlohmann::json scenes;
+        std::unordered_map<std::string, std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
 
     public:
@@ -83,7 +84,7 @@ namespace Engine {
         T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);
             if (it != assets.end() && !(it->second->IsRemoved())) {
-                return dynamic_cast<T *>(it->second);
+                return (T *)(it->second);
             } else {
                 return nullptr;
             }

@@ -17,7 +17,7 @@ shared_ptr<Resource> AMesh::GetResource() {
     return sp;
 }
 
-Mesh::Mesh(AMesh *amesh) : Resource(amesh) {
+Mesh::Mesh(AMesh *amesh) : Resource(amesh), vcnt(0), icnt(0), vao(0), vbo(0), ebo(0) {
     Apply();
 }
 

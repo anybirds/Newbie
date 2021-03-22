@@ -20,6 +20,8 @@ namespace Engine {
         bool removed;
 
     public:
+        Entity() : removed(false) {}
+        
         bool IsRemoved() const { return removed; }
         virtual void SetRemoved() { removed = true; }
         virtual Type *GetType() const = 0;
