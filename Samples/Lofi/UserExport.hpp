@@ -17,4 +17,5 @@
 /* type_init function that creates Type object for all types. */
 extern "C" {
     void USER_EXPORT type_init();
+    void USER_EXPORT type_clear();
 }
