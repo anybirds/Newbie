@@ -32,10 +32,24 @@ void Renderer::Draw(Camera *camera) {
     location = glGetUniformLocation(material->program, "_MODEL");
 
     mat4 _MODEL = GetGameObject()->GetTransform()->GetLocalToWorldMatrix();
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<4; j++) {
+            cerr << _MODEL[i][j] << ' ';
+        }
+        cerr << '\n';
+    }
+    cerr << '\n';
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_MODEL);
 
     location = glGetUniformLocation(material->program, "_CAM");
     mat4 _CAM = camera->GetGameObject()->GetTransform()->GetLocalToWorldMatrix();
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<4; j++) {
+            cerr << _CAM[i][j] << ' ';
+        }
+        cerr << '\n';
+    }
+    cerr << '\n';
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_CAM);
     location = glGetUniformLocation(material->program, "_NORM");
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&camera->GetNormalization());

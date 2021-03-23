@@ -23,6 +23,7 @@ GameObject *GameObject::GetGameObject(const string &name) {
             return child;
         }
     }
+    return nullptr;
 }
 
 GameObject *GameObject::AddGameObject(const string &name) {
@@ -30,6 +31,7 @@ GameObject *GameObject::AddGameObject(const string &name) {
     Transform *t = child->AddComponent<Transform>();
     t->SetParent(transform);
 
+    child->group = group;
     child->name = name;
     child->transform = t;
     return child;

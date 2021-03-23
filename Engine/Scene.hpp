@@ -52,5 +52,7 @@ namespace Engine {
         void Start();
         void Update();
         void Render();
+
+        friend class Group;
     };
 }

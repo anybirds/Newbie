@@ -35,11 +35,16 @@ namespace glm {
 namespace Engine {
     
     class Entity;
-
-    /* instantiate function that creates the object of the type. */
-    template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T>, bool> = true>
+    
+    template <typename T,
+    std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
     Entity *instantiate() {
         return (Entity *)new T();
+    }
+    template <typename T,
+    std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
+    Entity *instantiate() {
+        return nullptr;
     }
 
     /* serialize function that serializes the object. */

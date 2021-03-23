@@ -22,10 +22,11 @@ namespace Engine {
 
         const std::string &GetName() const { return asset->GetName(); }
         void SetName(const std::string &name) { asset->SetName(name); }
+        const uint64_t GetSerial() const { return asset->GetSerial(); }
     };
 
-    void to_json(nlohmann::json &js, const std::shared_ptr<Resource> &resource);
-    void from_json(const nlohmann::json &js, std::shared_ptr<Resource> &resource);
+    void ENGINE_EXPORT to_json(nlohmann::json &js, const std::shared_ptr<Resource> &resource);
+    void ENGINE_EXPORT from_json(const nlohmann::json &js, std::shared_ptr<Resource> &resource);
 
     template <typename T, std::enable_if_t<std::is_base_of_v<Resource, T>, bool> = true>
     void from_json(const nlohmann::json &js, std::shared_ptr<T> &t) {

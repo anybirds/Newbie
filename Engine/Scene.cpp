@@ -19,9 +19,11 @@ using namespace Engine;
 
 bool Scene::Load(const string &name) {
     Scene &scene = Scene::GetInstance();
+
     // close project
     Scene::Close();
 
+    scene.name = name;
     try {
         // get scene file path
         const string &path = Project::GetInstance().GetScene(name);
@@ -163,13 +165,11 @@ void Scene::Close() {
 
 Group *Scene::AddGroup() {
     Group *group = new Group();
-    groups.push_back(group);
     return group;
 }
 
 void Scene::RemoveGroup(Group *group) {
     delete group;
-    groups.erase(find(groups.begin(), groups.end(), group));
 }
 
 GameObject *Scene::GetGameObject(const string &name) {
@@ -183,9 +183,9 @@ GameObject *Scene::GetGameObject(const string &name) {
 
 void Scene::Start() {
     for (Group *group : groups) {
-        for (Component *ibehavior : group->ibehaviors) {
+        for (IBehavior *ibehavior : group->ibehaviors) {
             try {
-                ((IBehavior *)ibehavior)->Start();
+                ibehavior->Start();
             } catch(...) {}
         }
     } 
@@ -193,9 +193,9 @@ void Scene::Start() {
 
 void Scene::Update() {
     for (Group *group : groups) {
-        for (Component *ibehavior : group->ibehaviors) {
+        for (IBehavior *ibehavior : group->ibehaviors) {
             try {
-                ((IBehavior *)ibehavior)->Update();
+                ibehavior->Update();
             } catch(...) {}
         }
     }
@@ -203,9 +203,9 @@ void Scene::Update() {
 
 void Scene::Render() {
     for (Group *group : groups) {
-        for (Component *irender : group->irenders) {
+        for (IRender *irender : group->irenders) {
             try {
-                ((IRender *)irender)->Render();
+                irender->Render();
             } catch(...) {}
         }
     }

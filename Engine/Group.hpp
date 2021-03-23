@@ -11,7 +11,10 @@ namespace Engine {
 
     class GameObject;
     class Component;
-
+    class IBehavior;
+    class IRender;
+    class IDraw;
+    
     /*
     Unit of destruction. 
     */
@@ -20,12 +23,13 @@ namespace Engine {
 
     private:
         std::vector<GameObject *> gameObjects;
-        std::vector<Component *> ibehaviors;
-        std::vector<Component *> irenders;
-        std::vector<Component *> idraws;
+        std::vector<IBehavior *> ibehaviors;
+        std::vector<IRender *> irenders;
+        std::vector<IDraw *> idraws;
 
     public:
-        ~Group();
+        Group();
+        virtual ~Group();
 
         GameObject *GetGameObject(const std::string &name) const;
         GameObject *AddGameObject(const std::string &name);

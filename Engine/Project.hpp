@@ -76,8 +76,9 @@ namespace Engine {
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *AddAsset(const std::string &name) {
             T *asset = new T();
+            asset->serial = setting->GetSerial();
             asset->SetName(name);
-            assets.insert({setting->GetSerial(), asset});
+            assets.insert({asset->serial, asset});
             return asset;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>

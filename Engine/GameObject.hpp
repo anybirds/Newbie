@@ -30,7 +30,7 @@ namespace Engine {
         std::vector<Component *> components;
 
     public:
-        ~GameObject();
+        virtual ~GameObject();
 
         virtual void SetRemoved() override;
 
@@ -58,13 +58,13 @@ namespace Engine {
             component->gameObject = this;
             components.push_back(component); 
             if (std::is_base_of_v<IBehavior, T>) {
-                group->ibehaviors.push_back((Component *)component);
+                group->ibehaviors.push_back(dynamic_cast<IBehavior *>(component));
             }
             if (std::is_base_of_v<IRender, T>) {
-                group->irenders.push_back((Component *)component);   
+                group->irenders.push_back(dynamic_cast<IRender *>(component));
             }
             if (std::is_base_of_v<IDraw, T>) {
-                group->idraws.push_back((Component *)component);
+                group->idraws.push_back(dynamic_cast<IDraw *>(component));
             }
             return component;
         }

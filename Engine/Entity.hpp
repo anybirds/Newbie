@@ -8,6 +8,7 @@
 namespace Engine {
     
     class Type;
+    class Interface;
 
     /*
     Base class for all serializable types
@@ -21,12 +22,10 @@ namespace Engine {
 
     public:
         Entity() : removed(false) {}
+        virtual ~Entity() {}
         
         bool IsRemoved() const { return removed; }
         virtual void SetRemoved() { removed = true; }
         virtual Type *GetType() const = 0;
     };
-    
-    void to_json(nlohmann::json &js, const Entity *entity);
-    void from_json(const nlohmann::json &js, Entity *&entity);
 }

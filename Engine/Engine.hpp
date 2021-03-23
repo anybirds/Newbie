@@ -15,11 +15,11 @@
 #include <Group.hpp>
 #include <IBehavior.hpp>
 #include <IDraw.hpp>
+#include <Interface.hpp>
 #include <IRender.hpp>
 #include <Project.hpp>
 #include <Resource.hpp>
 #include <Scene.hpp>
-#include <Script.hpp>
 #include <Time.hpp>
 #include <Transform.hpp>
 #include <Type.hpp>

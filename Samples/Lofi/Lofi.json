@@ -5,23 +5,22 @@
     },
     "Asset" : {
         "AMaterial" : {
-            "8" : [ "girl", 5, 6, 7 ]
+            "8" : [ 8, "girl", 5, 6, 7 ]
         },
         "AMesh" : {
-            "1" : [ "square", 3, 0 ],
-            "2" : [ "girl", 4, 0 ]
+            "1" : [ 1, "square", 3, 0 ],
+            "2" : [ 2, "girl", 4, 0 ]
         },
         "AModel" : {
-            "3" : [ "square", "C:/Newbie/Samples/Lofi/Models/square.obj" ],
-            "4" : [ "girl", "C:/Newbie/Samples/Lofi/Models/girl.obj" ]
+            "3" : [ 3, "square", "C:/Newbie/Samples/Lofi/Models/square.obj" ],
+            "4" : [ 4, "girl", "C:/Newbie/Samples/Lofi/Models/girl.obj" ]
         },
         "AShader" : {
-            "5" : [ "unlit_vert", "C:/Newbie/Samples/Lofi/Shaders/unlit_vert.glsl", 35633 ],
-            "6" : [ "unlit_frag", "C:/Newbie/Samples/Lofi/Shaders/unlit_frag.glsl", 35632 ]
-        },
-    
+            "5" : [ 5, "unlit_vert", "C:/Newbie/Samples/Lofi/Shaders/unlit_vert.glsl", 35633 ],
+            "6" : [ 6, "unlit_frag", "C:/Newbie/Samples/Lofi/Shaders/unlit_frag.glsl", 35632 ]
+        },   
         "ATexture" : {
-            "7" : [ "girl", "C:/Newbie/Samples/Lofi/Textures/girl.png" ]
+            "7" : [ 7, "girl", "C:/Newbie/Samples/Lofi/Textures/girl.png" ]
         }
     }
 }
