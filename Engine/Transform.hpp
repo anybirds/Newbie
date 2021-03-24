@@ -25,13 +25,13 @@ namespace Engine {
         Transform *parent;
         std::vector<Transform *> children;
 
-        mutable bool updated;
+        mutable bool dirty;
         mutable glm::mat4 localToWorldMatrix;
 
         void PropagateUpdate();
 
     public:
-        Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)) {}
+        Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)), dirty(false) {}
 
         virtual void SetRemoved() override;
 

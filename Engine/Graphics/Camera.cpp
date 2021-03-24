@@ -82,7 +82,7 @@ void Camera::Render() {
     for (IDraw *idraw : GetGameObject()->GetGroup()->idraws) {
         Component *component = dynamic_cast<Component *>(idraw);
         if (!component->IsRemoved() && component->IsEnabled()) {
-            ((IDraw *)idraw)->Draw(this);
+            idraw->Draw(this);
         }
     }
 

@@ -33,6 +33,8 @@ namespace Engine {
     */
     class ENGINE_EXPORT Mesh : public Resource {
     private:
+        std::shared_ptr<Model> model;
+        
 		unsigned vcnt;
 		unsigned icnt;
 

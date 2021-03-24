@@ -20,10 +20,10 @@ void Transform::SetRemoved() {
 }
 
 void Transform::PropagateUpdate() {
-    if (!updated) {
+    if (dirty) {
         return;
     }
-    updated = false;
+    dirty = true;
 
     for (Transform *transform : children) {
         transform->PropagateUpdate();
@@ -31,8 +31,8 @@ void Transform::PropagateUpdate() {
 }
 
 mat4 Transform::GetLocalToWorldMatrix() const {
-    if (!updated) {
-        updated = true;
+    if (dirty) {
+        dirty = false;
 
         mat4 T = glm::translate(mat4(1.0f), localPosition);
         quat R = localRotation;
@@ -92,7 +92,7 @@ void Transform::SetScale(const glm::vec3 &scale) {
 }
 
 void Transform::SetParent(Transform *parent) {
-    updated = false;
+    dirty = true;
     this->parent = parent;
 }
 

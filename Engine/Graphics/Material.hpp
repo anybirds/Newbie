@@ -37,6 +37,10 @@ namespace Engine {
 
     class ENGINE_EXPORT Material : public Resource {
     private:
+        std::shared_ptr<Shader> vertexShader;
+        std::shared_ptr<Shader> fragmentShader;
+        std::shared_ptr<Texture> mainTexture;
+        
         GLuint program;
 
     public:

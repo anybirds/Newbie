@@ -32,7 +32,7 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Apply() {
-    shared_ptr<Model> model = GetModel();
+    model = GetModel();
     if (!model) {
         cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh:" << GetName() << '\n';
         throw exception();

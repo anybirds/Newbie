@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 #include <Graphics/Texture.hpp>
+#include <Project.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -30,8 +31,9 @@ Texture::~Texture() {
 void Texture::Apply() {
     glDeleteTextures(1, &id);
 
+    stbi_set_flip_vertically_on_load(true);
     int width, height, channel;
-    unsigned char *image = stbi_load(GetPath().c_str(), &width, &height, &channel, 0);
+    unsigned char *image = stbi_load((Project::GetInstance().GetDirectoy() + "/" + GetPath()).c_str(), &width, &height, &channel, 0);
     if (!image) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << GetPath() << '\n';
         throw exception();

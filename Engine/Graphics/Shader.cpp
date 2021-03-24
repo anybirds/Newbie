@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include <Graphics/Shader.hpp>
+#include <Project.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -34,7 +35,7 @@ void Shader::Apply() {
         throw exception();
     }
 
-    ifstream file(GetPath());
+    ifstream file(Project::GetInstance().GetDirectoy() + "/" + GetPath());
     if (!file.is_open()) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << endl;
         glDeleteShader(id);

@@ -28,8 +28,9 @@ Material::~Material() {
 }
 
 void Material::Apply() {
-    shared_ptr<Shader> vertexShader = GetVertexShader();
-    shared_ptr<Shader> fragmentShader = GetFragmentShader();
+    vertexShader = GetVertexShader();
+    fragmentShader = GetFragmentShader();
+    mainTexture = GetMainTexture();
     if (!vertexShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material:" << GetName() << '\n';
         throw exception();

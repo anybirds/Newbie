@@ -10,6 +10,6 @@ uniform mat4 _NORM;
 out vec2 _FRAG_UV;
 
 void main() {
-    _FRAG_UV = vec2(_VERT_UV.x, 1 - _VERT_UV.y);
+    _FRAG_UV = _VERT_UV;
     gl_Position = _NORM * inverse(_CAM) * _MODEL * vec4(_VERT_POS, 1.0);
 }

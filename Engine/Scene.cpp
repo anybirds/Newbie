@@ -29,7 +29,7 @@ bool Scene::Load(const string &name) {
         const string &path = Project::GetInstance().GetScene(name);
         
         // open json file
-        ifstream fs(path);
+        ifstream fs(Project::GetInstance().GetDirectoy() + "/" + path);
         if (fs.fail()) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
             return false;
@@ -75,7 +75,7 @@ bool Scene::Save() {
     Scene &scene = Scene::GetInstance();
     
     // open json file
-    ofstream fs(scene.name);
+    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + Project::GetInstance().GetScene(scene.name));
     if (fs.fail()) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << scene.name << '\n';
         return false;

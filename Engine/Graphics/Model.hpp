@@ -17,7 +17,7 @@ namespace Engine {
     
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-        const std::string &GetPath() const { return path; }
+        const std::string &GetPath() const { return path; };
 
         void SetPath(const std::string &path) { this->path = path; }
     };
