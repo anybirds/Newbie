@@ -9,11 +9,11 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
-int main(int argc, char **argv) { 
+int main(int argc, char **argv) {
     // type init
     try {
         type_init();
-    } catch (...) {        
+    } catch (...) {
         return 0;
     }
     
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     window.SetName(project.GetName());
 
     // load the start Scene
-    if (!Scene::Load(project.GetSetting()->GetStartSceneName())) {
+    if (!Scene::Load(project.GetSetting()->GetStartSceneIndex())) {
         return 0;
     }
     Scene &scene = Scene::GetInstance();

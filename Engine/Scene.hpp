@@ -30,7 +30,7 @@ namespace Engine {
     class ENGINE_EXPORT Scene final {
     public:
         static Scene &GetInstance() { static Scene scene; return scene; }  
-        static bool Load(const std::string &name);
+        static bool Load(int index);
         static bool Save();
         static void Close();
 
@@ -38,6 +38,7 @@ namespace Engine {
         Scene() {}
 
         std::string name;
+        std::string path;
         SceneSetting *setting;
         std::list<Group *> groups;
         

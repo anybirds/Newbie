@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <functional>
+#include <filesystem>
 #include <algorithm>
 
 #include <Project.hpp>
@@ -17,21 +18,21 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-bool Scene::Load(const string &name) {
+bool Scene::Load(int index) {
     Scene &scene = Scene::GetInstance();
 
     // close project
     Scene::Close();
 
-    scene.name = name;
     try {
         // get scene file path
-        const string &path = Project::GetInstance().GetScene(name);
+        scene.path = Project::GetInstance().GetScene(index);
+        scene.name = filesystem::path(scene.path).stem().string();
         
         // open json file
-        ifstream fs(Project::GetInstance().GetDirectoy() + "/" + path);
+        ifstream fs(Project::GetInstance().GetDirectoy() + "/" + scene.path);
         if (fs.fail()) {
-            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file with index: " << index << '\n';
             return false;
         }
 
@@ -63,11 +64,11 @@ bool Scene::Load(const string &name) {
         Entity::temp.clear();
     } catch(...) {
         Scene::Close();
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene with index: " << index << '\n';
         return false;
     }
     
-    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << name << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " read scene with index: " << index << " done.\n";
     return true;
 }
 
@@ -75,7 +76,7 @@ bool Scene::Save() {
     Scene &scene = Scene::GetInstance();
     
     // open json file
-    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + Project::GetInstance().GetScene(scene.name));
+    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + scene.path);
     if (fs.fail()) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << scene.name << '\n';
         return false;

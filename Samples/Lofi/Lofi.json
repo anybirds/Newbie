@@ -1,8 +1,6 @@
 {
-    "ProjectSetting" : [ 8, "Main" ],
-    "Scene" : {
-        "Main" : "Scenes/Main.json"
-    },
+    "ProjectSetting" : [ 8, 0 ],
+    "Scene" : [ "Scenes/Main.json" ],
     "Asset" : {
         "AMaterial" : {
             "8" : [ 8, "girl", 5, 6, 7 ]
