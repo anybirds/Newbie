@@ -31,34 +31,43 @@ Texture::~Texture() {
 void Texture::Apply() {
     glDeleteTextures(1, &id);
 
-    stbi_set_flip_vertically_on_load(true);
-    int width, height, channel;
-    unsigned char *image = stbi_load((Project::GetInstance().GetDirectoy() + "/" + GetPath()).c_str(), &width, &height, &channel, 0);
-    if (!image) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << GetPath() << '\n';
-        throw exception();
-    }
+    ATexture *atexture = (ATexture *)asset;
+    unsigned char *image;
+    if (!GetPath().empty()) {
+        stbi_set_flip_vertically_on_load(true);
 
-    GLenum format;
-    switch (channel) {
-    case 3:
-        format = GL_RGB;
-        break;
-    case 4:
-        format = GL_RGBA;
-        break;
-    default:
-        format = GL_RGB;
-        break;
+        int width, height, channel;
+        image = stbi_load((Project::GetInstance().GetDirectoy() + "/" + GetPath()).c_str(), &width, &height, &channel, 0);
+        if (!image) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << atexture->GetPath() << '\n';
+            throw exception();
+        }
+
+        GLenum format;
+        switch (channel) {
+        case 3:
+            format = GL_RGB;
+            break;
+        case 4:
+            format = GL_RGBA;
+            break;
+        default:
+            format = GL_RGB;
+            break;
+        }
+
+        atexture->SetWidth(width);
+        atexture->SetHeight(height);
+        atexture->SetFormat(format);
     }
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetHorizontalWrap());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetVerticalWrap());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetMinFilter());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagFilter());
 
-    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GetFormat(), GetWidth(), GetHeight(), 0, GetFormat(), GL_UNSIGNED_BYTE, image);
     stbi_image_free(image);
 }

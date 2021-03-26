@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
 #include <Entity.hpp>
 #include <Type.hpp>
+#include <IRender.hpp>
 
 namespace Engine {
 
@@ -14,7 +16,8 @@ namespace Engine {
     class IBehavior;
     class IRender;
     class IDraw;
-    
+    class IRenderCompare;
+
     /*
     Unit of destruction. 
     */
@@ -24,7 +27,7 @@ namespace Engine {
     private:
         std::vector<GameObject *> gameObjects;
         std::vector<IBehavior *> ibehaviors;
-        std::vector<IRender *> irenders;
+        std::multiset<IRender *, IRenderCompare> irenders;
         std::vector<IDraw *> idraws;
 
     public:

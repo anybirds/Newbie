@@ -3,7 +3,6 @@
 #include <memory>
 
 #include <Component.hpp>
-#include <Type.hpp>
 #include <IDraw.hpp>
 
 namespace Engine {

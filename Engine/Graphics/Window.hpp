@@ -14,7 +14,10 @@ namespace Engine {
     class ENGINE_EXPORT Window final {
     public:
         static Window &GetInstance() { static Window window; return window; }
-
+    
+    private:
+        static void FramebufferResizeCallback(GLFWwindow *glfwWindow, int fwidth, int fheight);
+        
     private:
         Window();
 
@@ -22,6 +25,8 @@ namespace Engine {
         std::string name;
         int width;
         int height;
+        int fwidth; // framebuffer width
+        int fheight; // framebuffer height
 
     public:
         Window(const Window &) = delete;

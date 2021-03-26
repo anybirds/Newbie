@@ -6,7 +6,6 @@
 
 #include <Asset.hpp>
 #include <Resource.hpp>
-#include <Type.hpp>
 
 namespace Engine {
     class ENGINE_EXPORT [[Serialize]] AModel : [[Serialize]] public Asset {

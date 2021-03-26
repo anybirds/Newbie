@@ -18,9 +18,9 @@
         "AShader" : {
             "5" : [ 5, "unlit_vert", "Shaders/unlit_vert.glsl", 35633 ],
             "6" : [ 6, "unlit_frag", "Shaders/unlit_frag.glsl", 35632 ]
-        },   
+        },
         "ATexture" : {
-            "7" : [ 7, "girl", "Textures/girl.png" ]
+            "7" : [ 7, "girl", "Textures/girl.png", 2048, 2048, 6408, 10497, 10497, 9728, 9729 ]
         }
     }
 }

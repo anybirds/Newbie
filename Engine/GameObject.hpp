@@ -61,7 +61,7 @@ namespace Engine {
                 group->ibehaviors.push_back(dynamic_cast<IBehavior *>(component));
             }
             if (std::is_base_of_v<IRender, T>) {
-                group->irenders.push_back(dynamic_cast<IRender *>(component));
+                group->irenders.insert(dynamic_cast<IRender *>(component));
             }
             if (std::is_base_of_v<IDraw, T>) {
                 group->idraws.push_back(dynamic_cast<IDraw *>(component));

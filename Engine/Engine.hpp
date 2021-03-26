@@ -5,6 +5,7 @@
 #include <Entity.hpp>
 #include <GameObject.hpp>
 #include <Graphics/Camera.hpp>
+#include <Graphics/Framebuffer.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
 #include <Graphics/Model.hpp>

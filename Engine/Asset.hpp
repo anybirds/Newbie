@@ -26,6 +26,8 @@ namespace Engine {
         std::weak_ptr<Resource> resource;
 
     public:
+        void Apply();
+
         virtual std::shared_ptr<Resource> GetResource() = 0;
         
         const std::string &GetName() const { return name; }

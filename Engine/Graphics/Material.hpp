@@ -6,7 +6,6 @@
 
 #include <Asset.hpp>
 #include <Resource.hpp>
-#include <Type.hpp>
 
 namespace Engine {
 
@@ -69,9 +68,9 @@ namespace Engine {
 
         void UseTextures();
 
-        std::shared_ptr<Shader> GetVertexShader() const;
-        std::shared_ptr<Shader> GetFragmentShader() const;
-        std::shared_ptr<Texture> GetMainTexture() const;
+        std::shared_ptr<Shader> GetVertexShader() const { return vertexShader; }
+        std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }
+        std::shared_ptr<Texture> GetMainTexture() const { return mainTexture; }
 
         friend class Renderer;
     };

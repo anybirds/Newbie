@@ -32,7 +32,8 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Apply() {
-    model = GetModel();
+    AMesh *amesh = (AMesh *)asset; 
+    model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());
     if (!model) {
         cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh:" << GetName() << '\n';
         throw exception();
@@ -139,9 +140,4 @@ void Mesh::Apply() {
     delete[] idx;
 
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
-}
-
-shared_ptr<Model> Mesh::GetModel() const { 
-    AMesh *amesh = (AMesh *)asset; 
-    return dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource()); 
 }

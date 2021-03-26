@@ -4,10 +4,14 @@
 #include <GameObject.hpp>
 #include <Group.hpp>
 #include <Transform.hpp>
+#include <Scene.hpp>
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
 #include <Graphics/Renderer.hpp>
+#include <Graphics/Framebuffer.hpp>
+#include <Graphics/Texture.hpp>
+#include <Graphics/Window.hpp>
 
 using namespace glm;
 using namespace std;
@@ -15,19 +19,14 @@ using namespace Engine;
 
 void Camera::ComputeNormalization() {
     if (orthographic) {
-        normalization = ortho(left, right, bottom, top, nr, fr);
+        normalization = ortho(-size * aspectRatio, size * aspectRatio, -size, size, nr, fr);
     } else {
-        normalization = perspective(radians(fovy), width / height, nr, fr);
+        normalization = perspective(radians(fovy), aspectRatio, nr, fr);
     }
 }
 
 void Camera::SetFovy(float fovy) {
     this->fovy = fovy;
-    ComputeNormalization();
-}
-
-void Camera::SetWidth(float width) {
-    this->width = width;
     ComputeNormalization();
 }
 
@@ -41,26 +40,32 @@ void Camera::SetFar(float fr) {
     ComputeNormalization();
 }
 
-void Camera::SetLeft(float left) {
-    this->left = left;
-    ComputeNormalization();
-}
-
-void Camera::SetRight(float right) {
-    this->right = right;
-    ComputeNormalization();
-}
-void Camera::SetTop(float top) {
-    this->top = top;
-    ComputeNormalization();
-}
-
-void Camera::SetBottom(float bottom) {
-    this->bottom = bottom;
+void Camera::SetSize(float size) {
+    this->size = size;
     ComputeNormalization();
 }
 
 void Camera::Render() {
+    if (this == Scene::GetInstance().GetSettiing()->GetMainCamera()) {
+        Window &window = Window::GetInstance();
+        float windowAspectRatio = (float)window.GetWidth() / window.GetHeight();
+        if (aspectRatio != windowAspectRatio) {
+            aspectRatio = windowAspectRatio;
+            ComputeNormalization();
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    } else if (framebuffer) {
+        float framebufferAspectRatio = (float)framebuffer->GetWidth() / framebuffer->GetHeight();
+        if (aspectRatio != framebufferAspectRatio) {
+            aspectRatio = framebufferAspectRatio;
+            ComputeNormalization();
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
+    } else {
+        cerr << '[' << __FUNCTION__ << ']' << " framebuffer not specified in Camera: " << GetGameObject()->GetName() << '\n';
+        throw exception();
+    }
+
     glClearColor((GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
