@@ -8,7 +8,7 @@
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
-#include <Graphics/Renderer.hpp>
+#include <Graphics/Drawer.hpp>
 #include <Graphics/Framebuffer.hpp>
 #include <Graphics/Texture.hpp>
 #include <Graphics/Window.hpp>
@@ -17,32 +17,16 @@ using namespace glm;
 using namespace std;
 using namespace Engine;
 
-void Camera::ComputeNormalization() {
-    if (orthographic) {
-        normalization = ortho(-size * aspectRatio, size * aspectRatio, -size, size, nr, fr);
-    } else {
-        normalization = perspective(radians(fovy), aspectRatio, nr, fr);
+const mat4 &Camera::GetNormalization() {
+    if (dirty) {
+        if (orthographic) {
+            normalization = ortho(-size * aspectRatio, size * aspectRatio, -size, size, nr, fr);
+        } else {
+            normalization = perspective(radians(fovy), aspectRatio, nr, fr);
+        }
+        dirty = false;   
     }
-}
-
-void Camera::SetFovy(float fovy) {
-    this->fovy = fovy;
-    ComputeNormalization();
-}
-
-void Camera::SetNear(float nr) {
-    this->nr = nr;
-    ComputeNormalization();
-}
-
-void Camera::SetFar(float fr) {
-    this->fr = fr;
-    ComputeNormalization();
-}
-
-void Camera::SetSize(float size) {
-    this->size = size;
-    ComputeNormalization();
+    return normalization;
 }
 
 void Camera::Render() {
@@ -51,14 +35,14 @@ void Camera::Render() {
         float windowAspectRatio = (float)window.GetWidth() / window.GetHeight();
         if (aspectRatio != windowAspectRatio) {
             aspectRatio = windowAspectRatio;
-            ComputeNormalization();
+            dirty = true;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else if (framebuffer) {
         float framebufferAspectRatio = (float)framebuffer->GetWidth() / framebuffer->GetHeight();
         if (aspectRatio != framebufferAspectRatio) {
             aspectRatio = framebufferAspectRatio;
-            ComputeNormalization();
+            dirty = true;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     } else {
@@ -84,10 +68,9 @@ void Camera::Render() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    for (IDraw *idraw : GetGameObject()->GetGroup()->idraws) {
-        Component *component = dynamic_cast<Component *>(idraw);
-        if (!component->IsRemoved() && component->IsEnabled()) {
-            idraw->Draw(this);
+    for (Drawer *drawer : GetGroup()->drawers) {
+        if (drawer->IsEnabled()) {
+            drawer->Draw(this);
         }
     }
 

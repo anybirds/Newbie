@@ -8,17 +8,6 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
-void Transform::SetRemoved() {
-    if (IsRemoved()) {
-        return;
-    }
-    Entity::SetRemoved();
-    GetGameObject()->SetRemoved();
-    for (Transform *t : children) {
-        t->SetRemoved();
-    }
-}
-
 void Transform::PropagateUpdate() {
     if (dirty) {
         return;

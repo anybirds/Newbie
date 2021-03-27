@@ -32,6 +32,6 @@ namespace Engine {
     void from_json(const nlohmann::json &js, std::shared_ptr<T> &t) {
         std::shared_ptr<Resource> resource;
         from_json(js, resource);
-        t = dynamic_pointer_cast<T>(resource);
+        t = std::dynamic_pointer_cast<T>(resource);
     }
 }

@@ -10,7 +10,7 @@ namespace Engine {
     class AModel;
     class Model;
 
-    class ENGINE_EXPORT [[Serialize]] AMesh : [[Serialize]] public Asset {
+    class ENGINE_EXPORT [[Serialize]] AMesh : public Asset {
         TYPE(AMesh)
 
     private:
@@ -52,6 +52,6 @@ namespace Engine {
         uint32_t GetIndex() const { AMesh *amesh = (AMesh *)asset; return amesh->GetIndex(); }
         std::shared_ptr<Model> GetModel() const { return model; }
 
-        friend class Renderer;
+        friend class MeshDrawer;
     };
 }

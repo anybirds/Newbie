@@ -3,10 +3,6 @@
 using namespace glm;
 using namespace Engine;
 
-void RotateScript::Start() {
-
-}
-
 void RotateScript::Update() {
     float dt = Time::DeltaTime();
     Transform *transform = GetGameObject()->GetTransform();

@@ -8,7 +8,7 @@
 #include <Resource.hpp>
 
 namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] AModel : [[Serialize]] public Asset {
+    class ENGINE_EXPORT [[Serialize]] AModel : public Asset {
         TYPE(AModel)
     
     private:

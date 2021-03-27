@@ -49,8 +49,11 @@ int main(int argc, char **argv) {
     while (!window.ShouldClose()) {
         Time::Tick();
         
+        scene.Refresh();
         scene.Update();
         scene.Render();
+
+        scene.Delete();
 
 		window.SwapBuffers();
         window.PollEvents();

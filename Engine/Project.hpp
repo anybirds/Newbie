@@ -11,6 +11,7 @@
 #include <string>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <nlohmann/json.hpp>
 
@@ -64,6 +65,8 @@ namespace Engine {
         std::vector<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
 
+        std::unordered_set<Asset *> garbages;
+
     public:
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
@@ -75,22 +78,22 @@ namespace Engine {
         void AddScene(const std::string &path);
         void RemoveScene(int index);
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
-        T *AddAsset(const std::string &name) {
-            T *asset = new T();
-            asset->serial = setting->GetSerial();
-            asset->SetName(name);
-            assets.insert({asset->serial, asset});
-            return asset;
-        }
-        template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);
-            if (it != assets.end() && !(it->second->IsRemoved())) {
-                return (T *)(it->second);
+            if (it != assets.end()) {
+                return dynamic_cast<T *>(it->second);
             } else {
                 return nullptr;
             }
         }
+        template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
+        T *AddAsset() {
+            T *asset = new T();
+            asset->serial = setting->GetSerial();
+            assets.insert({asset->serial, asset});
+            return asset;
+        }
+        void RemoveAsset(Asset *asset);
 
         friend class Scene;
     };

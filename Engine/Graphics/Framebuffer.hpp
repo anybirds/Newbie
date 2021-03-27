@@ -10,7 +10,7 @@ namespace Engine {
     class ATexture;
     class Texture;
 
-    class ENGINE_EXPORT [[Serialize]] AFramebuffer : [[Serialize]] public Asset {
+    class ENGINE_EXPORT [[Serialize]] AFramebuffer : public Asset {
         TYPE(AFramebuffer)
 
     private:

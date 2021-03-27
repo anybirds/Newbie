@@ -130,18 +130,10 @@ bool Project::Save() {
 
         // write assets
         json &assets = js["Asset"];
-        unordered_map<uint64_t, Asset *> temp;
-        for (auto it = project.assets.begin(); it != project.assets.end(); ) {
-            if (it->second->IsRemoved()) {
-                temp.insert(*it);
-                it = project.assets.erase(it);
-            } else {
-                Type *type = it->second->GetType();
-                type->Serialize(assets[type->GetName()][to_string(it->first)], it->second);
-                it++;
-            }
+        for (auto &p : project.assets) {
+            Type *type = p.second->GetType();
+            type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
         }
-        project.assets.insert(temp.begin(), temp.end());
 
         fs << js;
     } catch(...) {
@@ -172,6 +164,10 @@ void Project::Close() {
         delete p.second;
     }
     project.assets.clear(); 
+    for (Asset *garbage : project.garbages) {
+        delete garbage;
+    }
+    project.garbages.clear();
 
     // clear out lib and types
     if (project.lib) {
@@ -197,4 +193,9 @@ void Project::AddScene(const string &path) {
 void Project::RemoveScene(int index) {
     scenes.at(index);
     scenes.erase(scenes.begin() + index);
+}
+
+void Project::RemoveAsset(Asset *asset) {
+    assets.erase(asset->GetSerial());
+    garbages.insert(asset);
 }

@@ -6,7 +6,6 @@
 
 #include <Entity.hpp>
 #include <Type.hpp>
-#include <Interface.hpp>
 
 namespace Engine {
 
@@ -40,7 +39,7 @@ namespace Engine {
     void ENGINE_EXPORT from_json(const nlohmann::json &js, Entity *&entity);
     void ENGINE_EXPORT from_json(const nlohmann::json &js, Asset *&asset);
 
-    template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T> || std::is_base_of_v<Interface, T>, bool> = true>
+    template <typename T>
     void to_json(nlohmann::json &js, const T *t) {
         if (std::is_base_of_v<Entity, T>) {
             js = reinterpret_cast<uint64_t>(t);
@@ -49,7 +48,7 @@ namespace Engine {
         }
     }   
 
-    template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T> || std::is_base_of_v<Interface, T>, bool> = true>
+    template <typename T>
     void from_json(const nlohmann::json &js, T *&t) {
         if (std::is_base_of_v<Asset, T>) {
             Asset *asset = nullptr;

@@ -8,7 +8,7 @@
 
 namespace Engine {
 
-    class ENGINE_EXPORT [[Serialize]] AShader : [[Serialize]] public Asset {
+    class ENGINE_EXPORT [[Serialize]] AShader : public Asset {
         TYPE(AShader)
 
     private:

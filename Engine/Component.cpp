@@ -1,20 +1,22 @@
+#include <functional>
+
 #include <Component.hpp>
 #include <GameObject.hpp>
 #include <Transform.hpp>
+#include <Group.hpp>
 
+using namespace std;
 using namespace Engine;
 
-bool Component::IsEnabled() const {
-    bool enabled = this->enabled;
-    Transform *transform = gameObject->GetTransform();
-    while (enabled && transform) {
-        enabled = enabled && transform->enabled;
-        transform = transform->GetParent();
-    }
-    return enabled;
+Transform *Component::GetTransform() const {
+    return gameObject->GetTransform();
 }
 
-bool Component::SetEnabled() {
-    enabled = true;
-    return IsEnabled();
+Group *Component::GetGroup() const {
+    return GetGameObject()->GetGroup();
+}
+
+void Component::SetLocalEnabled(bool localEnabled) {
+    this->localEnabled = localEnabled;
+    GetGroup()->dirty = true;
 }

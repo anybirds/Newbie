@@ -8,11 +8,9 @@
 #include <Group.hpp>
 #include <GameObject.hpp>
 #include <Transform.hpp>
-#include <Component.hpp>
 #include <Scene.hpp>
-#include <Type.hpp>
-#include <IBehavior.hpp>
-#include <IRender.hpp>
+#include <Script.hpp>
+#include <Graphics/Renderer.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -68,7 +66,7 @@ bool Scene::Load(int index) {
         return false;
     }
     
-    cerr << '[' << __FUNCTION__ << ']' << " read scene with index: " << index << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << scene.name << " done.\n";
     return true;
 }
 
@@ -92,56 +90,29 @@ bool Scene::Save() {
         json& entities = js["Entity"];
         function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
             Transform *transform = gameObject->GetTransform();
-            size_t j = 0;
-            for (size_t i=0; i<transform->children.size(); i++) {
-                GameObject *child = transform->children[i]->GetGameObject();
-                if (!child->IsRemoved()) {
-                    recurse(child);
-                    swap(transform->children[j], transform->children[i]);
-                    j++;
-                }
+            for (Transform *t : transform->children) {
+                recurse(t->GetGameObject());
             }
-            vector<Transform *> tempg(transform->children.begin() + j, transform->children.end());
-            transform->children.resize(j);
 
-            j = 0;
-            for (size_t i=0; i<gameObject->components.size(); i++) {
-                Component *component = gameObject->components[i];
-                if (!component->IsRemoved()) {
-                    Type *type = component->GetType();
+            for (Component *component : gameObject->components) {
+                Type *type = component->GetType();
                     type->Serialize(
-                        entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))], 
-                        component);
-                    swap(gameObject->components[j], gameObject->components[i]);
-                    j++;
-                }
+                        entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
+                        component); 
             }
-            vector<Component *> tempc(gameObject->components.begin() + j, gameObject->components.end());
-            gameObject->components.resize(j);
 
             GameObject::StaticType()->Serialize(
                 entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
                 gameObject);
-            transform->children.insert(transform->children.end(), tempg.begin(), tempg.end());
-            gameObject->components.insert(gameObject->components.end(), tempc.begin(), tempc.end());
         };
         for (Group *group : scene.groups) {
-            size_t j = 0;
-            for (size_t i=0; i<group->gameObjects.size(); i++) {
-                GameObject *gameObject = group->gameObjects[i];
-                if (!gameObject->IsRemoved()) {
-                    recurse(gameObject);
-                    swap(group->gameObjects[j], group->gameObjects[i]);
-                    j++;
-                }
+            for (GameObject *gameObject : group->gameObjects) {
+                recurse(gameObject);
             }
-            vector<GameObject *> temp(group->gameObjects.begin() + j, group->gameObjects.end());
-            group->gameObjects.resize(j);
 
             Group::StaticType()->Serialize(
                 entities[Group::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(group))], 
                 group);
-            group->gameObjects.insert(group->gameObjects.end(), temp.begin(), temp.end());
         }
         
         fs << js;
@@ -157,11 +128,16 @@ bool Scene::Save() {
 void Scene::Close() {
     Scene &scene = Scene::GetInstance();
     scene.name.clear();
-    delete scene.setting;
-    for (Group *group : scene.groups) {
+    scene.path.clear();
+    if (scene.setting) {
+        delete scene.setting;
+    }
+    vector<Group *> temp(scene.groups.begin(), scene.groups.end());
+    for (Group *group : temp) {
         delete group;
     }
     scene.groups.clear();
+    scene.garbages.clear();
 }
 
 Group *Scene::AddGroup() {
@@ -170,12 +146,12 @@ Group *Scene::AddGroup() {
 }
 
 void Scene::RemoveGroup(Group *group) {
-    delete group;
+    garbages.insert(group);
 }
 
-GameObject *Scene::GetGameObject(const string &name) {
+GameObject *Scene::FindGameObject(const string &name) {
     for (Group *group : groups) {
-        if (GameObject *gameObject = group->GetGameObject(name)) {
+        if (GameObject *gameObject = group->FindGameObject(name)) {
             return gameObject;
         }
     }
@@ -184,19 +160,31 @@ GameObject *Scene::GetGameObject(const string &name) {
 
 void Scene::Start() {
     for (Group *group : groups) {
-        for (IBehavior *ibehavior : group->ibehaviors) {
+        for (Script *script : group->scripts) {
             try {
-                ibehavior->Start();
+                if (script->IsEnabled()) {
+                    script->Start();
+                }
             } catch(...) {}
         }
     } 
 }
 
+void Scene::Refresh() {
+    for (Group *group : groups) {
+        if (group->dirty) {
+            group->Refresh();
+        }
+    }
+}
+
 void Scene::Update() {
     for (Group *group : groups) {
-        for (IBehavior *ibehavior : group->ibehaviors) {
+        for (Script *script : group->scripts) {
             try {
-                ibehavior->Update();
+                if (script->IsEnabled()) {
+                    script->Update();
+                }
             } catch(...) {}
         }
     }
@@ -204,10 +192,19 @@ void Scene::Update() {
 
 void Scene::Render() {
     for (Group *group : groups) {
-        for (IRender *irender : group->irenders) {
+        for (Renderer *renderer : group->renderers) {
             try {
-                irender->Render();
+                if (renderer->IsEnabled()) {
+                    renderer->Render();
+                }
             } catch(...) {}
         }
     }
+}
+
+void Scene::Delete() {
+    for (Group *garbage : garbages) {
+        delete garbage;
+    }
+    garbages.clear();
 }

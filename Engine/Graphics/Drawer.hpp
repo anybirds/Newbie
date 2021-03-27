@@ -3,23 +3,26 @@
 #include <Component.hpp>
 
 namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] Renderer : public Component {
-        TYPE(Renderer)
+    
+    class Camera;
+
+    class ENGINE_EXPORT [[Serialize]] Drawer : public Component {
+        TYPE(Drawer)
     
     private:
         unsigned order;
     
     public:
-        Renderer() : order(0U) {}
-        virtual void Render() = 0;
+        Drawer() : order(0U) {}
+        virtual void Draw(Camera *camera) = 0;
 
         unsigned GetOrder() const { return order; }
         void SetOrder(unsigned order);
     };
     
-    class RendererComparer {
+    class DrawerComparer {
     public:
-        bool operator()(Renderer *l, Renderer *r) const {
+        bool operator()(Drawer *l, Drawer *r) const {
             return l->GetOrder() < r->GetOrder();
         }
     };

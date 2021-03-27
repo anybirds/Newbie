@@ -14,7 +14,7 @@ namespace Engine {
     class Shader;
     class Texture;
 
-    class ENGINE_EXPORT [[Serialize]] AMaterial : [[Serialize]] public Asset {
+    class ENGINE_EXPORT [[Serialize]] AMaterial : public Asset {
         TYPE(AMaterial)
     
     private:
@@ -72,6 +72,6 @@ namespace Engine {
         std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }
         std::shared_ptr<Texture> GetMainTexture() const { return mainTexture; }
 
-        friend class Renderer;
+        friend class MeshDrawer;
     };
 }
