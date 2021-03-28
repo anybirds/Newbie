@@ -68,7 +68,8 @@ void Camera::Render() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    for (Drawer *drawer : GetGroup()->drawers) {
+    Scene &scene = Scene::GetInstance();
+    for (Drawer *drawer : scene.drawers) {
         if (drawer->IsEnabled()) {
             drawer->Draw(this);
         }

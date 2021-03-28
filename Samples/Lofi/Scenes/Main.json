@@ -1,13 +1,14 @@
 {
-    "SceneSetting" : [ 7 ],
-    "Entity" : {
+    "setting" : [ 7 ],
+    "groups" : [ 11 ],
+    "scripts" : [ 10 ],
+    "renderers" : [ 7 ],
+    "drawers" : [ 8, 9 ],
+    "entities" : {
         "Group" : {
             "11" : [ 
                 false,
-                [ 1, 2, 3 ],
-                [ 10 ],
-                [ 7 ],
-                [ 8, 9 ]
+                [ 1, 2, 3 ]
             ]
         },
         "GameObject" : {

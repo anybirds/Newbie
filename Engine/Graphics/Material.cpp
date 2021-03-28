@@ -19,7 +19,7 @@ shared_ptr<Resource> AMaterial::GetResource() {
     return sp;
 }
 
-Material::Material(AMaterial *amaterial) : Resource(amaterial) {
+Material::Material(AMaterial *amaterial) : Resource(amaterial), program(0) {
     Apply();
 }
 
@@ -33,11 +33,11 @@ void Material::Apply() {
     fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
     mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());
     if (!vertexShader) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material:" << GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
         throw exception();
     }
     if (!fragmentShader) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material:" << GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material: " << GetName() << '\n';
         throw exception();
     }
 

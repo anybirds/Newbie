@@ -35,7 +35,7 @@ void Mesh::Apply() {
     AMesh *amesh = (AMesh *)asset; 
     model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());
     if (!model) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh:" << GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh: " << GetName() << '\n';
         throw exception();
     }
 

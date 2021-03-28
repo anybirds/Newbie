@@ -12,7 +12,7 @@ void Group::Refresh() {
     std::function<void(GameObject *, bool)> recurse = [&recurse](GameObject *gameObject, bool enabled) {
         enabled = enabled && gameObject->IsLocalEnabled();
         for (Component *component : gameObject->components) {
-            component->SetLocalEnabled(enabled && component->IsLocalEnabled());
+            component->enabled = enabled && component->IsLocalEnabled();
         }
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
@@ -26,11 +26,6 @@ void Group::Refresh() {
     dirty = false;
 }
 
-Group::Group() {
-    Scene &scene = Scene::GetInstance();
-    scene.groups.insert(this);
-}
-
 Group::~Group() {
     for (GameObject *gameObject : gameObjects) {
         delete gameObject;
@@ -38,8 +33,6 @@ Group::~Group() {
     for (GameObject *garbage : garbages) {
         delete garbage;
     }
-    Scene &scene = Scene::GetInstance();
-    scene.groups.erase(this);
 }
 
 GameObject *Group::FindGameObject(const string &name) const {
@@ -54,7 +47,8 @@ GameObject *Group::FindGameObject(const string &name) const {
 GameObject *Group::AddGameObject() {
     GameObject *gameObject = new GameObject();
     Transform *transform = gameObject->AddComponent<Transform>();
-    
+    transform->enabled = true;
+
     gameObject->group = this;
     gameObject->transform = transform;
 

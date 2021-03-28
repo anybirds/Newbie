@@ -30,7 +30,7 @@ namespace Engine {
         mutable bool dirty;
         mutable glm::mat4 localToWorldMatrix;
 
-        void PropagateUpdate();
+        void Propagate();
 
     public:
         Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)), dirty(false) {}

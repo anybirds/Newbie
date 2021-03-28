@@ -1,7 +1,7 @@
 {
-    "ProjectSetting" : [ 8, 0 ],
-    "Scene" : [ "Scenes/Main.json" ],
-    "Asset" : {
+    "setting" : [ 8, 0 ],
+    "scenes" : [ "Scenes/Main.json" ],
+    "assets" : {
         "AMaterial" : {
             "8" : [ 8, "girl", 5, 6, 7 ]
         },

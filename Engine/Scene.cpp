@@ -10,7 +10,6 @@
 #include <Transform.hpp>
 #include <Scene.hpp>
 #include <Script.hpp>
-#include <Graphics/Renderer.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -39,7 +38,7 @@ bool Scene::Load(int index) {
         fs >> js;
         
         // read entities
-        json &entities = js["Entity"];
+        json &entities = js["entities"];
         for (json::iterator i = entities.begin(); i != entities.end(); i++) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
@@ -55,9 +54,15 @@ bool Scene::Load(int index) {
             }
         }
         
+        // read extras
+        scene.groups = js["groups"].get<unordered_set<Group *>>();
+        scene.scripts = js["scripts"].get<unordered_set<Script *>>();
+        scene.renderers = js["renderers"].get<multiset<Renderer *, RendererComparer>>();
+        scene.drawers = js["drawers"].get<multiset<Drawer *, DrawerComparer>>();
+
         // read scene setting
         scene.setting = (SceneSetting *)SceneSetting::StaticType()->Instantiate();
-        SceneSetting::StaticType()->Deserialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
+        SceneSetting::StaticType()->Deserialize(js["setting"], scene.setting);
         
         Entity::temp.clear();
     } catch(...) {
@@ -84,10 +89,16 @@ bool Scene::Save() {
         json js;
 
         // write scene setting
-        SceneSetting::StaticType()->Serialize(js[SceneSetting::StaticType()->GetName()], scene.setting);
+        SceneSetting::StaticType()->Serialize(js["setting"], scene.setting);
+
+        // write extras
+        js["groups"] = scene.groups;
+        js["scripts"] = scene.scripts;
+        js["renderers"] = scene.renderers;
+        js["drawers"] = scene.drawers;
 
         // write entities
-        json& entities = js["Entity"];
+        json& entities = js["entities"];
         function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
             Transform *transform = gameObject->GetTransform();
             for (Transform *t : transform->children) {
@@ -159,15 +170,13 @@ GameObject *Scene::FindGameObject(const string &name) {
 }
 
 void Scene::Start() {
-    for (Group *group : groups) {
-        for (Script *script : group->scripts) {
-            try {
-                if (script->IsEnabled()) {
-                    script->Start();
-                }
-            } catch(...) {}
-        }
-    } 
+    for (Script *script : scripts) {
+        try {
+            if (script->IsEnabled()) {
+                script->Start();
+            }
+        } catch(...) {}
+    }
 }
 
 void Scene::Refresh() {
@@ -179,26 +188,22 @@ void Scene::Refresh() {
 }
 
 void Scene::Update() {
-    for (Group *group : groups) {
-        for (Script *script : group->scripts) {
-            try {
-                if (script->IsEnabled()) {
-                    script->Update();
-                }
-            } catch(...) {}
-        }
+    for (Script *script : scripts) {
+        try {
+            if (script->IsEnabled()) {
+                script->Update();
+            }
+        } catch(...) {}
     }
 }
 
 void Scene::Render() {
-    for (Group *group : groups) {
-        for (Renderer *renderer : group->renderers) {
-            try {
-                if (renderer->IsEnabled()) {
-                    renderer->Render();
-                }
-            } catch(...) {}
-        }
+    for (Renderer *renderer : renderers) {
+        try {
+            if (renderer->IsEnabled()) {
+                renderer->Render();
+            }
+        } catch(...) {}
     }
 }
 

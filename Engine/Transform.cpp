@@ -3,19 +3,20 @@
 
 #include <Transform.hpp>
 #include <GameObject.hpp>
+#include <Group.hpp>
 
 using namespace std;
 using namespace glm;
 using namespace Engine;
 
-void Transform::PropagateUpdate() {
+void Transform::Propagate() {
     if (dirty) {
         return;
     }
     dirty = true;
 
     for (Transform *transform : children) {
-        transform->PropagateUpdate();
+        transform->Propagate();
     }
 }
 
@@ -50,39 +51,58 @@ vec3 Transform::GetScale() const {
 
 void Transform::SetLocalPosition(const glm::vec3 &localPosition) {
     this->localPosition = localPosition;
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetLocalRotation(const glm::quat &localRotation) {
     this->localEulerAngles = degrees(eulerAngles(localRotation));
     this->localRotation = localRotation;
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetLocalScale(const glm::vec3 &localScale) {
     this->localScale = localScale;
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetLocalEulerAngles(const glm::vec3 &localEulerAngles) {
     this->localEulerAngles = localEulerAngles;
     this->localRotation = quat(radians(localEulerAngles));
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetPosition(const glm::vec3 &position) {
     this->localPosition = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * position;
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetScale(const glm::vec3 &scale) {
     this->localScale = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * scale;
-    PropagateUpdate();
+    Propagate();
 }
 
 void Transform::SetParent(Transform *parent) {
-    dirty = true;
-    this->parent = parent;
+    Transform *p = parent;
+    while (p) {
+        if (this == p) {
+            return;
+        }
+        p = p->parent;
+    }
+    Group *group = GetGroup();
+    if (this->parent) {
+        this->parent->children.erase(this);
+    } else {
+        group->gameObjects.erase(GetGameObject());
+    }
+    if (parent) {
+        parent->children.insert(this);
+    } else {
+        group->gameObjects.insert(GetGameObject());
+    }
+    this->parent = parent;  
+    group->dirty = true;
+    Propagate();
 }
 
 void Transform::Rotate(const glm::vec3 &eulerAngles) {

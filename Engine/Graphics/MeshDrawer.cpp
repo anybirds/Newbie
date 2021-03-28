@@ -15,11 +15,11 @@ using namespace Engine;
 
 void MeshDrawer::Draw(Camera *camera) {
     if (!mesh) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing Mesh in GameObject:" << GetGameObject()->GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " missing Mesh in GameObject: " << GetGameObject()->GetName() << '\n';
         throw exception();
     }
     if (!material) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing Material in GameObject:" << GetGameObject()->GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " missing Material in GameObject: " << GetGameObject()->GetName() << '\n';
         throw exception();
     }
 

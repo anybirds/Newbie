@@ -7,7 +7,7 @@
 #include <Script.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Drawer.hpp>
-#include <Group.hpp>
+#include <Scene.hpp>
 
 namespace Engine {
     
@@ -58,6 +58,7 @@ namespace Engine {
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
+            t->enabled = IsEnabled();
             components.insert(t);
             return t;
         }
@@ -65,24 +66,27 @@ namespace Engine {
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
+            t->enabled = IsEnabled();
             components.insert(t);
-            group->scripts.insert((Script *)t);
+            Scene::GetInstance().scripts.insert((Script *)t);
             return t;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Renderer, T>, bool> = true> 
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
+            t->enabled = IsEnabled();
             components.insert(t);
-            group->renderers.insert((Renderer *)t);
+            Scene::GetInstance().renderers.insert((Renderer *)t);
             return t;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Drawer, T>, bool> = true> 
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
+            t->enabled = IsEnabled();
             components.insert(t);
-            group->drawers.insert((Drawer *)t);
+            Scene::GetInstance().drawers.insert((Drawer *)t);
             return t;
         }
         void RemoveComponent(Component *component);

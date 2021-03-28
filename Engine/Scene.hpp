@@ -1,17 +1,19 @@
 #pragma once
 
 #include <string>
+#include <set>
 #include <unordered_set>
 
-#include <Entity.hpp>
 #include <Asset.hpp>
-#include <Type.hpp>
+#include <Graphics/Renderer.hpp>
+#include <Graphics/Drawer.hpp>
 
 namespace Engine {
 
     class Camera;
     class Group;
     class GameObject;
+    class Script;
 
     class ENGINE_EXPORT [[Serialize]] SceneSetting final : public Entity {
         TYPE(SceneSetting)
@@ -41,6 +43,9 @@ namespace Engine {
         std::string path;
         SceneSetting *setting;
         std::unordered_set<Group *> groups;
+        std::unordered_set<Script *> scripts;
+        std::multiset<Renderer *, RendererComparer> renderers;
+        std::multiset<Drawer *, DrawerComparer> drawers;
 
         std::unordered_set<Group *> garbages;
         
@@ -60,5 +65,10 @@ namespace Engine {
         void Delete();
 
         friend class Group;
+        friend class GameObject;
+        friend class Camera;
+        friend class Script;
+        friend class Renderer;
+        friend class Drawer;
     };
 }

@@ -1,12 +1,11 @@
-#include <Group.hpp>
-#include <GameObject.hpp>
+#include <Scene.hpp>
 #include <Graphics/Renderer.hpp>
 
 using namespace Engine;
 
 void Renderer::SetOrder(unsigned order) {
-    Group *group = GetGroup();
-    group->renderers.erase(this);
+    Scene &scene = Scene::GetInstance();
+    scene.renderers.erase(this);
     this->order = order;
-    group->renderers.insert(this);
+    scene.renderers.insert(this);
 }

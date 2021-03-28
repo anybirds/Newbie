@@ -1,12 +1,11 @@
-#include <Group.hpp>
-#include <GameObject.hpp>
+#include <Scene.hpp>
 #include <Graphics/Drawer.hpp>
 
 using namespace Engine;
 
 void Drawer::SetOrder(unsigned order) {
-    Group *group = GetGroup();
-    group->drawers.erase(this);
+    Scene &scene = Scene::GetInstance();
+    scene.drawers.erase(this);
     this->order = order;
-    group->drawers.insert(this);
+    scene.drawers.insert(this);
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <set>
 #include <unordered_set>
 
 #include <Entity.hpp>
@@ -25,9 +24,6 @@ namespace Engine {
         bool dirty;
 
         std::unordered_set<GameObject *> gameObjects;
-        std::unordered_set<Script *> scripts;
-        std::multiset<Renderer *, RendererComparer> renderers;
-        std::multiset<Drawer *, DrawerComparer> drawers;
 
         [[NoSerialize]]
         std::unordered_set<GameObject *> garbages;
@@ -35,7 +31,6 @@ namespace Engine {
         void Refresh();
 
     public:
-        Group();
         virtual ~Group();
 
         GameObject *FindGameObject(const std::string &name) const;
@@ -45,8 +40,6 @@ namespace Engine {
         friend class Scene;
         friend class Component;
         friend class GameObject;
-        friend class Drawer;
-        friend class Renderer;
-        friend class Camera;
+        friend class Transform;
     };
 }

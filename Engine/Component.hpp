@@ -22,11 +22,9 @@ namespace Engine {
         bool enabled;
         GameObject *gameObject;
 
-        void SetEnabled(bool enabled) { this->enabled = enabled; }
-
     public:
-        Component() : gameObject(nullptr) {}
-        
+        Component() : localEnabled(true), gameObject(nullptr) {}
+
         bool IsLocalEnabled() { return localEnabled; }
         bool IsEnabled() { return enabled; }
         void SetLocalEnabled(bool localEnabled);
@@ -36,5 +34,6 @@ namespace Engine {
         Group *GetGroup() const;
 
 		friend class GameObject;
+        friend class Group;
     };
 }

@@ -71,10 +71,10 @@ bool Project::Load(const string &path) {
         fs >> js;
         
         // read scenes
-        project.scenes = js["Scene"].get<vector<string>>();
+        project.scenes = js["scenes"].get<vector<string>>();
         
         // read assets
-        json &assets = js["Asset"];
+        json &assets = js["assets"];
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
@@ -92,11 +92,11 @@ bool Project::Load(const string &path) {
         
         // read project setting
         project.setting = (ProjectSetting *)ProjectSetting::StaticType()->Instantiate();
-        ProjectSetting::StaticType()->Deserialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
+        ProjectSetting::StaticType()->Deserialize(js["setting"], project.setting);
 
     } catch(...) {
-        Project::Close();
         cerr << '[' << __FUNCTION__ << ']' << " cannot read project: " << project.name << '\n';
+        Project::Close();
         return false;
     }
     
@@ -123,13 +123,13 @@ bool Project::Save() {
         json js;
         
         // write project setting
-        ProjectSetting::StaticType()->Serialize(js[ProjectSetting::StaticType()->GetName()], project.setting);
+        ProjectSetting::StaticType()->Serialize(js["setting"], project.setting);
 
         // write scenes
-        js["Scene"] = project.scenes;
+        js["scenes"] = project.scenes;
 
         // write assets
-        json &assets = js["Asset"];
+        json &assets = js["assets"];
         for (auto &p : project.assets) {
             Type *type = p.second->GetType();
             type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
@@ -137,8 +137,8 @@ bool Project::Save() {
 
         fs << js;
     } catch(...) {
-        Project::Close();
         cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << project.name << '\n';
+        Project::Close();
         return false;
     }
 

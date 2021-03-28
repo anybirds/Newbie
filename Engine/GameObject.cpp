@@ -1,5 +1,6 @@
 #include <GameObject.hpp>
 #include <Component.hpp>
+#include <Scene.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -20,12 +21,14 @@ void GameObject::RemoveComponent(Component *component) {
     if (this == component->GetGameObject() && Transform::StaticType() != component->GetType()) {
         components.erase(component);
         garbages.insert(component);
+
+        Scene &scene = Scene::GetInstance();
         if (Script *script = dynamic_cast<Script *>(component)) {
-            group->scripts.erase(script);
+            scene.scripts.erase(script);
         } else if (Renderer *renderer = dynamic_cast<Renderer *>(component)) {
-            group->renderers.erase(renderer);
+            scene.renderers.erase(renderer);
         } else if (Drawer *drawer = dynamic_cast<Drawer *>(component)) {
-            group->drawers.erase(drawer);
+            scene.drawers.erase(drawer);
         }
     }
 }
@@ -46,7 +49,8 @@ GameObject *GameObject::FindGameObject(const string &name) const {
 GameObject *GameObject::AddGameObject() {
     GameObject *child = new GameObject();
     Transform *t = child->AddComponent<Transform>();
-    t->SetParent(transform);
+    t->enabled = IsEnabled();
+    t->parent = transform;
 
     child->group = group;
     child->transform = t;
