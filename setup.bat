@@ -1,7 +1,7 @@
 @echo off
 
 cd c:/
-if exist vcpkg\ (
+if not exist vcpkg\ (
     git clone https://github.com/Microsoft/vcpkg.git
 )
 cd c:/vcpkg
@@ -16,14 +16,16 @@ vcpkg install zlib:x64-windows
 vcpkg install nlohmann-json:x64-windows
 
 cd c:/Newbie/Engine
-cmake -G "Visual Studio 16 2019 " -A x64 -B "../Build/Engine"
-cd c:/Newbie/Build/Engine
+cmake -G "Visual Studio 16 2019 " -A x64 -B "../build/Engine"
+cd c:/Newbie/build/Engine
 cmake --build . --config Release
+
 cd c:/Newbie/Editor
-cmake -G "Visual Studio 16 2019" -A x64 -B "../Build/Editor"
-cd c:/Newbie/Build/Editor
+cmake -G "Visual Studio 16 2019" -A x64 -B "../build/Editor"
+cd c:/Newbie/build/Editor
 cmake --build . --config Release
-cd c:/Newbie/App
-cmake -G "Visual Studio 16 2019" -A x64 -B "../Build/App"
-cd c:/Newbie/Build/App
+
+cd c:/Newbie/Samples/Lofi
+cmake -G "Visual Studio 16 2019" -A x64 -B "../build/Samples/Lofi"
+cd c:/Newbie/build/Samples/Lofi
 cmake --build . --config Release
