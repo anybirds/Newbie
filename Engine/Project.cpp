@@ -23,6 +23,9 @@ bool Project::Load(const string &path) {
     project.directory = filesystem::path(project.path).parent_path().string();
     project.libpath = project.directory + "/User.dll";
 
+    // compile library
+    
+    
     // load shared library
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     project.lib = LoadLibrary((project.libpath).c_str());

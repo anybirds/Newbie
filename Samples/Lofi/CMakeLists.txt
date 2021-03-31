@@ -1,5 +1,5 @@
-# Run cmake -G "Visual Studio 15 2017" -A x64 -B ../../build/Samples/Lofi
-# Run cmake --build ../../build/Samples/Lofi --config Release
+# Run cmake -G "Visual Studio 16 2019" -A x64 -B build
+# Run cmake --build build --config Release
 
 cmake_minimum_required(VERSION 3.8)
 
@@ -22,7 +22,10 @@ set(Engine_DIR "C:/Newbie/build/Engine")
 find_package(Engine REQUIRED)
 
 file(GLOB_RECURSE USER_HEADER "*.hpp")
+list(FILTER USER_HEADER EXCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/build/.*" )
 file(GLOB_RECURSE USER_SOURCE "*.cpp")
+list(FILTER USER_SOURCE EXCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/build/.*" )
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_HEADER} ${USER_SOURCE})
 
 add_custom_command(
