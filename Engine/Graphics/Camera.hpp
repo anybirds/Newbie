@@ -5,7 +5,7 @@
 
 #include <Graphics/Renderer.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class Framebuffer;
 
@@ -13,33 +13,24 @@ namespace Engine {
     Featured by its normalization matrix.
     Specify camera properties that affect the normalization matrix.
     */
-    class ENGINE_EXPORT [[Serialize]] Camera : public Renderer {
-        TYPE(Camera)
+    CLASS_ATTR(Camera, Renderer, ENGINE_EXPORT) {
+        TYPE(Camera);
 
-    private:
-        bool dirty;
-
-        glm::mat4 normalization;
-
-        bool orthographic;
-        float fovy;
-        float aspectRatio;
-        float nr; // near
-        float fr; // far
-        float size;
-        
-        std::shared_ptr<Framebuffer> framebuffer;
+        PROPERTY_NONE(bool, dirty);
+        PROPERTY_NONE(glm::mat4, normalization);
+        PROPERTY_NONE(bool, orthographic);
+        PROPERTY_GET(float, fovy, Fovy);
+        PROPERTY_GET(float, aspectRatio, AspectRatio);
+        PROPERTY_GET(float, nr, Near);
+        PROPERTY_GET(float, fr, Far);
+        PROPERTY_GET(float, size, Size);
+        PROPERTY(std::shared_ptr<Framebuffer>, framebuffer, Framebuffer);
 
     public:
         Camera() : dirty(true), fovy(60.0f), aspectRatio(1.0f), nr(0.1f), fr(1000.0f) { }
 
         bool IsOrthographic() const { return orthographic; }
         bool IsPerspective() const { return !orthographic; }
-        float GetFovy() const { return fovy; }
-        float GetAspectRatio() const { return aspectRatio; }
-        float GetNear() const { return nr; }
-        float GetFar() const { return fr; }
-        float GetSize() const { return size; }
         const glm::mat4 &GetNormalization();
 
         void SetOrthographic() { orthographic = true; dirty = true; }

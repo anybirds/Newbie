@@ -5,7 +5,7 @@
 #include <Entity.hpp>
 #include <Type.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class Group;
     class GameObject;
@@ -14,14 +14,13 @@ namespace Engine {
     /*
     Components that organizes the GameObject.
     */
-    class ENGINE_EXPORT [[Serialize]] Component : public Entity {
-        TYPE(Component)
+    CLASS_ATTR(Component, Entity, ENGINE_EXPORT) {
+        TYPE(Component);
 
-    private:
-        bool localEnabled;
-        bool enabled;
-        GameObject *gameObject;
-
+        PROPERTY_NONE(bool, localEnabled);
+        PROPERTY_NONE(bool, enabled);
+        PROPERTY_GET(GameObject *, gameObject, GameObject);
+        
     public:
         Component() : localEnabled(true), gameObject(nullptr) {}
 
@@ -29,7 +28,6 @@ namespace Engine {
         bool IsEnabled() { return enabled; }
         void SetLocalEnabled(bool localEnabled);
         
-        GameObject *GetGameObject() const { return gameObject; }
         Transform *GetTransform() const;
         Group *GetGroup() const;
 

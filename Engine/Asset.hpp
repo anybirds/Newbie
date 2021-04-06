@@ -7,32 +7,26 @@
 #include <Entity.hpp>
 #include <Type.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class Resource;
 
     /*
     Menifest to how to instantiate the Resource object.
     */
-    class ENGINE_EXPORT [[Serialize]] Asset : public Entity {
-        TYPE(Asset)
-    private:
-        uint64_t serial;
-        std::string name;
+    CLASS_ATTR(Asset, Entity, ENGINE_EXPORT) {
+        TYPE(Asset);
 
+        PROPERTY_GET(uint64_t, serial, Serial);
+        PROPERTY(std::string, name, Name);
+        
     protected:
-        [[NoSerialize]]
         std::weak_ptr<Resource> resource;
 
     public:
         void Apply();
-
         virtual std::shared_ptr<Resource> GetResource() = 0;
         
-        const std::string &GetName() const { return name; }
-        void SetName(const std::string &name) { this->name = name; }
-        const uint64_t GetSerial() const { return serial; }
-
         friend class Project;
     };
 

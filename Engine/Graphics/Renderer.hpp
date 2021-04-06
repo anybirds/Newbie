@@ -2,18 +2,16 @@
 
 #include <Component.hpp>
 
-namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] Renderer : public Component {
-        TYPE(Renderer)
+NAMESPACE(Engine) {
+    CLASS_ATTR(Renderer, Component, ENGINE_EXPORT) {
+        TYPE(Renderer);
     
-    private:
-        unsigned order;
+        PROPERTY_GET(unsigned, order, Order);
     
     public:
         Renderer() : order(0U) {}
         virtual void Render() = 0;
 
-        unsigned GetOrder() const { return order; }
         void SetOrder(unsigned order);
     };
     

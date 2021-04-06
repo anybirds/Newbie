@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <cstdlib>
 
 #include <Project.hpp>
 #include <Scene.hpp>
@@ -21,10 +22,11 @@ bool Project::Load(const string &path) {
     project.path = filesystem::absolute(filesystem::path(path)).string();
     project.name = filesystem::path(project.path).filename().stem().string();
     project.directory = filesystem::path(project.path).parent_path().string();
-    project.libpath = project.directory + "/User.dll";
 
     // compile library
-    
+    string cmd("cmake --build " + project.directory + "/build --config Release");
+    system(cmd.c_str());
+    project.libpath = project.directory + "/build/Release/User.dll";
     
     // load shared library
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)

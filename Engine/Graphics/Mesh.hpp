@@ -5,26 +5,19 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
     
     class AModel;
     class Model;
 
-    class ENGINE_EXPORT [[Serialize]] AMesh : public Asset {
-        TYPE(AMesh)
+    CLASS_ATTR(AMesh, Asset, ENGINE_EXPORT) {
+        TYPE(AMesh);
 
-    private:
-        AModel *amodel;
-        uint32_t index;
-    
+        PROPERTY(AModel *, amodel, Model);
+        PROPERTY(uint32_t, index, Index);
+
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-
-        AModel *GetModel() const { return amodel; }
-        uint32_t GetIndex() const { return index; }
-
-        void SetModel(AModel *amodel) { this->amodel = amodel; }
-        void SetIndex(uint32_t index) { this->index = index; }
     };
 
     /*

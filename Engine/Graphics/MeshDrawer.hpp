@@ -4,7 +4,7 @@
 
 #include <Graphics/Drawer.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
 	class Material;
 	class Mesh;
@@ -12,20 +12,13 @@ namespace Engine {
 	/*
 	Responsible for rendering objects that have Mesh and Material.
 	*/
-	class ENGINE_EXPORT [[Serialize]] MeshDrawer final : public Drawer {
-		TYPE(MeshDrawer)
+	CLASS_FINAL_ATTR(MeshDrawer, Drawer, ENGINE_EXPORT) {
+		TYPE(MeshDrawer);
 
-	private:
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Material> material;
+		PROPERTY(std::shared_ptr<Mesh>, mesh, Mesh);
+		PROPERTY(std::shared_ptr<Material>, material, Material);
 
 	public:
 		virtual void Draw(Camera *camera) override;
-
-		const std::shared_ptr<Mesh> &GetMesh() const { return mesh; }
-		const std::shared_ptr<Material> &GetMaterial() const { return material; }
-
-		void SetMesh(const std::shared_ptr<Mesh> &mesh) { this->mesh = mesh; }
-		void SetMaterial(const std::shared_ptr<Material> &material) { this->material = material; }
 	};
 }

@@ -7,18 +7,14 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] AModel : public Asset {
-        TYPE(AModel)
+NAMESPACE(Engine) {
+    CLASS_ATTR(AModel, Asset, ENGINE_EXPORT) {
+        TYPE(AModel);
     
-    private:
-        std::string path;
+        PROPERTY(std::string, path, Path);
     
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-        const std::string &GetPath() const { return path; };
-
-        void SetPath(const std::string &path) { this->path = path; }
     };
 
     class ENGINE_EXPORT Model : public Resource {

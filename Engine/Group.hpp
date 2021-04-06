@@ -9,7 +9,7 @@
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Drawer.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class GameObject;
     class Component;
@@ -17,17 +17,15 @@ namespace Engine {
     /*
     Unit of destruction. 
     */
-    class ENGINE_EXPORT [[Serialize]] Group final : public Entity {
-        TYPE(Group)
+    CLASS_FINAL_ATTR(Group, Entity, ENGINE_EXPORT) {
+        TYPE(Group);
+
+        PROPERTY_NONE(bool, dirty);
+        PROPERTY_NONE(std::unordered_set<GameObject *>, gameObjects);
 
     private:
-        bool dirty;
-
-        std::unordered_set<GameObject *> gameObjects;
-
-        [[NoSerialize]]
         std::unordered_set<GameObject *> garbages;
-
+        
         void Refresh();
 
     public:

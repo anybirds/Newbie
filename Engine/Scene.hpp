@@ -8,22 +8,17 @@
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Drawer.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class Camera;
     class Group;
     class GameObject;
     class Script;
 
-    class ENGINE_EXPORT [[Serialize]] SceneSetting final : public Entity {
-        TYPE(SceneSetting)
+    CLASS_FINAL_ATTR(SceneSetting, Entity, ENGINE_EXPORT) {
+        TYPE(SceneSetting);
 
-    private:
-        Camera *mainCamera;
-        
-    public:
-        Camera *GetMainCamera() const { return mainCamera; }
-        void SetMainCamera(Camera *camera) { mainCamera = camera; }
+        PROPERTY(Camera *, mainCamera, MainCamera);
     };
 
     /*

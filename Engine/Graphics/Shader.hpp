@@ -6,22 +6,16 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
-    class ENGINE_EXPORT [[Serialize]] AShader : public Asset {
-        TYPE(AShader)
+    CLASS_ATTR(AShader, Asset, ENGINE_EXPORT) {
+        TYPE(AShader);
 
-    private:
-        std::string path;
-        unsigned shaderType;
+        PROPERTY(std::string, path, Path);
+        PROPERTY(unsigned, shaderType, ShaderType);
 
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-        const std::string &GetPath() const { return path; }
-        unsigned GetShaderType() const { return shaderType; }
-
-        void SetPath(const std::string &path) { this->path = path; }
-        void SetShaderType(unsigned shaderType) { this->shaderType = shaderType; }
     };
 
     class ENGINE_EXPORT Shader : public Resource {

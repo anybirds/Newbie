@@ -2,9 +2,9 @@
 
 #include <Component.hpp>
 
-namespace Engine {
-    class ENGINE_EXPORT [[Serialize]] Script : public Component {
-        TYPE(Script)
+NAMESPACE(Engine) {
+    CLASS_ATTR(Script, Component, ENGINE_EXPORT) {
+        TYPE(Script);
 
     public:
         virtual void Start() {}

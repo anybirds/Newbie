@@ -3,13 +3,11 @@
 #include <Engine.hpp>
 #include <UserExport.hpp>
 
-class USER_EXPORT [[Serialize]] RotateScript : public Engine::Script {
-    TYPE(RotateScript)
+CLASS_ATTR(RotateScript, Engine::Script, USER_EXPORT) {
+    TYPE(RotateScript);
 
-private:
-    float rate;
+    PROPERTY(float, rate, Rate);
 
 public:
     virtual void Update() override;
 };
- 

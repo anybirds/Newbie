@@ -5,26 +5,19 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class ATexture;
     class Texture;
 
-    class ENGINE_EXPORT [[Serialize]] AFramebuffer : public Asset {
-        TYPE(AFramebuffer)
+    CLASS_ATTR(AFramebuffer, Asset, ENGINE_EXPORT) {
+        TYPE(AFramebuffer);
 
-    private:
-        ATexture *colorTexture;
-        ATexture *depthTexture;
+        PROPERTY(ATexture *, colorTexture, ColorTexture);
+        PROPERTY(ATexture *, depthTexture, DepthTexture);
 
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-
-        ATexture *GetColorTexture() const { return colorTexture; }
-        ATexture *GetDepthTexture() const { return depthTexture; }
-        
-        void SetColorTexture() { this->colorTexture = colorTexture; }
-        void SetDepthTexture() { this->depthTexture = depthTexture; }
     };
 
     /*

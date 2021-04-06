@@ -7,31 +7,22 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
     class AShader;
     class ATexture;
     class Shader;
     class Texture;
 
-    class ENGINE_EXPORT [[Serialize]] AMaterial : public Asset {
-        TYPE(AMaterial)
+    CLASS_ATTR(AMaterial, Asset, ENGINE_EXPORT) {
+        TYPE(AMaterial);
     
-    private:
-        AShader *vertexShader;
-        AShader *fragmentShader;
-        ATexture *mainTexture;
+        PROPERTY(AShader *, vertexShader, VertexShader);
+        PROPERTY(AShader *, fragmentShader, FragmentShader);
+        PROPERTY(ATexture *, mainTexture, MainTexture);
 
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-
-        AShader *GetVertexShader() const { return vertexShader; }
-        AShader *GetFragmentShader() const { return fragmentShader; }
-        ATexture *GetMainTexture() const { return mainTexture; }
-        
-        void SetVertexShader(AShader *vertexShader) { this->vertexShader = vertexShader; }
-        void SetFragmentShader(AShader *fragmentShader) { this->fragmentShader = fragmentShader; }
-        void SetMainTexture(ATexture *mainTexture) { this->mainTexture = mainTexture; }
     };
 
     class ENGINE_EXPORT Material : public Resource {

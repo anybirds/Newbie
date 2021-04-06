@@ -6,42 +6,22 @@
 #include <Asset.hpp>
 #include <Resource.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
     
-    class ENGINE_EXPORT [[Serialize]] ATexture : public Asset {
-        TYPE(ATexture)
+    CLASS_ATTR(ATexture, Asset, ENGINE_EXPORT) {
+        TYPE(ATexture);
     
-    private:
-        std::string path;
-
-        int width;
-        int height;
-        unsigned format;
-        int horizontalWrap;
-        int verticalWrap;
-        int minFilter;
-        int magFilter;
+        PROPERTY(std::string, path, Path);
+        PROPERTY(int, width, Width);
+        PROPERTY(int, height, Height);
+        PROPERTY(unsigned, format, Format);
+        PROPERTY(int, horizontalWrap, HorizontalWrap);
+        PROPERTY(int, verticalWrap, VerticalWrap);
+        PROPERTY(int, minFilter, MinFilter);
+        PROPERTY(int, magFilter, MagFilter);
 
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
-        
-        const std::string &GetPath() const { return path; }
-        int GetWidth() const { return width; }
-        int GetHeight() const { return height; }
-        int GetFormat() const { return format; }
-        int GetHorizontalWrap() const { return horizontalWrap; }
-        int GetVerticalWrap() const { return verticalWrap; }
-        int GetMinFilter() const { return minFilter; }
-        int GetMagFilter() const { return magFilter; }
-
-        void SetPath(const std::string &path) { this->path = path; }
-        void SetWidth(int width) { this->width = width; }
-        void SetHeight(int height) { this->height = height; }
-        void SetFormat(unsigned format) { this->format = format; }
-        void SetHorizontalWrap(int horizontalWrap) { this->horizontalWrap = horizontalWrap; }
-        void SetVerticalWrap(int verticalWrap) { this->verticalWrap = verticalWrap; }
-        void SetMinFilter(int minFilter) { this->minFilter = minFilter; }
-        void SetMagFilter(int magFilter) { this->magFilter = magFilter; }
     };
 
     /*

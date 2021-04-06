@@ -19,19 +19,16 @@
 #include <Asset.hpp>
 #include <Type.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
 
-    class ENGINE_EXPORT [[Serialize]] ProjectSetting final : public Entity {
-        TYPE(ProjectSetting)
+    CLASS_FINAL_ATTR(ProjectSetting, Entity, ENGINE_EXPORT) {
+        TYPE(ProjectSetting);
 
-    private:
-        uint64_t serial;
-        int startSceneIndex;
+        PROPERTY_NONE(uint64_t, serial);
+        PROPERTY(int, startSceneIndex, StartSceneIndex);
         
     public:
         uint64_t GetSerial() { return ++serial; }
-        int GetStartSceneIndex() const { return startSceneIndex; }
-        void SetStartSceneIndex(int startScene) { this->startSceneIndex = startSceneIndex; }
         
         friend class Project;
     };

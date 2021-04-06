@@ -7,40 +7,30 @@
 #include <EngineExport.hpp>
 #include <Component.hpp>
 
-namespace Engine {	
+NAMESPACE(Engine) {	
 
     /*
     Represents a single frame in 3D space that has position, rotation, scale and hierarchical parent information.
     */
-    class ENGINE_EXPORT [[Serialize]] Transform final : public Component {
-        TYPE(Transform)
+    CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
+        TYPE(Transform);
+
+        PROPERTY_GET(glm::vec3, localPosition, LocalPosition);
+        PROPERTY_GET(glm::quat, localRotation, LocalRotation);
+        PROPERTY_GET(glm::vec3, localScale, LocalScale);
+        PROPERTY_GET(glm::vec3, localEulerAngles, LocalEulerAngles);
+        PROPERTY_GET(Transform *, parent, Parent);
+        PROPERTY_GET(std::unordered_set<Transform *>, children, Children);
+        PROPERTY_NONE_ATTR(bool, dirty, mutable);
+        PROPERTY_NONE_ATTR(glm::mat4, localToWorldMatrix, mutable);
 
     private:
-        glm::vec3 localPosition;
-        glm::quat localRotation;
-        glm::vec3 localScale;
-        glm::vec3 localEulerAngles;
-
-        Transform *parent;
-        std::unordered_set<Transform *> children;
-
-        [[NoSerialize]]
         std::unordered_set<Transform *> garbages;
-
-        mutable bool dirty;
-        mutable glm::mat4 localToWorldMatrix;
 
         void Propagate();
 
     public:
         Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)), dirty(false) {}
-
-        const glm::vec3 &GetLocalPosition() const { return localPosition; }
-        const glm::quat &GetLocalRotation() const { return localRotation; }
-        const glm::vec3 &GetLocalScale() const { return localScale; }
-        const glm::vec3 &GetLocalEulerAngles() const { return localEulerAngles; }
-        Transform *GetParent() const { return parent; }
-        const std::unordered_set<Transform *> &GetChildren() const { return children; }
 
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;

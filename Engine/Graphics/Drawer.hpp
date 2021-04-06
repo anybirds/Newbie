@@ -2,21 +2,19 @@
 
 #include <Component.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
     
     class Camera;
 
-    class ENGINE_EXPORT [[Serialize]] Drawer : public Component {
-        TYPE(Drawer)
+    CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
+        TYPE(Drawer);
     
-    private:
-        unsigned order;
+        PROPERTY_GET(unsigned, order, Order);
     
     public:
         Drawer() : order(0U) {}
         virtual void Draw(Camera *camera) = 0;
 
-        unsigned GetOrder() const { return order; }
         void SetOrder(unsigned order);
     };
     

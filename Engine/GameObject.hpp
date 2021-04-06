@@ -9,7 +9,7 @@
 #include <Graphics/Drawer.hpp>
 #include <Scene.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
     
     class Group;
     class Component;
@@ -18,16 +18,15 @@ namespace Engine {
     /*
     Abstraction of an object in the scene.
     */
-    class ENGINE_EXPORT [[Serialize]] GameObject final : public Entity {
+    CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
         TYPE(GameObject);
 
-    private:
-        std::string name;
-        Group *group;
-        Transform *transform;
-        std::unordered_set<Component *> components;
+        PROPERTY(std::string, name, Name);
+        PROPERTY_GET(Group *, group, Group);
+        PROPERTY_GET(Transform *, transform, Transform);
+        PROPERTY_NONE(std::unordered_set<Component *>, components);
 
-        [[NoSerialize]]
+    private:
         std::unordered_set<Component *> garbages;
 
     public:
@@ -35,13 +34,9 @@ namespace Engine {
         
         bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
         bool IsEnabled() const { return transform->IsEnabled(); }
-        const std::string &GetName() const { return name; }
-        Group *GetGroup() const { return group; }
-        Transform *GetTransform() const { return transform; }
-        GameObject *GetParent() const { Transform *p = transform->GetParent(); if (p) { return p->GetGameObject(); } else { return nullptr; }}
-
         void SetLocalEnabled(bool localEnabled) { transform->SetLocalEnabled(localEnabled); }
-        void SetName(const std::string &name) { this->name = name; }
+
+        GameObject *GetParent() const { Transform *p = transform->GetParent(); if (p) { return p->GetGameObject(); } else { return nullptr; }}
 
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
         T *GetComponent() const {

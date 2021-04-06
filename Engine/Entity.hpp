@@ -5,16 +5,13 @@
 
 #include <Type.hpp>
 
-namespace Engine {
+NAMESPACE(Engine) {
     
-    class Type;
-    class Interface;
-
     /*
     Base class for all serializable types
     */
-    class ENGINE_EXPORT [[Serialize]] Entity {
-        TYPE(Entity)
+    CLASS_ENTITY(Entity, , ENGINE_EXPORT) {
+        TYPE(Entity);
 
     public:
         static std::unordered_map<uint64_t, Entity *> temp;
