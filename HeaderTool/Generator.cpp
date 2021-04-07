@@ -15,6 +15,9 @@ Generator::Generator(const string &dir) {
             if (p.is_directory()) {
                 parse(p.path().string());
             } else if (p.path().extension() == ".hpp" || p.path().extension() == ".h") {
+
+                cerr << p.path().string() << '\n';
+
                 wifstream ifs(p.path().string());
                 if (ifs.fail()) {
                     cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << p.path().string() << '\n';
@@ -75,7 +78,7 @@ void Generator::Deserialize() {
         for (Class *cs : ns->classes) {
             cout << "void " << cs->name << "::Deserialize(json &js, Engine::Entity *entity) {\n";
 
-            cout << "  const " << cs->name << " *e = (const " << cs->name << " *)entity;\n";
+            cout << "  " << cs->name << " *e = (" << cs->name << " *)entity;\n";
             for (auto it = cs->properties.rbegin(); it != cs->properties.rend(); it++) {
                 Property *p = *it;
                 cout << "  e->" << p->name << " = js.back().get<" << p->type << ">(); js.erase(--js.end());\n";
@@ -128,7 +131,7 @@ void Generator::TypeClear() {
         }
     };
 
-    cout << "void type_init() {\n";
+    cout << "void type_clear() {\n";
     for (Namespace *ns : namespaces) {
         write(ns);
     }

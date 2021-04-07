@@ -6,8 +6,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_HEADER} ${ENGINE_SO
 
 add_custom_command(
   OUTPUT generated.cpp 
-  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} Engine > generated.cpp
-  DEPENDS ${ENGINE_HEADER}
+  COMMAND HeaderTool ${CMAKE_CURRENT_SOURCE_DIR} > generated.cpp
+  DEPENDS HeaderTool ${ENGINE_HEADER}
 )
 
 add_library(Engine SHARED ${ENGINE_SOURCE} generated.cpp)
@@ -37,7 +37,7 @@ install(EXPORT Engine
 include(CMakePackageConfigHelpers)
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/EngineConfig.cmake"
-  INSTALL_DESTINATION "lib/cmake/example"
+  INSTALL_DESTINATION "lib/cmake/Engine"
   NO_SET_AND_CHECK_MACRO
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )

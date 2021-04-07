@@ -1,0 +1,3 @@
+C:/Newbie/Samples/Lofi/build/CMakeFiles/User.dir
+C:/Newbie/Samples/Lofi/build/CMakeFiles/ALL_BUILD.dir
+C:/Newbie/Samples/Lofi/build/CMakeFiles/ZERO_CHECK.dir

@@ -24,8 +24,15 @@ bool Project::Load(const string &path) {
     project.directory = filesystem::path(project.path).parent_path().string();
 
     // compile library
-    string cmd("cmake --build " + project.directory + "/build --config Release");
-    system(cmd.c_str());
+    string gcmd;
+    if (_MSC_VER >= 1920) {
+        gcmd = "cmake -G \"Visual Studio 16 2019\" -A x64 -B " + project.directory + "/build " + project.directory;
+    } else if (_MSC_VER >= 1910) {
+        gcmd = "cmake -G \"Visual Studio 15 2017\" -A x64 -B " + project.directory + "/build " + project.directory;
+    }
+    system(gcmd.c_str());
+    string bcmd("cmake --build " + project.directory + "/build --config Release");
+    system(bcmd.c_str());
     project.libpath = project.directory + "/build/Release/User.dll";
     
     // load shared library

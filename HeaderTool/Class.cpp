@@ -77,22 +77,23 @@ wifstream &HeaderTool::operator>>(wifstream &ifs, Class &cs) {
                 }
                 break;
             default:
-                for (; !ifs.eof() && c != L'{' && c != L';' && str != L"public" && str != L"private" && str != L"protected"; ifs >> c) {
+                for (; !ifs.eof() && c != L'{' && c != L';' && str != L"public" && str != L"private" && str != L"protected"; c = ifs.get()) {
                     str += c;
                 }
                 assert(!ifs.eof());
 
                 switch (c) {
                     case L'{':
+                        cnt = 1;
                         do {
-                            cnt = 0;
+                            c = ifs.get();
                             if (c == L'{') {
                                 cnt++;
                             } else if (c == L'}') {
                                 cnt--;
                             }
-                            ifs >> c;
-                        } while (cnt > 0);
+                        } while (!ifs.eof() && cnt > 0);
+                        assert(!ifs.eof());
                         break;
                     case L':':
                         break;

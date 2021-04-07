@@ -18,6 +18,8 @@ find_package(Stb REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
+set(HeaderTool_DIR "C:/Newbie/build/HeaderTool")
+find_package(HeaderTool REQUIRED)
 set(Engine_DIR "C:/Newbie/build/Engine")
 find_package(Engine REQUIRED)
 
@@ -30,8 +32,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_HEADER} ${USER_SOURCE
 
 add_custom_command(
   OUTPUT generated.cpp 
-  COMMAND HeaderTool ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} User > generated.cpp
-  DEPENDS ${USER_HEADER}
+  COMMAND HeaderTool ${CMAKE_CURRENT_SOURCE_DIR} > generated.cpp
+  DEPENDS HeaderTool ${USER_HEADER}
 )
 
 add_library(User SHARED ${USER_SOURCE} generated.cpp)

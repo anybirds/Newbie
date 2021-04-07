@@ -7,7 +7,7 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE PATH "toolchain file")
 endif()
 
-project(User LANGUAGES CXX)
+project(Newbie LANGUAGES CXX)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)

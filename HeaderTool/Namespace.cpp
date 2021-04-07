@@ -85,10 +85,11 @@ wifstream &HeaderTool::operator>>(wifstream &ifs, Namespace &ns) {
                 }
                 break;
             default:
-                for (; !ifs.eof() && c != L'{' && c != L';'; ifs >> c) {
+                for (; !ifs.eof() && c != L'{' && c != L';'; c = ifs.get()) {
                     str += c;
                 }
                 assert(!ifs.eof());
+
                 switch (c) {
                     case L'{':
                         if (str.substr(0, 9) == L"NAMESPACE") {
@@ -100,15 +101,16 @@ wifstream &HeaderTool::operator>>(wifstream &ifs, Namespace &ns) {
                             ns.classes.push_back(cs);
                             ifs >> *cs;
                         } else {
+                            cnt = 1;
                             do {
-                                cnt = 0;
+                                c = ifs.get();
                                 if (c == L'{') {
                                     cnt++;
                                 } else if (c == L'}') {
                                     cnt--;
                                 }
-                                ifs >> c;
-                            } while (cnt > 0);
+                            } while (!ifs.eof() && cnt > 0);
+                            assert(!ifs.eof());
                         } 
                         break;
                     case L';':
