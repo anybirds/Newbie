@@ -1,9 +1,12 @@
-#include <string>
-#include <iostream>
-#include <filesystem>
-
 #include <Engine.hpp>
-#include <Graphics/Window.hpp>
+
+#include <string>
+
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
+#include <MainMenuBar.hpp>
 
 using namespace std;
 using namespace glm;
@@ -17,47 +20,45 @@ int main(int argc, char **argv) {
         return 0;
     }
     
-    // find the project file 
-    string pdir("c:/Newbie/Samples/Lofi/");
-    string pfile;
-    for (auto &p : filesystem::directory_iterator(pdir)) {
-        if (p.path().extension().string() == ".json") {
-            pfile = p.path().string();
-            break;
-        }
-    }
-    
     // create OpenGL context and Window
     Window &window = Window::GetInstance();
-        
-    // load the Project
-    if (!Project::Load(pfile)) {
-        return 0;
-    }
-    Project &project = Project::GetInstance();
-    window.SetName(project.GetName());
+    window.SetName("Newbie");
+    
+    // setup imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); 
+    io.Fonts->AddFontFromFileTTF("c:/Newbie/Editor/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf", 20.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window.GetGlfwWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
 
-    // load the start Scene
-    if (!Scene::Load(project.GetSetting()->GetStartSceneIndex())) {
-        return 0;
-    }
-    Scene &scene = Scene::GetInstance();
+    MainMenuBar mainMenuBar;
 
-    // game loop
-    Time::Init();
-    scene.Start();
     while (!window.ShouldClose()) {
-        Time::Tick();
-        
-        scene.Refresh();
-        scene.Update();
-        scene.Render();
-
-        scene.Delete();
-
-		window.SwapBuffers();
         window.PollEvents();
+
+        // start the imgui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // menu bar
+        mainMenuBar.CreateImGui();
+
+        ImGui::ShowDemoWindow();
+
+        // render
+        ImGui::Render();
+        glViewport(0, 0, window.GetFramebufferWidth(), window.GetFramebufferHeight());
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        window.SwapBuffers();
     }
+
+    window.Destroy();
 
     return 0;
 }

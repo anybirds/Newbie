@@ -7,25 +7,25 @@
 using namespace std;
 using namespace HeaderTool;
 
-Class::Class(const std::wstring &macro) {
-    wstringstream ss;
+Class::Class(const std::string &macro) {
+    stringstream ss;
     ss << macro;
-    wchar_t c;
+    char c;
     do {
         ss >> c;
     }
-    while (!ss.eof() && c != L'(');
+    while (!ss.eof() && c != '(');
     assert(!ss.eof());
 
     do {
-        wstring arg;
+        string arg;
         ss >> c;
-        while (!ss.eof() && c != L',' && c != L')') {
+        while (!ss.eof() && c != ',' && c != ')') {
             arg += c;
             c = ss.get();
         }
-        args.push_back(string(arg.begin(), arg.end()));
-    } while (!ss.eof() && c != L')');
+        args.push_back(arg);
+    } while (!ss.eof() && c != ')');
     assert(!ss.eof());
     
     name = args[0];
@@ -37,68 +37,83 @@ Class::~Class() {
         delete property;
     }
 }
-wifstream &HeaderTool::operator>>(wifstream &ifs, Class &cs) {
+
+ifstream &HeaderTool::operator>>(ifstream &ifs, Class &cs) {
     while (!ifs.eof()) {
-        wchar_t c;
-        wstring str;
+        char c;
+        string str, temp;
         int cnt;
 
         ifs >> c;
-        if (c == L'}') {
+        if (c == '}') {
             break;
         }
         switch (c) {
-            case L'#':
+            case '#':
                 do {
-                    getline(ifs, str);
-                } while (str.back() == L'\\');
-                break;
-            case L'/':
-                c = ifs.get();
-                switch (c) {
-                    case L'/':
-                        getline(ifs, str);
-                        break;
-                    case L'*':
-                        do {
-                            ifs >> c;
-                            if (c == L'*') {
-                                c = ifs.get();
-                                if (c == L'/') {
-                                    break;
-                                }
-                            }
-                        } while (!ifs.eof());
-                        assert(!ifs.eof());
-                        break;
-                    default:
-                        assert(false);
-                        break;
-                }
+                    getline(ifs, temp);
+                } while (temp.back() == '\\');
                 break;
             default:
-                for (; !ifs.eof() && c != L'{' && c != L';' && str != L"public" && str != L"private" && str != L"protected"; c = ifs.get()) {
-                    str += c;
+                for (; !ifs.eof() && c != '{' && c != ';' && str != "public" && str != "private" && str != "protected"; ifs >> c) {
+                    switch (c) {
+                        case '/':
+                            c = ifs.get();
+                            switch (c) {
+                                case '/':
+                                    getline(ifs, temp);
+                                    break;
+                                case '*':
+                                    c = ifs.get();
+                                    do {
+                                        temp += c;
+                                        c = ifs.get();
+                                    } while (!ifs.eof() && !(c == '/' && temp.back() == '*'));
+                                    assert(!ifs.eof());
+                                    break;
+                                default:
+                                    assert(false);
+                                    break;
+                            }
+                            break;
+                        case '\'':
+                            do {
+                                str += c;
+                                c = ifs.get();
+                            } while (!ifs.eof() && !(c == '\'' && str.back() != '\\'));
+                            assert(!ifs.eof());
+                            break;
+                        case '\"':
+                            do {
+                                str += c;
+                                c = ifs.get();
+                            } while (!ifs.eof() && !(c == '\"' && str.back() != '\\'));
+                            assert(!ifs.eof());
+                            break;
+                        default:
+                            str += c;
+                            break;
+                    }                   
                 }
                 assert(!ifs.eof());
 
                 switch (c) {
-                    case L'{':
+                    case '{':
                         cnt = 1;
                         do {
                             c = ifs.get();
-                            if (c == L'{') {
+                            if (c == '{') {
                                 cnt++;
-                            } else if (c == L'}') {
+                            } else if (c == '}') {
                                 cnt--;
                             }
                         } while (!ifs.eof() && cnt > 0);
                         assert(!ifs.eof());
                         break;
-                    case L':':
+                    case ':':
                         break;
-                    case L';':
-                        if (str.substr(0, 8) == L"PROPERTY") {
+                    case ';':
+                        if (str.substr(0, 8) == "PROPERTY") {
                             Property *p = new Property(str);
                             cs.properties.push_back(p);
                         }

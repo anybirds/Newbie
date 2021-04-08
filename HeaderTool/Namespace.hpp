@@ -17,9 +17,9 @@ namespace HeaderTool {
         std::vector<Class *> classes;
 
     public:
-        Namespace(const std::wstring &macro);
+        Namespace(const std::string &macro);
         ~Namespace();
-        friend std::wifstream &operator>>(std::wifstream &ifs, Namespace &ns);
+        friend std::ifstream &operator>>(std::ifstream &ifs, Namespace &ns);
         friend class Generator;
     };
 }

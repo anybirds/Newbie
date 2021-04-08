@@ -11,7 +11,7 @@ namespace HeaderTool {
         std::vector<std::string> args;
 
     public:
-        Property(const std::wstring &macro);
+        Property(const std::string &macro);
         friend class Generator;
     };
 }

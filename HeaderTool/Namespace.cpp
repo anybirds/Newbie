@@ -7,30 +7,30 @@
 using namespace std;
 using namespace HeaderTool;
 
-Namespace::Namespace(const wstring &macro) {
+Namespace::Namespace(const string &macro) {
     // global namespace
     if (macro.empty()) {
         return;
     }
     
-    wstringstream ss;
+    stringstream ss;
     ss << macro;
-    wchar_t c;
+    char c;
     do {
         ss >> c;
     }
-    while (!ss.eof() && c != L'(');
+    while (!ss.eof() && c != '(');
     assert(!ss.eof());
 
     do {
-        wstring arg;
+        string arg;
         ss >> c;
-        while (!ss.eof() && c != L',' && c != L')') {
+        while (!ss.eof() && c != ',' && c != ')') {
             arg += c;
             c = ss.get();
         }
-        args.push_back(string(arg.begin(), arg.end()));
-    } while (!ss.eof() && c != L')');
+        args.push_back(arg);
+    } while (!ss.eof() && c != ')');
     assert(!ss.eof());
 
     name = args[0];
@@ -45,58 +45,72 @@ Namespace::~Namespace() {
     }
 }
 
-wifstream &HeaderTool::operator>>(wifstream &ifs, Namespace &ns) {
+ifstream &HeaderTool::operator>>(ifstream &ifs, Namespace &ns) {
     while (!ifs.eof()) {
-        wchar_t c;
-        wstring str;
+        char c;
+        string str, temp;
         int cnt;
 
         ifs >> c;
-        if (c == L'}') {
+        if (c == '}') {
             break;
         }
         switch (c) {
-            case L'#':
+            case '#':
                 do {
-                    getline(ifs, str);
-                } while (str.back() == L'\\');
-                break;
-            case L'/':
-                c = ifs.get();
-                switch (c) {
-                    case L'/':
-                        getline(ifs, str);
-                        break;
-                    case L'*':
-                        do {
-                            ifs >> c;
-                            if (c == L'*') {
-                                c = ifs.get();
-                                if (c == L'/') {
-                                    break;
-                                }
-                            }
-                        } while (!ifs.eof());
-                        assert(!ifs.eof());
-                        break;
-                    default:
-                        assert(false);
-                        break;
-                }
+                    getline(ifs, temp);
+                } while (temp.back() == '\\');
                 break;
             default:
-                for (; !ifs.eof() && c != L'{' && c != L';'; c = ifs.get()) {
-                    str += c;
+                for (; !ifs.eof() && c != '{' && c != ';'; ifs >> c) {
+                    switch (c) {
+                        case '/':
+                            c = ifs.get();
+                            switch (c) {
+                                case '/':
+                                    getline(ifs, temp);
+                                    break;
+                                case '*':
+                                    c = ifs.get();
+                                    do {
+                                        temp += c;
+                                        c = ifs.get();
+                                    } while (!ifs.eof() && !(c == '/' && temp.back() == '*'));
+                                    assert(!ifs.eof());
+                                    break;
+                                default:
+                                    assert(false);
+                                    break;
+                            }
+                            break;
+                        case '\'':
+                            do {
+                                str += c;
+                                c = ifs.get();
+                            } while (!ifs.eof() && !(c == '\'' && str.back() != '\\'));
+                            assert(!ifs.eof());
+                            break;
+                        case '\"':
+                            do {
+                                str += c;
+                                c = ifs.get();
+                            } while (!ifs.eof() && !(c == '\"' && str.back() != '\\'));
+                            assert(!ifs.eof());
+                            break;
+                        default:
+                            str += c;
+                            break;
+                    }
                 }
                 assert(!ifs.eof());
 
                 switch (c) {
-                    case L'{':
-                        if (str.substr(0, 9) == L"NAMESPACE") {
+                    case '{':
+                        if (str.substr(0, 9) == "NAMESPACE") {
                             Namespace *n = new Namespace(str);
                             ns.namespaces.push_back(n);
                             ifs >> *n;
-                        } else if (str.substr(0, 5) == L"CLASS") {
+                        } else if (str.substr(0, 5) == "CLASS") {
                             Class *cs = new Class(str);
                             ns.classes.push_back(cs);
                             ifs >> *cs;
@@ -104,16 +118,16 @@ wifstream &HeaderTool::operator>>(wifstream &ifs, Namespace &ns) {
                             cnt = 1;
                             do {
                                 c = ifs.get();
-                                if (c == L'{') {
+                                if (c == '{') {
                                     cnt++;
-                                } else if (c == L'}') {
+                                } else if (c == '}') {
                                     cnt--;
                                 }
                             } while (!ifs.eof() && cnt > 0);
                             assert(!ifs.eof());
                         } 
                         break;
-                    case L';':
+                    case ';':
                         break;
                     default:
                         assert(false);

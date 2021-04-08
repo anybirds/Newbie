@@ -18,7 +18,7 @@ Generator::Generator(const string &dir) {
 
                 cerr << p.path().string() << '\n';
 
-                wifstream ifs(p.path().string());
+                ifstream ifs(p.path().string());
                 if (ifs.fail()) {
                     cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << p.path().string() << '\n';
                     throw exception();
@@ -26,7 +26,7 @@ Generator::Generator(const string &dir) {
 
                 files.push_back(p.path().string());
 
-                Namespace *ns = new Namespace(L"");
+                Namespace *ns = new Namespace("");
                 namespaces.push_back(ns);
                 ifs >> *ns;
             }
@@ -99,7 +99,7 @@ void Generator::Deserialize() {
 void Generator::TypeInit() {
     function<void(Namespace *ns)> write = [&write](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
-            cout << "{\nusing namespace " << n->name << ";\n";
+            cout << "{\n  using namespace " << n->name << ";\n";
             write(n);
             cout << "}\n";
         }
@@ -122,7 +122,7 @@ void Generator::TypeInit() {
 void Generator::TypeClear() {
     function<void(Namespace *ns)> write = [&write](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
-            cout << "{\nusing namespace " << n->name << ";\n";
+            cout << "{\n  using namespace " << n->name << ";\n";
             write(n);
             cout << "}\n";
         }
@@ -143,7 +143,6 @@ void Generator::Generate() {
         cout << "#include \"" << file << "\"\n";
     }
     
-    std::cout << "#include <type_traits>\n";
     std::cout << "#include <nlohmann/json.hpp>\n";
     std::cout << "using json = nlohmann::json;\n";
 

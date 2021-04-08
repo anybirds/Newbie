@@ -1,6 +1,5 @@
 #include "C:/Newbie/Samples/Lofi\Scripts\RotateScript.hpp"
 #include "C:/Newbie/Samples/Lofi\UserExport.hpp"
-#include <type_traits>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 void RotateScript::Serialize(json &js, const Engine::Entity *entity) {

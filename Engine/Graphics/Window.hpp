@@ -1,9 +1,9 @@
 #pragma once 
 
-#include <string>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <string>
 
 #include <EngineExport.hpp>
 
@@ -16,6 +16,7 @@ namespace Engine {
         static Window &GetInstance() { static Window window; return window; }
     
     private:
+        static void ErrorCallback(int error, const char *description);
         static void FramebufferResizeCallback(GLFWwindow *glfwWindow, int fwidth, int fheight);
         
     private:
@@ -35,13 +36,15 @@ namespace Engine {
         const std::string &GetName() const { return name; }
         int GetWidth() const { return width; }
         int GetHeight() const { return height; }
-        
+        int GetFramebufferWidth() const { return fwidth; }
+        int GetFramebufferHeight() const { return fheight; }
+        GLFWwindow *GetGlfwWindow() { return window; }
+
         void SetName(const std::string &name);
-        
-        ~Window();
 
         bool ShouldClose();
         void SwapBuffers();
         void PollEvents();
+        void Destroy();
     };
 }

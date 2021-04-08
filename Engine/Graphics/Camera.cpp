@@ -30,16 +30,19 @@ const mat4 &Camera::GetNormalization() {
 }
 
 void Camera::Render() {
+    int width, height;
     if (this == Scene::GetInstance().GetSettiing()->GetMainCamera()) {
         Window &window = Window::GetInstance();
-        float windowAspectRatio = (float)window.GetWidth() / window.GetHeight();
+        width = window.GetFramebufferWidth(); height = window.GetFramebufferHeight();
+        float windowAspectRatio = (float)width / height;
         if (aspectRatio != windowAspectRatio) {
             aspectRatio = windowAspectRatio;
             dirty = true;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else if (framebuffer) {
-        float framebufferAspectRatio = (float)framebuffer->GetWidth() / framebuffer->GetHeight();
+        width = framebuffer->GetWidth(); height = framebuffer->GetHeight();
+        float framebufferAspectRatio = (float)width / height;
         if (aspectRatio != framebufferAspectRatio) {
             aspectRatio = framebufferAspectRatio;
             dirty = true;
@@ -50,6 +53,7 @@ void Camera::Render() {
         throw exception();
     }
 
+    glViewport(0, 0, width, height);
     glClearColor((GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -5,6 +5,10 @@
 using namespace std;
 using namespace Engine;
 
+void Window::ErrorCallback(int error, const char *description) {
+    cerr << "glfw error " << error << ": " << description << '\n';
+}
+
 void Window::FramebufferResizeCallback(GLFWwindow *glfwWindow, GLsizei fwidth, GLsizei fheight) {
     glViewport(0, 0, fwidth, fheight);
     
@@ -15,6 +19,7 @@ void Window::FramebufferResizeCallback(GLFWwindow *glfwWindow, GLsizei fwidth, G
 }
 
 Window::Window() {
+    glfwSetErrorCallback(ErrorCallback);
     if (!glfwInit()) {
         cerr << '[' << __FUNCTION__ << ']' << " glfw init failed."  << '\n';
         throw exception();
@@ -33,6 +38,7 @@ Window::Window() {
         throw exception();
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // enable vsync
     glfwMaximizeWindow(window);
     glfwGetWindowSize(window, &width, &height);
     glfwGetFramebufferSize(window, &fwidth, &fheight);
@@ -49,7 +55,7 @@ Window::Window() {
     glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 }
 
-Window::~Window() {
+void Window::Destroy() {
 	glfwDestroyWindow(window);
     glfwTerminate();
 }

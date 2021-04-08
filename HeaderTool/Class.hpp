@@ -17,9 +17,9 @@ namespace HeaderTool {
         std::vector<Property *> properties;
 
     public:
-        Class(const std::wstring &macro);
+        Class(const std::string &macro);
         ~Class();
-        friend std::wifstream &operator>>(std::wifstream &ifs, Class &cs);
+        friend std::ifstream &operator>>(std::ifstream &ifs, Class &cs);
         friend class Generator;
     };
 }
