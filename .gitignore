@@ -1,3 +1,2 @@
-.vscode/*
-build/*
-Samples/Lofi/build/*
+.vscode/
+build/
