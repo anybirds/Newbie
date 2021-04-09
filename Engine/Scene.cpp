@@ -15,7 +15,7 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-bool Scene::Load(int index) {
+bool Scene::Load(const string &path) {
     Scene &scene = Scene::GetInstance();
 
     // close project
@@ -23,13 +23,13 @@ bool Scene::Load(int index) {
 
     try {
         // get scene file path
-        scene.path = Project::GetInstance().GetScene(index);
+        scene.path = path;
         scene.name = filesystem::path(scene.path).stem().string();
         
         // open json file
         ifstream fs(Project::GetInstance().GetDirectoy() + "/" + scene.path);
         if (fs.fail()) {
-            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file with index: " << index << '\n';
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file: " << scene.path << '\n';
             return false;
         }
 
@@ -66,8 +66,8 @@ bool Scene::Load(int index) {
         
         Entity::temp.clear();
     } catch(...) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << scene.name << '\n';
         Scene::Close();
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene with index: " << index << '\n';
         return false;
     }
     

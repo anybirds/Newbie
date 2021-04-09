@@ -12,6 +12,7 @@ using namespace std;
 void FileDialog::CreateImGui() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(480.0f, 0.0f));
 
     bool p_open = true;
     string title;
@@ -20,7 +21,7 @@ void FileDialog::CreateImGui() {
     } else {
         title = "Open File";
     }
-    if (ImGui::BeginPopupModal(title.c_str(), &p_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal(title.c_str(), &p_open, ImGuiWindowFlags_NoResize)) {
         string temp(dir);
         auto path(filesystem::absolute(filesystem::path(dir)));
         vector<pair<string, filesystem::path>> split;
@@ -29,6 +30,8 @@ void FileDialog::CreateImGui() {
             path = path.parent_path();
         }
         split.push_back(make_pair(path.root_name().string(), path.root_path()));
+
+        ImGui::BeginChild("file", ImVec2(0.0f, 40.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         for (auto it = split.rbegin(); it != split.rend(); it++) {
             ImGui::SameLine();
             if (it != split.rbegin()) {
@@ -39,9 +42,10 @@ void FileDialog::CreateImGui() {
                 temp = it->second.string();
             }
         }
+        ImGui::EndChild();
 
         ImGui::Separator();
-        ImGui::BeginChild("", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("list", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         int index = 0;
         for (auto &p : filesystem::directory_iterator(dir)) {
             try {
@@ -55,8 +59,6 @@ void FileDialog::CreateImGui() {
                                 temp = p.path().string();
                             }
                             selected = index;
-                            fill(buf, buf + 256, 0);
-                            copy(name.begin(), name.end(), buf);
                             arg = p.path().string();
                         }
                     }
@@ -77,8 +79,6 @@ void FileDialog::CreateImGui() {
                             }
                         }
                         selected = index;
-                        fill(buf, buf + 256, 0);
-                        copy(name.begin(), name.end(), buf);
                         arg = p.path().string();
                     }
                 }
@@ -88,15 +88,8 @@ void FileDialog::CreateImGui() {
         ImGui::EndChild();
 
         ImGui::Separator();
-        if (folder) {
-            ImGui::Text("Folder: ");
-        } else {
-            ImGui::Text("File: ");
-        }
-        ImGui::SameLine();
-        ImGui::InputText("", buf, 256);
-        ImGui::SameLine();
-        if (ImGui::Button("Select")) {
+        ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
+        if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
             if (selected >= 0) {
                 callback(arg);
                 ImGui::CloseCurrentPopup();
@@ -108,7 +101,6 @@ void FileDialog::CreateImGui() {
         if (dir != temp) {
             dir = temp;
             selected = -1;
-            fill(buf, buf + 256, 0);
             arg.clear();
         }
     }

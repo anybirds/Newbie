@@ -9,11 +9,10 @@ public:
     static FileDialog &GetInstance() { static FileDialog fileDialog; return fileDialog; }
 
 private:
-    FileDialog() : selected(-1), dir("."), folder(false) { std::fill(buf, buf + 256, 0); }
+    FileDialog() : selected(-1), dir("."), folder(false) {}
 
     int selected;
     std::string arg;
-    char buf[256];
     std::string dir;
 
     bool folder;

@@ -83,7 +83,7 @@ bool Project::Load(const string &path) {
         fs >> js;
         
         // read scenes
-        project.scenes = js["scenes"].get<vector<string>>();
+        project.scenes = js["scenes"].get<unordered_set<string>>();
         
         // read assets
         json &assets = js["assets"];
@@ -112,6 +112,7 @@ bool Project::Load(const string &path) {
         return false;
     }
     
+    project.loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read project: " << project.name << " done.\n";
     return true;
 }
@@ -191,20 +192,9 @@ void Project::Close() {
 #endif
         project.lib = nullptr;
     }
+
+    project.loaded = false;
     cerr << '[' << __FUNCTION__ << ']' << " close projece done.\n";
-}
-
-const string &Project::GetScene(int index) const {
-    return scenes.at(index);
-}
-
-void Project::AddScene(const string &path) {
-    scenes.push_back(path);
-}
-
-void Project::RemoveScene(int index) {
-    scenes.at(index);
-    scenes.erase(scenes.begin() + index);
 }
 
 void Project::RemoveAsset(Asset *asset) {

@@ -1,5 +1,5 @@
 {
-    "setting" : [ 8, 0 ],
+    "setting" : [ 8, "Scenes/Main.json" ],
     "scenes" : [ "Scenes/Main.json" ],
     "assets" : {
         "AMaterial" : {

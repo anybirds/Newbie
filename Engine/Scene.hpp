@@ -26,8 +26,8 @@ NAMESPACE(Engine) {
     */
     class ENGINE_EXPORT Scene final {
     public:
-        static Scene &GetInstance() { static Scene scene; return scene; }  
-        static bool Load(int index);
+        static Scene &GetInstance() { static Scene scene; return scene; }
+        static bool Load(const std::string &path);
         static bool Save();
         static void Close();
 

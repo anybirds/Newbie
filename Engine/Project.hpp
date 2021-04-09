@@ -25,7 +25,7 @@ NAMESPACE(Engine) {
         TYPE(ProjectSetting);
 
         PROPERTY_NONE(uint64_t, serial);
-        PROPERTY(int, startSceneIndex, StartSceneIndex);
+        PROPERTY(std::string, startScene, StartScene);
         
     public:
         uint64_t GetSerial() { return ++serial; }
@@ -54,12 +54,13 @@ NAMESPACE(Engine) {
     #endif
         func init;
         func clear;
+        bool loaded;
         std::string path;
         std::string name;
         std::string directory;
         std::string libpath;
         ProjectSetting *setting;
-        std::vector<std::string> scenes;
+        std::unordered_set<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
 
         std::unordered_set<Asset *> garbages;
@@ -68,12 +69,15 @@ NAMESPACE(Engine) {
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
         
+        bool IsLoaded() const { return loaded; }
         const std::string &GetName() const { return name; }
         const std::string &GetDirectoy() const { return directory; }
         ProjectSetting *GetSetting() const { return setting; }
-        const std::string &GetScene(int index) const;
-        void AddScene(const std::string &path);
-        void RemoveScene(int index);
+
+        const std::unordered_set<std::string> &GetAllScenes() const { return scenes; }
+        void AddScene(const std::string &path) { scenes.insert(path); }
+        void RemoveScene(const std::string &path) { scenes.erase(path); }
+
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);
