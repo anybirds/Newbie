@@ -9,6 +9,11 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
+Transform::Transform() :
+    localPosition(0.0f), localRotation(1.0f, 0.0f, 0.0f, 0.0f), localScale(1.0f),
+    localEulerAngles(0.0f), parent(nullptr), dirty(true), 
+    localToWorldMatrix(glm::mat4(1.0f)) {}
+    
 void Transform::Propagate() {
     if (dirty) {
         return;

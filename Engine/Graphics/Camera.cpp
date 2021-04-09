@@ -1,10 +1,11 @@
 #include <iostream>
+#include <algorithm>
 #include <glm/gtx/transform.hpp>
 
 #include <GameObject.hpp>
-#include <Group.hpp>
 #include <Transform.hpp>
 #include <Scene.hpp>
+#include <Project.hpp>
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
@@ -16,6 +17,10 @@
 using namespace glm;
 using namespace std;
 using namespace Engine;
+
+Camera::Camera() : 
+    dirty(true), orthographic(false), 
+    fovy(60.0f), aspectRatio(1.0f), nr(0.1f), fr(1000.0f), size(5.0f) {}
 
 const mat4 &Camera::GetNormalization() {
     if (dirty) {
@@ -31,16 +36,7 @@ const mat4 &Camera::GetNormalization() {
 
 void Camera::Render() {
     int width, height;
-    if (this == Scene::GetInstance().GetSettiing()->GetMainCamera()) {
-        Window &window = Window::GetInstance();
-        width = window.GetFramebufferWidth(); height = window.GetFramebufferHeight();
-        float windowAspectRatio = (float)width / height;
-        if (aspectRatio != windowAspectRatio) {
-            aspectRatio = windowAspectRatio;
-            dirty = true;
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    } else if (framebuffer) {
+    if (framebuffer) {
         width = framebuffer->GetWidth(); height = framebuffer->GetHeight();
         float framebufferAspectRatio = (float)width / height;
         if (aspectRatio != framebufferAspectRatio) {
@@ -49,8 +45,25 @@ void Camera::Render() {
         }
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     } else {
-        cerr << '[' << __FUNCTION__ << ']' << " framebuffer not specified in Camera: " << GetGameObject()->GetName() << '\n';
-        throw exception();
+        Project &project = Project::GetInstance();
+        if (project.GetUseDefaultFramebuffer()) {
+            Window &window = Window::GetInstance();
+            width = window.GetFramebufferWidth(); height = window.GetFramebufferHeight();
+            float windowAspectRatio = (float)width / height;
+            if (aspectRatio != windowAspectRatio) {
+                aspectRatio = windowAspectRatio;
+                dirty = true;
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        } else {
+            width = project.GetGameFramebuffer()->GetWidth(); height = project.GetGameFramebuffer()->GetHeight();
+            float framebufferAspectRatio = (float)width / height;
+            if (aspectRatio != framebufferAspectRatio) {
+                aspectRatio = framebufferAspectRatio;
+                dirty = true;
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, project.GetGameFramebuffer()->fbo);
+        }
     }
 
     glViewport(0, 0, width, height);

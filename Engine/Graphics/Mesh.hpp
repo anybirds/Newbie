@@ -17,6 +17,7 @@ NAMESPACE(Engine) {
         PROPERTY(uint32_t, index, Index);
 
     public:
+        AMesh();
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
@@ -40,11 +41,13 @@ NAMESPACE(Engine) {
         
         virtual void Apply() override;
 
+        GLuint GetVertexArray() const { return vao; }
+        GLuint GetVertexBuffer() const { return vbo; }
+        GLuint GetElementBuffer() const { return ebo; }
         unsigned GetVertexCount() const { return vcnt; }
+        unsigned GetElementCount() const { return icnt; }
         unsigned GetFaceCount() const { return icnt / 3; }
         uint32_t GetIndex() const { AMesh *amesh = (AMesh *)asset; return amesh->GetIndex(); }
         std::shared_ptr<Model> GetModel() const { return model; }
-
-        friend class MeshDrawer;
     };
 }

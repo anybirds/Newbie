@@ -23,7 +23,7 @@ void MeshDrawer::Draw(Camera *camera) {
         throw exception();
     }
 
-    glBindVertexArray(mesh->vao);
+    glBindVertexArray(mesh->GetVertexArray());
 
     glUseProgram(material->program);
 
@@ -42,12 +42,12 @@ void MeshDrawer::Draw(Camera *camera) {
     location = glGetUniformLocation(material->program, "_NORM");
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&camera->GetNormalization());
 
-    if (!mesh->icnt) {
+    if (!mesh->GetElementCount()) {
         // mesh without EBO
-        glDrawArrays(GL_TRIANGLES, 0, mesh->vcnt);
+        glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
     }
     else {
         // mesh with EBO
-        glDrawElements(GL_TRIANGLES, mesh->icnt, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh->GetElementCount(), GL_UNSIGNED_INT, 0);
     }   
 }

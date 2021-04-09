@@ -59,6 +59,7 @@ void MainMenuBar::CreateImGui() {
                     return;
                 }
                 Project &project = Project::GetInstance();
+                project.SetUseDefaultFramebuffer(false); // use game panel framebuffer
             });
             ImGui::OpenPopup("Open Folder");
         }

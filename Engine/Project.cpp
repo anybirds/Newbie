@@ -5,14 +5,18 @@
 
 #include <Project.hpp>
 #include <Scene.hpp>
-#include <Type.hpp>
+#include <GameObject.hpp>
+#include <Transform.hpp>
+#include <Graphics/Camera.hpp>
+#include <Graphics/Texture.hpp>
+#include <Graphics/Framebuffer.hpp>
+#include <Graphics/Window.hpp>
 
 using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
 bool Project::Load(const string &path) {
-
     Project &project = GetInstance();
 
     // close project
@@ -29,6 +33,9 @@ bool Project::Load(const string &path) {
         gcmd = "cmake -G \"Visual Studio 16 2019\" -A x64 -B " + project.directory + "/build " + project.directory;
     } else if (_MSC_VER >= 1910) {
         gcmd = "cmake -G \"Visual Studio 15 2017\" -A x64 -B " + project.directory + "/build " + project.directory;
+    } else {
+        cerr << '[' << __FUNCTION__ << ']' << " inappropriate Visual Studio version: " << _MSC_VER << '\n';
+        return false;
     }
     system(gcmd.c_str());
     string bcmd("cmake --build " + project.directory + "/build --config Release");
@@ -111,7 +118,32 @@ bool Project::Load(const string &path) {
         Project::Close();
         return false;
     }
+
+    // create panel color texture
+    Window &window = Window::GetInstance();
+    project.gameTexture = new ATexture();
+    project.gameTexture->SetWidth(window.GetMonitorWidth());
+    project.gameTexture->SetHeight(window.GetMonitorHeight());
+    project.sceneTexture = new ATexture();
+    project.sceneTexture->SetWidth(window.GetMonitorWidth());
+    project.sceneTexture->SetHeight(window.GetMonitorHeight());
     
+    // create panel framebuffer
+    project.gameFramebuffer = new AFramebuffer();
+    project.gameFramebuffer->SetColorTexture(project.gameTexture);
+    project.gameFramebuffer->SetUseDepthRenderTexture(true);
+    project.gameFramebufferResource = dynamic_pointer_cast<Framebuffer>(project.gameFramebuffer->GetResource());
+    project.sceneFramebuffer = new AFramebuffer();
+    project.sceneFramebuffer->SetColorTexture(project.sceneTexture);
+    project.sceneFramebuffer->SetUseDepthRenderTexture(true);
+
+    // create scene panel camera
+    project.sceneCamera = new GameObject();
+    Transform *t = project.sceneCamera->AddComponent<Transform>();
+    t->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    Camera *cam = project.sceneCamera->AddComponent<Camera>();
+    cam->SetFramebuffer(dynamic_pointer_cast<Framebuffer>(project.sceneFramebuffer->GetResource()));
+
     project.loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read project: " << project.name << " done.\n";
     return true;

@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <memory>
 #include <nlohmann/json.hpp>
 
 #include <Entity.hpp>
@@ -21,6 +22,11 @@
 
 NAMESPACE(Engine) {
 
+    class ATexture;
+    class AFramebuffer;
+    class Framebuffer;
+    class GameObject;
+    
     CLASS_FINAL_ATTR(ProjectSetting, Entity, ENGINE_EXPORT) {
         TYPE(ProjectSetting);
 
@@ -44,8 +50,9 @@ NAMESPACE(Engine) {
         static void Close();
         
     private:
-        Project() {}
+        Project() : loaded(false) {}
 
+        bool loaded;
         typedef void (*func)();
     #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
         HINSTANCE lib;
@@ -54,7 +61,6 @@ NAMESPACE(Engine) {
     #endif
         func init;
         func clear;
-        bool loaded;
         std::string path;
         std::string name;
         std::string directory;
@@ -62,6 +68,15 @@ NAMESPACE(Engine) {
         ProjectSetting *setting;
         std::unordered_set<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
+
+        // used for game, scene panel in editor
+        bool useDefaultFramebuffer;
+        ATexture *gameTexture;
+        AFramebuffer *gameFramebuffer;
+        std::shared_ptr<Framebuffer> gameFramebufferResource;
+        ATexture *sceneTexture;
+        AFramebuffer *sceneFramebuffer;
+        GameObject *sceneCamera;
 
         std::unordered_set<Asset *> garbages;
 
@@ -77,6 +92,11 @@ NAMESPACE(Engine) {
         const std::unordered_set<std::string> &GetAllScenes() const { return scenes; }
         void AddScene(const std::string &path) { scenes.insert(path); }
         void RemoveScene(const std::string &path) { scenes.erase(path); }
+
+        bool GetUseDefaultFramebuffer() const { return useDefaultFramebuffer; }
+        void SetUseDefaultFramebuffer(bool useDefaultFramebuffer) { this->useDefaultFramebuffer = useDefaultFramebuffer; }
+        const std::shared_ptr<Framebuffer> &GetGameFramebuffer() const { return gameFramebufferResource; }
+        GameObject *GetSceneCamera() const { return sceneCamera; }
 
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {

@@ -6,6 +6,8 @@
 using namespace std;
 using namespace Engine;
 
+AMesh::AMesh() : amodel(nullptr), index(0U) {}
+
 shared_ptr<Resource> AMesh::GetResource() {
     shared_ptr<Resource> sp;
     if (!(sp = resource.lock())) {

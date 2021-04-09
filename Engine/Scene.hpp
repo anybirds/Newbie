@@ -17,8 +17,6 @@ NAMESPACE(Engine) {
 
     CLASS_FINAL_ATTR(SceneSetting, Entity, ENGINE_EXPORT) {
         TYPE(SceneSetting);
-
-        PROPERTY(Camera *, mainCamera, MainCamera);
     };
 
     /*
@@ -32,8 +30,9 @@ NAMESPACE(Engine) {
         static void Close();
 
     private:
-        Scene() {}
+        Scene() : loaded(false) {}
 
+        bool loaded;
         std::string name;
         std::string path;
         SceneSetting *setting;
@@ -48,6 +47,7 @@ NAMESPACE(Engine) {
         Scene(const Scene &) = delete;
         void operator=(const Scene &) = delete;
 
+        bool IsLoaded() const { return loaded; }
         Group *AddGroup();
         void RemoveGroup(Group *group);
         GameObject *FindGameObject(const std::string &name);

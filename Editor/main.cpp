@@ -1,5 +1,3 @@
-#include <Engine.hpp>
-
 #include <string>
 
 #include <imgui/imgui.h>
@@ -9,9 +7,12 @@
 #include <icons/IconsFontAwesome4.h>
 
 #include <MainMenuBar.hpp>
+#include <GamePanel.hpp>
+#include <ScenePanel.hpp>
+
+#include <Graphics/Window.hpp>
 
 using namespace std;
-using namespace glm;
 using namespace Engine;
 
 int main(int argc, char **argv) {
@@ -43,6 +44,8 @@ int main(int argc, char **argv) {
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
     MainMenuBar mainMenuBar;
+    GamePanel gamePanel;
+    ScenePanel scenePanel;
 
     while (!window.ShouldClose()) {
         window.PollEvents();
@@ -54,7 +57,9 @@ int main(int argc, char **argv) {
 
         // menu bar
         mainMenuBar.CreateImGui();
-
+        gamePanel.CreateImGui();
+        scenePanel.CreateImGui();
+        
         ImGui::ShowDemoWindow();
 
         // render

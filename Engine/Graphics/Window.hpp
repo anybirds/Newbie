@@ -1,9 +1,9 @@
 #pragma once 
 
+#include <string>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include <string>
 
 #include <EngineExport.hpp>
 
@@ -28,6 +28,8 @@ namespace Engine {
         int height;
         int fwidth; // framebuffer width
         int fheight; // framebuffer height
+        int mwidth; // monitor width
+        int mheight; // monitor height
 
     public:
         Window(const Window &) = delete;
@@ -38,6 +40,8 @@ namespace Engine {
         int GetHeight() const { return height; }
         int GetFramebufferWidth() const { return fwidth; }
         int GetFramebufferHeight() const { return fheight; }
+        int GetMonitorWidth() const { return mwidth; }
+        int GetMonitorHeight() const { return mheight; }
         GLFWwindow *GetGlfwWindow() { return window; }
 
         void SetName(const std::string &name);

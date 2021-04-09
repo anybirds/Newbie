@@ -21,6 +21,7 @@ NAMESPACE(Engine) {
         PROPERTY(int, magFilter, MagFilter);
 
     public:
+        ATexture();
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
@@ -44,6 +45,7 @@ NAMESPACE(Engine) {
         
         virtual void Apply() override;
 
+        int GetId() const { return id; }
         const std::string &GetPath() const { ATexture *atexture = (ATexture *)asset; return atexture->GetPath(); }
         int GetWidth() const { ATexture *atexture = (ATexture *)asset; return atexture->GetWidth(); }
         int GetHeight() const { ATexture *atexture = (ATexture *)asset; return atexture->GetHeight(); }
@@ -52,8 +54,5 @@ NAMESPACE(Engine) {
         int GetVerticalWrap() const { ATexture *atexture = (ATexture *)asset; return atexture->GetVerticalWrap(); }
         int GetMinFilter() const { ATexture *atexture = (ATexture *)asset; return atexture->GetMinFilter(); }
         int GetMagFilter() const { ATexture *atexture = (ATexture *)asset; return atexture->GetMagFilter(); }
-
-        friend class Material;
-        friend class Framebuffer;
     };
 }

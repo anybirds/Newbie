@@ -8,6 +8,8 @@ using namespace std;
 using namespace glm;
 using namespace Engine;
 
+AMaterial::AMaterial() : vertexShader(nullptr), fragmentShader(nullptr), mainTexture(nullptr) {}
+
 shared_ptr<Resource> AMaterial::GetResource() {
     shared_ptr<Resource> sp;
     if (!(sp = resource.lock())) {
@@ -51,8 +53,8 @@ void Material::Apply() {
 
     // attach shaders and link
     program = glCreateProgram();
-    glAttachShader(program, vertexShader->id);
-    glAttachShader(program, fragmentShader->id);
+    glAttachShader(program, vertexShader->GetId());
+    glAttachShader(program, fragmentShader->GetId());
     glLinkProgram(program);
 
     if (glGetError() != GL_NO_ERROR) {
@@ -207,5 +209,5 @@ void Material::SetMatrixArray(const char *name, const mat4 *value, int length) {
 
 void Material::UseTextures() {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, GetMainTexture()->id);
+    glBindTexture(GL_TEXTURE_2D, GetMainTexture()->GetId());
 }

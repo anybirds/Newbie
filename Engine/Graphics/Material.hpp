@@ -22,6 +22,7 @@ NAMESPACE(Engine) {
         PROPERTY(ATexture *, mainTexture, MainTexture);
 
     public:
+        AMaterial();
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 

@@ -28,11 +28,10 @@ Window::Window() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // full-screen window
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-
-    window = glfwCreateWindow(mode->width, mode->height, name.c_str(), NULL, NULL);
+    mwidth = mode->width; mheight = mode->height;
+    window = glfwCreateWindow(mwidth, mheight, name.c_str(), NULL, NULL);
     if (!window) {
         cerr << '[' << __FUNCTION__ << ']' << " window creation failed."  << '\n';
         throw exception();

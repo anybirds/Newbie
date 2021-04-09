@@ -71,6 +71,7 @@ bool Scene::Load(const string &path) {
         return false;
     }
     
+    scene.loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read scene: " << scene.name << " done.\n";
     return true;
 }
@@ -149,6 +150,8 @@ void Scene::Close() {
     }
     scene.groups.clear();
     scene.garbages.clear();
+
+    scene.loaded = false;
 }
 
 Group *Scene::AddGroup() {

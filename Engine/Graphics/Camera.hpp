@@ -27,7 +27,7 @@ NAMESPACE(Engine) {
         PROPERTY(std::shared_ptr<Framebuffer>, framebuffer, Framebuffer);
 
     public:
-        Camera() : dirty(true), fovy(60.0f), aspectRatio(1.0f), nr(0.1f), fr(1000.0f) { }
+        Camera();
 
         bool IsOrthographic() const { return orthographic; }
         bool IsPerspective() const { return !orthographic; }

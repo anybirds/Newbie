@@ -30,7 +30,7 @@ NAMESPACE(Engine) {
         void Propagate();
 
     public:
-        Transform() : localRotation(1.0f, 0.0f, 0.0f, 0.0f), localToWorldMatrix(glm::mat4(1.0f)), dirty(false) {}
+        Transform();
 
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;

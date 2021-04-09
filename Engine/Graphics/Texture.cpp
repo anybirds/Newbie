@@ -9,6 +9,11 @@
 using namespace std;
 using namespace Engine;
 
+ATexture::ATexture() : 
+    width(1024), height(1024), format(Texture::RGBA), 
+    horizontalWrap(Texture::REPEAT), verticalWrap(Texture::REPEAT),
+    minFilter(Texture::NEAREST), magFilter(Texture::LINEAR) {}
+
 shared_ptr<Resource> ATexture::GetResource() {
     shared_ptr<Resource> sp;
     if (!(sp = resource.lock())) {
@@ -32,7 +37,7 @@ void Texture::Apply() {
     glDeleteTextures(1, &id);
 
     ATexture *atexture = (ATexture *)asset;
-    unsigned char *image;
+    unsigned char *image = nullptr;
     if (!GetPath().empty()) {
         stbi_set_flip_vertically_on_load(true);
 

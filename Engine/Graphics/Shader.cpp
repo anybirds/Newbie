@@ -8,6 +8,8 @@
 using namespace std;
 using namespace Engine;
 
+AShader::AShader() : shaderType(Shader::VERTEX) {}
+
 shared_ptr<Resource> AShader::GetResource() {
     shared_ptr<Resource> sp;
     if (!(sp = resource.lock())) {

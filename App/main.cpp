@@ -3,7 +3,6 @@
 #include <filesystem>
 
 #include <Engine.hpp>
-#include <Graphics/Window.hpp>
 
 using namespace std;
 using namespace glm;
@@ -31,10 +30,11 @@ int main(int argc, char **argv) {
         return 0;
     }
     Project &project = Project::GetInstance();
+    project.SetUseDefaultFramebuffer(true); // render to default framebuffer
     window.SetName(project.GetName());
 
     // load the start Scene
-    if (!Scene::Load(project.GetSetting()->GetStartSceneIndex())) {
+    if (!Scene::Load(project.GetSetting()->GetStartScene())) {
         return 0;
     }
     Scene &scene = Scene::GetInstance();

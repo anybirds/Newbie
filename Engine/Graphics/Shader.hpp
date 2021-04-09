@@ -15,6 +15,7 @@ NAMESPACE(Engine) {
         PROPERTY(unsigned, shaderType, ShaderType);
 
     public:
+        AShader();
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
@@ -30,9 +31,8 @@ NAMESPACE(Engine) {
 
         virtual void Apply() override;
 
+        GLuint GetId() const { return id; }
         const std::string &GetPath() const { AShader *ashader = (AShader *)asset; return ashader->GetPath(); }
         unsigned GetShaderType() const { AShader *ashader = (AShader *)asset; return ashader->GetShaderType(); }
-
-        friend class Material;
     };
 }

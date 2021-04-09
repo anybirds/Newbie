@@ -1,6 +1,6 @@
 #pragma once
 
-class ScenePanel {
+class GamePanel {
 public:
     void CreateImGui();
 };
