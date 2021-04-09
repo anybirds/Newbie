@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <imgui/imgui.h>
+#include <Icons/IconsFontAwesome4.h>
 
 #include <FileDialog.hpp>
 
@@ -30,6 +31,10 @@ void FileDialog::CreateImGui() {
         split.push_back(make_pair(path.root_name().string(), path.root_path()));
         for (auto it = split.rbegin(); it != split.rend(); it++) {
             ImGui::SameLine();
+            if (it != split.rbegin()) {
+                ImGui::Text(ICON_FA_ANGLE_RIGHT);
+                ImGui::SameLine();
+            }
             if (ImGui::SmallButton(it->first.c_str())) {
                 temp = it->second.string();
             }
@@ -43,6 +48,8 @@ void FileDialog::CreateImGui() {
                 string name(p.path().filename().string());
                 if (folder) {
                     if (filesystem::is_directory(p.path())) {
+                        ImGui::Text(ICON_FA_FOLDER);
+                        ImGui::SameLine();
                         if (ImGui::Selectable(name.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
                             if (ImGui::IsMouseDoubleClicked(0)) {
                                 temp = p.path().string();
@@ -54,12 +61,19 @@ void FileDialog::CreateImGui() {
                         }
                     }
                 } else {
+                    if (filesystem::is_directory(p.path())) {
+                        ImGui::Text(ICON_FA_FOLDER);
+                    } else {
+                        ImGui::Text(ICON_FA_FILE);
+                    }
+                    ImGui::SameLine();
                     if (ImGui::Selectable(name.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
                         if (ImGui::IsMouseDoubleClicked(0)) {
                             if (filesystem::is_directory(p.path())) {
                                 temp = p.path().string();
                             } else {
                                 callback(p.path().string());
+                                ImGui::CloseCurrentPopup();
                             }
                         }
                         selected = index;
