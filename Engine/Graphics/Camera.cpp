@@ -68,7 +68,7 @@ void Camera::Render() {
 
     glViewport(0, 0, width, height);
     glClearColor((GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     // render setting
     bool depth_test_enabled = glIsEnabled(GL_DEPTH_TEST);
@@ -106,5 +106,10 @@ void Camera::Render() {
         glDisable(GL_CULL_FACE);
     }
     glCullFace(cull_face_mode);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " graphics error in Camera: " << GetGameObject()->GetName() << '\n';
+    }
 }
 

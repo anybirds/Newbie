@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <cstdint>
 #include <string>
 #include <type_traits>
@@ -45,12 +44,9 @@ NAMESPACE(Engine) {
     class ENGINE_EXPORT Project final {
     public:
         static Project &GetInstance() { static Project project; return project; }
-        static bool Load(const std::string &path);
-        static bool Save();
-        static void Close();
         
     private:
-        Project() : loaded(false) {}
+        Project() {}
 
         bool loaded;
         typedef void (*func)();
@@ -84,6 +80,10 @@ NAMESPACE(Engine) {
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
         
+        bool Load(const std::string &path);
+        bool Save();
+        void Close();
+
         bool IsLoaded() const { return loaded; }
         const std::string &GetName() const { return name; }
         const std::string &GetDirectoy() const { return directory; }

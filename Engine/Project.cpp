@@ -17,70 +17,68 @@ using namespace std;
 using namespace Engine;
 
 bool Project::Load(const string &path) {
-    Project &project = GetInstance();
-
     // close project
-    Project::Close();
+    Close();
 
     // resolve name, directory
-    project.path = filesystem::absolute(filesystem::path(path)).string();
-    project.name = filesystem::path(project.path).filename().stem().string();
-    project.directory = filesystem::path(project.path).parent_path().string();
+    this->path = filesystem::absolute(filesystem::path(path)).string();
+    name = filesystem::path(path).filename().stem().string();
+    directory = filesystem::path(path).parent_path().string();
 
     // compile library
     string gcmd;
     if (_MSC_VER >= 1920) {
-        gcmd = "cmake -G \"Visual Studio 16 2019\" -A x64 -B " + project.directory + "/build " + project.directory;
+        gcmd = "cmake -G \"Visual Studio 16 2019\" -A x64 -B " + directory + "/build " + directory;
     } else if (_MSC_VER >= 1910) {
-        gcmd = "cmake -G \"Visual Studio 15 2017\" -A x64 -B " + project.directory + "/build " + project.directory;
+        gcmd = "cmake -G \"Visual Studio 15 2017\" -A x64 -B " + directory + "/build " + directory;
     } else {
         cerr << '[' << __FUNCTION__ << ']' << " inappropriate Visual Studio version: " << _MSC_VER << '\n';
         return false;
     }
     system(gcmd.c_str());
-    string bcmd("cmake --build " + project.directory + "/build --config Release");
+    string bcmd("cmake --build " + directory + "/build --config Release");
     system(bcmd.c_str());
-    project.libpath = project.directory + "/build/Release/User.dll";
+    libpath = directory + "/build/Release/User.dll";
     
     // load shared library
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    project.lib = LoadLibrary((project.libpath).c_str());
-    if (!project.lib) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << project.libpath << '\n';
+    lib = LoadLibrary((libpath).c_str());
+    if (!lib) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << libpath << '\n';
         return false;
     }
-    project.init = reinterpret_cast<func>(GetProcAddress(project.lib, "type_init"));
-    project.clear = reinterpret_cast<func>(GetProcAddress(project.lib, "type_clear"));
+    init = reinterpret_cast<func>(GetProcAddress(lib, "type_init"));
+    clear = reinterpret_cast<func>(GetProcAddress(lib, "type_clear"));
 #else
-    project.lib = dlopen((name + ".so").c_str(), RTLD_LAZY);
-    if (!project.lib) {
+    lib = dlopen((name + ".so").c_str(), RTLD_LAZY);
+    if (!lib) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << name << '\n';
         return false;
     }
-    project.init = reinterpret_cast<func>(dlsym(project.lib, "type_init"));
-    project.clear = reinterpret_cast<func>(dlsym(project.lib, "type_clear"));
+    init = reinterpret_cast<func>(dlsym(lib, "type_init"));
+    clear = reinterpret_cast<func>(dlsym(lib, "type_clear"));
 #endif    
-    if (!project.init) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_init function symbol: " << project.libpath << '\n';
+    if (!init) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_init function symbol: " << libpath << '\n';
         return false;
     }
-    if (!project.clear) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_clear function symbol: " << project.libpath << '\n';
+    if (!clear) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_clear function symbol: " << libpath << '\n';
         return false;
     }
 
     try {
-        project.init();
+        init();
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " type_init failed: " << project.name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " type_init failed: " << name << '\n';
         return false;
     }
-    cerr << '[' << __FUNCTION__ << ']' << " loading shared library: " << project.libpath << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " loading shared library: " << libpath << " done.\n";
 
     // open json file
-    ifstream fs(project.path);
+    ifstream fs(this->path);
     if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << project.path << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << this->path << '\n';
         return false;
     }
 
@@ -90,7 +88,7 @@ bool Project::Load(const string &path) {
         fs >> js;
         
         // read scenes
-        project.scenes = js["scenes"].get<unordered_set<string>>();
+        scenes = js["scenes"].get<unordered_set<string>>();
         
         // read assets
         json &assets = js["assets"];
@@ -98,69 +96,70 @@ bool Project::Load(const string &path) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 Entity *entity = type->Instantiate();
-                project.assets.insert({stoll(j.key()), dynamic_cast<Asset *>(entity)});
+                this->assets.insert({stoll(j.key()), dynamic_cast<Asset *>(entity)});
             }
         }
         
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
             const Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                type->Deserialize(j.value(), project.assets.at(stoll(j.key())));
+                type->Deserialize(j.value(), this->assets.at(stoll(j.key())));
             }
         }
         
         // read project setting
-        project.setting = (ProjectSetting *)ProjectSetting::StaticType()->Instantiate();
-        ProjectSetting::StaticType()->Deserialize(js["setting"], project.setting);
+        setting = (ProjectSetting *)ProjectSetting::StaticType()->Instantiate();
+        ProjectSetting::StaticType()->Deserialize(js["setting"], setting);
 
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read project: " << project.name << '\n';
-        Project::Close();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read project: " << name << '\n';
+        Close();
         return false;
     }
 
+    
     // create panel color texture
     Window &window = Window::GetInstance();
-    project.gameTexture = new ATexture();
-    project.gameTexture->SetWidth(window.GetMonitorWidth());
-    project.gameTexture->SetHeight(window.GetMonitorHeight());
-    project.sceneTexture = new ATexture();
-    project.sceneTexture->SetWidth(window.GetMonitorWidth());
-    project.sceneTexture->SetHeight(window.GetMonitorHeight());
+    gameTexture = new ATexture();
+    gameTexture->SetWidth(window.GetMonitorWidth());
+    gameTexture->SetHeight(window.GetMonitorHeight());
+    sceneTexture = new ATexture();
+    sceneTexture->SetWidth(window.GetMonitorWidth());
+    sceneTexture->SetHeight(window.GetMonitorHeight());
     
     // create panel framebuffer
-    project.gameFramebuffer = new AFramebuffer();
-    project.gameFramebuffer->SetColorTexture(project.gameTexture);
-    project.gameFramebuffer->SetUseDepthRenderTexture(true);
-    project.gameFramebufferResource = dynamic_pointer_cast<Framebuffer>(project.gameFramebuffer->GetResource());
-    project.sceneFramebuffer = new AFramebuffer();
-    project.sceneFramebuffer->SetColorTexture(project.sceneTexture);
-    project.sceneFramebuffer->SetUseDepthRenderTexture(true);
+    gameFramebuffer = new AFramebuffer();
+    gameFramebuffer->SetColorTexture(gameTexture);
+    gameFramebuffer->SetUseDepthRenderTexture(true);
+    gameFramebufferResource = dynamic_pointer_cast<Framebuffer>(gameFramebuffer->GetResource());
+    sceneFramebuffer = new AFramebuffer();
+    sceneFramebuffer->SetColorTexture(sceneTexture);
+    sceneFramebuffer->SetUseDepthRenderTexture(true);
 
     // create scene panel camera
-    project.sceneCamera = new GameObject();
-    Transform *t = project.sceneCamera->AddComponent<Transform>();
+    sceneCamera = new GameObject();
+    Transform *t = sceneCamera->AddComponent<Transform>();
+    sceneCamera->transform = t;
     t->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-    Camera *cam = project.sceneCamera->AddComponent<Camera>();
-    cam->SetFramebuffer(dynamic_pointer_cast<Framebuffer>(project.sceneFramebuffer->GetResource()));
+    Camera *cam = sceneCamera->AddComponent<Camera>();
+    cam->SetFramebuffer(dynamic_pointer_cast<Framebuffer>(sceneFramebuffer->GetResource()));
 
-    project.loaded = true;
-    cerr << '[' << __FUNCTION__ << ']' << " read project: " << project.name << " done.\n";
+    loaded = true;
+    cerr << '[' << __FUNCTION__ << ']' << " read project: " << name << " done.\n";
     return true;
 }
 
 bool Project::Save() {
-    Project &project = Project::GetInstance();
-
     // save scene
-    if (!Scene::Save()) {
+    Scene &scene = Scene::GetInstance();
+    if (!scene.Save()) {
         return false;
     }
 
     // open json file
-    ofstream fs(project.path);
+    ofstream fs(path);
     if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << project.path << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << path << '\n';
         return false;
     }
 
@@ -168,64 +167,83 @@ bool Project::Save() {
         json js;
         
         // write project setting
-        ProjectSetting::StaticType()->Serialize(js["setting"], project.setting);
+        ProjectSetting::StaticType()->Serialize(js["setting"], setting);
 
         // write scenes
-        js["scenes"] = project.scenes;
+        js["scenes"] = scenes;
 
         // write assets
         json &assets = js["assets"];
-        for (auto &p : project.assets) {
+        for (auto &p : this->assets) {
             Type *type = p.second->GetType();
             type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
         }
 
         fs << js;
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << project.name << '\n';
-        Project::Close();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << name << '\n';
+        Close();
         return false;
     }
 
-    cerr << '[' << __FUNCTION__ << ']' << " save project: " << project.name << "done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " save project: " << name << "done.\n";
     return true;
 }
 
 void Project::Close() {
     // close scene
-    Scene::Close();
+    Scene &scene = Scene::GetInstance();
+    scene.Close();
 
     // clear out members
-    Project &project = GetInstance();
-    project.path.clear();
-    project.directory.clear();
-    project.name.clear();
-    project.libpath.clear();
-    if (project.setting) {
-        delete project.setting;
+    path.clear();
+    directory.clear();
+    name.clear();
+    libpath.clear();
+    if (setting) {
+        delete setting;
     }
-    project.scenes.clear();
-    for (auto &p : project.assets) {
+    scenes.clear();
+    for (auto &p : assets) {
         delete p.second;
     }
-    project.assets.clear(); 
-    for (Asset *garbage : project.garbages) {
+    assets.clear(); 
+    for (Asset *garbage : garbages) {
         delete garbage;
     }
-    project.garbages.clear();
+    garbages.clear();
 
     // clear out lib and types
-    if (project.lib) {
-        project.clear();
+    if (lib) {
+        clear();
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-        FreeLibrary((HMODULE)project.lib);
+        FreeLibrary((HMODULE)lib);
 #else
-        dlclose(project.lib);
+        dlclose(lib);
 #endif
-        project.lib = nullptr;
+        lib = nullptr;
+        init = nullptr;
+        clear = nullptr;
     }
 
-    project.loaded = false;
+    if (gameTexture){
+        delete gameTexture;
+    }
+    if (gameFramebuffer) {
+        delete gameFramebuffer;
+    }
+    gameFramebufferResource.reset();
+    if (sceneTexture) {
+        delete sceneTexture;
+    }
+    if (sceneFramebuffer) {
+        delete sceneFramebuffer;
+    }
+    if (sceneCamera) {
+        delete sceneCamera;
+    }
+
+    loaded = false;
     cerr << '[' << __FUNCTION__ << ']' << " close projece done.\n";
 }
 

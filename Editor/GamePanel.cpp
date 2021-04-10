@@ -9,7 +9,7 @@ using namespace Engine;
 void GamePanel::CreateImGui() {
     ImGui::SetNextWindowSize(ImVec2(800.0f, 480.0f));
 
-    ImGui::Begin("Scene");
+    ImGui::Begin("Game");
     Scene &scene = Scene::GetInstance();
     if (scene.IsLoaded()) {
         Project &project = Project::GetInstance();
@@ -21,7 +21,10 @@ void GamePanel::CreateImGui() {
         float imgHeight = ImGui::GetWindowSize().y - 5.0f;
 
         // todo: do fancy uv stuff to preserve aspect ratio
-        ImGui::Image((void *)(intptr_t)project.GetGameFramebuffer()->GetColorTexture()->GetId(), ImVec2(imgWidth, imgHeight));
+        ImGui::Image((void *)(intptr_t)project.GetGameFramebuffer()->GetColorTexture()->GetId(), 
+            ImVec2(imgWidth, imgHeight),
+            ImVec2(0.0f, 1.0f),
+            ImVec2(1.0f, 0.0f));
     }
     ImGui::End();
 }

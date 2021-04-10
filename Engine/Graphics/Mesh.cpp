@@ -35,7 +35,9 @@ Mesh::~Mesh() {
 
 void Mesh::Apply() {
     AMesh *amesh = (AMesh *)asset; 
-    model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());
+    if (amesh->GetModel()) {
+        model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());    
+    }
     if (!model) {
         cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh: " << GetName() << '\n';
         throw exception();
@@ -141,5 +143,9 @@ void Mesh::Apply() {
     delete[] attrib;
     delete[] idx;
 
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Mesh: " << GetName() << '\n';
+        throw exception();
+    }
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }

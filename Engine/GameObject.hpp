@@ -30,6 +30,7 @@ NAMESPACE(Engine) {
         std::unordered_set<Component *> garbages;
 
     public:
+        GameObject() : group(nullptr), transform(nullptr) {}
         virtual ~GameObject();
         
         bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
@@ -48,12 +49,14 @@ NAMESPACE(Engine) {
             return nullptr;
         }
         template <class T, 
-        std::enable_if_t<std::is_base_of_v<Component, T> && 
+        std::enable_if_t<std::is_base_of_v<Component, T> &&
         !std::is_base_of_v<Script, T> && !std::is_base_of_v<Drawer, T> && !std::is_base_of_v<Renderer, T>, bool> = true>
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
-            t->enabled = IsEnabled();
+            if (transform) {
+                t->enabled = IsEnabled() && t->IsLocalEnabled();
+            }
             components.insert(t);
             return t;
         }
@@ -63,7 +66,10 @@ NAMESPACE(Engine) {
             t->gameObject = this;
             t->enabled = IsEnabled();
             components.insert(t);
-            Scene::GetInstance().scripts.insert((Script *)t);
+            Scene &scene = Scene::GetInstance();
+            if (scene.IsLoaded()) {
+               scene.scripts.insert((Script *)t);
+            }
             return t;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Renderer, T>, bool> = true> 
@@ -72,7 +78,10 @@ NAMESPACE(Engine) {
             t->gameObject = this;
             t->enabled = IsEnabled();
             components.insert(t);
-            Scene::GetInstance().renderers.insert((Renderer *)t);
+            Scene &scene = Scene::GetInstance();
+            if (scene.IsLoaded()) {
+               scene.renderers.insert((Renderer *)t);
+            }
             return t;
         }
         template <class T, std::enable_if_t<std::is_base_of_v<Drawer, T>, bool> = true> 
@@ -81,7 +90,10 @@ NAMESPACE(Engine) {
             t->gameObject = this;
             t->enabled = IsEnabled();
             components.insert(t);
-            Scene::GetInstance().drawers.insert((Drawer *)t);
+            Scene &scene = Scene::GetInstance();
+            if (scene.IsLoaded()) {
+               scene.drawers.insert((Drawer *)t);
+            }
             return t;
         }
         void RemoveComponent(Component *component);
@@ -92,6 +104,7 @@ NAMESPACE(Engine) {
 
         friend class Group;
         friend class Scene;
+        friend class Project;
         friend class Component;
     };
 }

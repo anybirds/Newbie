@@ -18,11 +18,13 @@ void ScenePanel::CreateImGui() {
         float imgHeight = ImGui::GetWindowSize().y - 5.0f;
         cam->GetFramebuffer()->SetWidth((int)imgWidth);
         cam->GetFramebuffer()->SetHeight((int)imgHeight);
-        cam->Render();
+        try {
+            cam->Render();
+        } catch(...) {}
         ImGui::Image((void *)(intptr_t)cam->GetFramebuffer()->GetColorTexture()->GetId(), 
             ImVec2(imgWidth, imgHeight),
-            ImVec2(0.0f, 0.0f),
-            ImVec2(imgWidth / cam->GetFramebuffer()->GetMaxWidth(), imgHeight / cam->GetFramebuffer()->GetMaxHeight()));
+            ImVec2(0.0f, imgHeight / cam->GetFramebuffer()->GetMaxHeight()),
+            ImVec2(imgWidth / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
     }
     ImGui::End();
 }

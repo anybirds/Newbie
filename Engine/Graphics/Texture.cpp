@@ -25,7 +25,7 @@ shared_ptr<Resource> ATexture::GetResource() {
     return sp;
 }
 
-Texture::Texture(ATexture *atexture) : Resource(atexture) {
+Texture::Texture(ATexture *atexture) : Resource(atexture), id(0) {
     Apply();
 }
 
@@ -74,5 +74,15 @@ void Texture::Apply() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagFilter());
 
     glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GetFormat(), GetWidth(), GetHeight(), 0, GetFormat(), GL_UNSIGNED_BYTE, image);
-    stbi_image_free(image);
+
+    if (image) {
+        stbi_image_free(image);
+    }
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Texture: " << GetName() << '\n';
+        glDeleteTextures(1, &id);
+        throw exception();
+    }
+    cerr << '[' << __FUNCTION__ << ']' << " created Texture: " << GetName() << '\n';
 }

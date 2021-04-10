@@ -31,9 +31,15 @@ Material::~Material() {
 
 void Material::Apply() {
     AMaterial *amaterial = (AMaterial *)asset;
-    vertexShader = dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
-    fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
-    mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());
+    if (amaterial->GetVertexShader()) {
+        vertexShader =  dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
+    }
+    if (amaterial->GetFragmentShader()) {
+        fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());    
+    }
+    if (amaterial->GetMainTexture()) {
+        mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());    
+    }
     if (!vertexShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
         throw exception();
@@ -57,18 +63,21 @@ void Material::Apply() {
     glAttachShader(program, fragmentShader->GetId());
     glLinkProgram(program);
 
-    if (glGetError() != GL_NO_ERROR) {
-        glDeleteProgram(program);
-        cerr << '[' << __FUNCTION__ << ']' << " failed program link in Material: " << GetName() << '\n';
-        throw exception();
-    }
-
     // sampler uniform values
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, "_MAIN_TEX");
     glUniform1i(location, 0);
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Material: " << GetName() << '\n';
+        glDeleteProgram(program);
+        throw exception();
+    }
+    cerr << '[' << __FUNCTION__ << ']' << " created Material: " << GetName() << '\n';
 }
 
 int Material::GetInteger(const char *name) const {
+    glUseProgram(program);
     int ret = 0;
     GLint location = glGetUniformLocation(program, name);
     if (location != -1) {
@@ -78,6 +87,7 @@ int Material::GetInteger(const char *name) const {
 }
 
 vector<int> Material::GetIntegerArray(const char *name) const {
+    glUseProgram(program);
     vector<int> ret;
     GLint location;
     string str(name);
@@ -94,6 +104,7 @@ vector<int> Material::GetIntegerArray(const char *name) const {
     return ret;
 }
 float Material::GetFloat(const char *name) const {
+    glUseProgram(program);
     float ret = 0.0f;
     GLint location = glGetUniformLocation(program, name);
     if (location != -1) {
@@ -102,6 +113,7 @@ float Material::GetFloat(const char *name) const {
     return ret;
 }
 vector<float> Material::GetFloatArray(const char *name) const {
+    glUseProgram(program);
     vector<float> ret;
     GLint location;
     string str(name);
@@ -118,6 +130,7 @@ vector<float> Material::GetFloatArray(const char *name) const {
     return ret;
 }
 vec4 Material::GetVector(const char *name) const {
+    glUseProgram(program);
     vec4 ret;
     GLint location = glGetUniformLocation(program, name);
     if (location != -1) {
@@ -126,6 +139,7 @@ vec4 Material::GetVector(const char *name) const {
     return ret;
 }
 vector<vec4> Material::GetVectorArray(const char *name) const {
+    glUseProgram(program);
     vector<vec4> ret;
     GLint location;
     string str(name);
@@ -142,6 +156,7 @@ vector<vec4> Material::GetVectorArray(const char *name) const {
     return ret;
 }
 mat4 Material::GetMatrix(const char *name) const {
+    glUseProgram(program);
     mat4 ret;
     GLint location = glGetUniformLocation(program, name);
     if (location != -1) {
@@ -151,6 +166,7 @@ mat4 Material::GetMatrix(const char *name) const {
 }
 
 vector<mat4> Material::GetMatrixArray(const char *name) const {
+    glUseProgram(program);
     vector<mat4> ret;
     GLint location;
     string str(name);
@@ -168,46 +184,55 @@ vector<mat4> Material::GetMatrixArray(const char *name) const {
 }
 
 void Material::SetInteger(const char *name, int value) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform1i(location, value);
 }
 
 void Material::SetIntegerArray(const char *name, const int *value, int length) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform1iv(location, length, value);
 }
 
 void Material::SetFloat(const char *name, float value) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform1f(location, value);
 }
 
 void Material::SetFloatArray(const char *name, const float *value, int length) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform1fv(location, length, value);
 }
 
 void Material::SetVector(const char *name, const vec4 &value) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform4fv(location, 1, (const GLfloat *)&value);
 }
 
 void Material::SetVectorArray(const char *name, const vec4 *value, int length) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniform4fv(location, length, (const GLfloat *)value);
 }
 
 void Material::SetMatrix(const char *name, const mat4 &value) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&value);
 }
 
 void Material::SetMatrixArray(const char *name, const mat4 *value, int length) {
+    glUseProgram(program);
     GLint location = glGetUniformLocation(program, name);
     glUniformMatrix4fv(location, length, GL_FALSE, (const GLfloat *)value);
 }
 
 void Material::UseTextures() {
+    glUseProgram(program);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, GetMainTexture()->GetId());
 }

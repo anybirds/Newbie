@@ -1,6 +1,5 @@
 #include <filesystem>
 #include <vector>
-#include <iostream>
 
 #include <imgui/imgui.h>
 #include <Icons/IconsFontAwesome4.h>
@@ -75,6 +74,7 @@ void FileDialog::CreateImGui() {
                                 temp = p.path().string();
                             } else {
                                 callback(p.path().string());
+                                selected = -1;
                                 ImGui::CloseCurrentPopup();
                             }
                         }
@@ -92,6 +92,7 @@ void FileDialog::CreateImGui() {
         if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
             if (selected >= 0) {
                 callback(arg);
+                selected = -1;
                 ImGui::CloseCurrentPopup();
             }
         }

@@ -22,7 +22,7 @@ NAMESPACE(Engine) {
         PROPERTY_GET(GameObject *, gameObject, GameObject);
         
     public:
-        Component() : localEnabled(true), gameObject(nullptr) {}
+        Component() : localEnabled(true), enabled(true), gameObject(nullptr) {}
 
         bool IsLocalEnabled() { return localEnabled; }
         bool IsEnabled() { return enabled; }

@@ -39,8 +39,8 @@ void Shader::Apply() {
 
     ifstream file(Project::GetInstance().GetDirectoy() + "/" + GetPath());
     if (!file.is_open()) {
-        glDeleteShader(id);
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << '\n';
+        glDeleteShader(id);
         throw exception();
     }
 
@@ -54,8 +54,15 @@ void Shader::Apply() {
     GLint status = 0;
     glGetShaderiv(id, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
-        glDeleteShader(id);
         cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << GetPath() << '\n';
+        glDeleteShader(id);
         throw exception();
     }
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Shader: " << GetName() << '\n';
+        glDeleteShader(id);
+        throw exception();
+    }
+    cerr << '[' << __FUNCTION__ << ']' << " created Shader: " << GetName() << '\n';
 }

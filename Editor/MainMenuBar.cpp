@@ -55,10 +55,10 @@ void MainMenuBar::CreateImGui() {
                 }
 
                 // load the Project
-                if (!Project::Load(pfile)) {
+                Project &project = Project::GetInstance();
+                if (!project.Load(pfile)) {
                     return;
                 }
-                Project &project = Project::GetInstance();
                 project.SetUseDefaultFramebuffer(false); // use game panel framebuffer
             });
             ImGui::OpenPopup("Open Folder");

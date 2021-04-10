@@ -10,7 +10,6 @@
 
 NAMESPACE(Engine) {
 
-    class Camera;
     class Group;
     class GameObject;
     class Script;
@@ -25,12 +24,9 @@ NAMESPACE(Engine) {
     class ENGINE_EXPORT Scene final {
     public:
         static Scene &GetInstance() { static Scene scene; return scene; }
-        static bool Load(const std::string &path);
-        static bool Save();
-        static void Close();
 
     private:
-        Scene() : loaded(false) {}
+        Scene() {}
 
         bool loaded;
         std::string name;
@@ -46,6 +42,10 @@ NAMESPACE(Engine) {
     public:
         Scene(const Scene &) = delete;
         void operator=(const Scene &) = delete;
+
+        bool Load(const std::string &path);
+        bool Save();
+        void Close();
 
         bool IsLoaded() const { return loaded; }
         Group *AddGroup();

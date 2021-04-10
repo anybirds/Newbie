@@ -50,4 +50,6 @@ void MeshDrawer::Draw(Camera *camera) {
         // mesh with EBO
         glDrawElements(GL_TRIANGLES, mesh->GetElementCount(), GL_UNSIGNED_INT, 0);
     }   
+
+    glUseProgram(0);
 }

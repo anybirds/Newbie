@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <Project.hpp>
 #include <Scene.hpp>
 
@@ -18,14 +20,17 @@ void SceneDialog::CreateImGui() {
         ImGui::BeginChild("", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         Project &project = Project::GetInstance();
         int index = 0;
-        for (auto &scene : project.GetAllScenes()) {
-            if (ImGui::Selectable(scene.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
+        for (auto &path : project.GetAllScenes()) {
+            if (ImGui::Selectable(path.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    Scene::Load(scene);
+                    Scene &scene = Scene::GetInstance();
+                    scene.Load(path);
+                    selected = -1;
                     ImGui::CloseCurrentPopup();
+                } else {
+                    selected = index;
                 }
-                selected = index;
-                arg = scene;
+                arg = path;
             }
             index++;
         }
@@ -35,7 +40,9 @@ void SceneDialog::CreateImGui() {
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
             if (selected >= 0) {
-                Scene::Load(arg);
+                Scene &scene = Scene::GetInstance();
+                scene.Load(arg);
+                selected = -1;
                 ImGui::CloseCurrentPopup();
             }
         }

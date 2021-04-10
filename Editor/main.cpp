@@ -43,9 +43,9 @@ int main(int argc, char **argv) {
     ImGui_ImplGlfw_InitForOpenGL(window.GetGlfwWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
-    MainMenuBar mainMenuBar;
-    GamePanel gamePanel;
-    ScenePanel scenePanel;
+    MainMenuBar &mainMenuBar = MainMenuBar::GetInstance();
+    GamePanel &gamePanel = GamePanel::GetInstance();
+    ScenePanel &scenePanel = ScenePanel::GetInstance();
 
     while (!window.ShouldClose()) {
         window.PollEvents();
@@ -55,10 +55,9 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // menu bar
-        mainMenuBar.CreateImGui();
         gamePanel.CreateImGui();
         scenePanel.CreateImGui();
+        mainMenuBar.CreateImGui();
         
         ImGui::ShowDemoWindow();
 

@@ -20,18 +20,23 @@ shared_ptr<Resource> AFramebuffer::GetResource() {
     return sp;
 }
 
-Framebuffer::Framebuffer(AFramebuffer *aframebuffer) : Resource(aframebuffer) {
+Framebuffer::Framebuffer(AFramebuffer *aframebuffer) : Resource(aframebuffer), fbo(0U), rbo(0U) {
     Apply();
 }
 
 Framebuffer::~Framebuffer() {
     glDeleteFramebuffers(1, &fbo);
+    glDeleteRenderbuffers(1, &rbo);
 }
 
 void Framebuffer::Apply() {
     AFramebuffer *aframebuffer = (AFramebuffer *)asset;
-    colorTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetColorTexture()->GetResource());
-    depthTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetDepthTexture()->GetResource());
+    if (aframebuffer->GetColorTexture()) {
+        colorTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetColorTexture()->GetResource());    
+    }
+    if (aframebuffer->GetDepthTexture()) {
+        depthTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetDepthTexture()->GetResource());    
+    }
 
     glDeleteFramebuffers(1, &fbo);
     glDeleteRenderbuffers(1, &rbo);
@@ -60,12 +65,19 @@ void Framebuffer::Apply() {
     maxWidth = width; maxHeight = height;
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        glDeleteFramebuffers(1, &fbo);
         cerr << '[' << __FUNCTION__ << ']' << " incomplete Framebuffer: " << GetName() << '\n';
+        glDeleteFramebuffers(1, &fbo);
         throw exception();    
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Framebuffer: " << GetName() << '\n';
+        glDeleteFramebuffers(1, &fbo);
+        throw exception();
+    }
+    cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }
 
 void Framebuffer::SetWidth(int width) {

@@ -38,4 +38,6 @@ void Model::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << GetPath() << '\n';
         throw exception();
     }
+
+    cerr << '[' << __FUNCTION__ << ']' << " created Model: " << GetName() << '\n';
 }

@@ -1,3 +1,5 @@
+#include <GL/glew.h>
+
 #include <iostream>
 #include <fstream>
 #include <functional>
@@ -16,20 +18,18 @@ using namespace std;
 using namespace Engine;
 
 bool Scene::Load(const string &path) {
-    Scene &scene = Scene::GetInstance();
-
     // close project
-    Scene::Close();
+    Close();
 
     try {
         // get scene file path
-        scene.path = path;
-        scene.name = filesystem::path(scene.path).stem().string();
+        this->path = path;
+        name = filesystem::path(this->path).stem().string();
         
         // open json file
-        ifstream fs(Project::GetInstance().GetDirectoy() + "/" + scene.path);
+        ifstream fs(Project::GetInstance().GetDirectoy() + "/" + this->path);
         if (fs.fail()) {
-            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file: " << scene.path << '\n';
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file: " << this->path << '\n';
             return false;
         }
 
@@ -55,34 +55,32 @@ bool Scene::Load(const string &path) {
         }
         
         // read extras
-        scene.groups = js["groups"].get<unordered_set<Group *>>();
-        scene.scripts = js["scripts"].get<unordered_set<Script *>>();
-        scene.renderers = js["renderers"].get<multiset<Renderer *, RendererComparer>>();
-        scene.drawers = js["drawers"].get<multiset<Drawer *, DrawerComparer>>();
+        groups = js["groups"].get<unordered_set<Group *>>();
+        scripts = js["scripts"].get<unordered_set<Script *>>();
+        renderers = js["renderers"].get<multiset<Renderer *, RendererComparer>>();
+        drawers = js["drawers"].get<multiset<Drawer *, DrawerComparer>>();
 
         // read scene setting
-        scene.setting = (SceneSetting *)SceneSetting::StaticType()->Instantiate();
-        SceneSetting::StaticType()->Deserialize(js["setting"], scene.setting);
+        setting = (SceneSetting *)SceneSetting::StaticType()->Instantiate();
+        SceneSetting::StaticType()->Deserialize(js["setting"], setting);
         
         Entity::temp.clear();
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << scene.name << '\n';
-        Scene::Close();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << name << '\n';
+        Close();
         return false;
     }
     
-    scene.loaded = true;
-    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << scene.name << " done.\n";
+    loaded = true;
+    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << name << " done.\n";
     return true;
 }
 
 bool Scene::Save() {
-    Scene &scene = Scene::GetInstance();
-    
     // open json file
-    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + scene.path);
+    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + path);
     if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << scene.name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
         return false;
     }
     
@@ -90,13 +88,13 @@ bool Scene::Save() {
         json js;
 
         // write scene setting
-        SceneSetting::StaticType()->Serialize(js["setting"], scene.setting);
+        SceneSetting::StaticType()->Serialize(js["setting"], setting);
 
         // write extras
-        js["groups"] = scene.groups;
-        js["scripts"] = scene.scripts;
-        js["renderers"] = scene.renderers;
-        js["drawers"] = scene.drawers;
+        js["groups"] = groups;
+        js["scripts"] = scripts;
+        js["renderers"] = renderers;
+        js["drawers"] = drawers;
 
         // write entities
         json& entities = js["entities"];
@@ -117,7 +115,7 @@ bool Scene::Save() {
                 entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
                 gameObject);
         };
-        for (Group *group : scene.groups) {
+        for (Group *group : groups) {
             for (GameObject *gameObject : group->gameObjects) {
                 recurse(gameObject);
             }
@@ -129,29 +127,32 @@ bool Scene::Save() {
         
         fs << js;
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << scene.name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << name << '\n';
+        Close();
         return false;
     }
 
-    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << scene.name << "done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << name << "done.\n";
     return true;
 }
 
 void Scene::Close() {
-    Scene &scene = Scene::GetInstance();
-    scene.name.clear();
-    scene.path.clear();
-    if (scene.setting) {
-        delete scene.setting;
+    name.clear();
+    path.clear();
+    if (setting) {
+        delete setting;
     }
-    vector<Group *> temp(scene.groups.begin(), scene.groups.end());
-    for (Group *group : temp) {
+    for (Group *group : groups) {
         delete group;
     }
-    scene.groups.clear();
-    scene.garbages.clear();
+    groups.clear();
+    for (Group *garbage : garbages) {
+        delete garbage;
+    }
+    garbages.clear();
 
-    scene.loaded = false;
+    loaded = false;
+    cerr << '[' << __FUNCTION__ << ']' << " close scene done\n";
 }
 
 Group *Scene::AddGroup() {
