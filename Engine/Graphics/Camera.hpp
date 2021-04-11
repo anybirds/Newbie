@@ -26,6 +26,14 @@ NAMESPACE(Engine) {
         PROPERTY_GET(float, size, Size);
         PROPERTY(std::shared_ptr<Framebuffer>, framebuffer, Framebuffer);
 
+    private:
+        static Framebuffer *defaultFramebuffer;
+    
+    public:
+        static void SetDefaultFramebuffer(const std::shared_ptr<Framebuffer> &defaultFramebuffer) {
+            Camera::defaultFramebuffer = defaultFramebuffer.get();
+        }
+
     public:
         Camera();
 

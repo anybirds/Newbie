@@ -8,6 +8,8 @@
 #include <MainMenuBar.hpp>
 #include <FileDialog.hpp>
 #include <SceneDialog.hpp>
+#include <GamePanel.hpp>
+#include <ScenePanel.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -40,6 +42,17 @@ void MainMenuBar::CreateImGui() {
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Window")) {
+            GamePanel &gamePanel = GamePanel::GetInstance();
+            if (ImGui::MenuItem("Game", nullptr, gamePanel.IsOpen())) {
+                gamePanel.Toggle();
+            }
+            ScenePanel &scenePanel = ScenePanel::GetInstance();
+            if (ImGui::MenuItem("Scene", nullptr, ScenePanel::GetInstance().IsOpen())) {
+                scenePanel.Toggle();
+            }
+            ImGui::EndMenu();
+        }
 
         FileDialog &fileDialog = FileDialog::GetInstance();
         if (project_open) {
@@ -59,7 +72,6 @@ void MainMenuBar::CreateImGui() {
                 if (!project.Load(pfile)) {
                     return;
                 }
-                project.SetUseDefaultFramebuffer(false); // use game panel framebuffer
             });
             ImGui::OpenPopup("Open Folder");
         }

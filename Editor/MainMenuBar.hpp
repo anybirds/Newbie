@@ -12,6 +12,6 @@ private:
 public:
     MainMenuBar(const MainMenuBar &) = delete;
     void operator=(const MainMenuBar &) = delete;
-    
+
     void CreateImGui();
 };

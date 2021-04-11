@@ -5,12 +5,6 @@
 
 #include <Project.hpp>
 #include <Scene.hpp>
-#include <GameObject.hpp>
-#include <Transform.hpp>
-#include <Graphics/Camera.hpp>
-#include <Graphics/Texture.hpp>
-#include <Graphics/Framebuffer.hpp>
-#include <Graphics/Window.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -117,33 +111,6 @@ bool Project::Load(const string &path) {
         return false;
     }
 
-    
-    // create panel color texture
-    Window &window = Window::GetInstance();
-    gameTexture = new ATexture();
-    gameTexture->SetWidth(window.GetMonitorWidth());
-    gameTexture->SetHeight(window.GetMonitorHeight());
-    sceneTexture = new ATexture();
-    sceneTexture->SetWidth(window.GetMonitorWidth());
-    sceneTexture->SetHeight(window.GetMonitorHeight());
-    
-    // create panel framebuffer
-    gameFramebuffer = new AFramebuffer();
-    gameFramebuffer->SetColorTexture(gameTexture);
-    gameFramebuffer->SetUseDepthRenderTexture(true);
-    gameFramebufferResource = dynamic_pointer_cast<Framebuffer>(gameFramebuffer->GetResource());
-    sceneFramebuffer = new AFramebuffer();
-    sceneFramebuffer->SetColorTexture(sceneTexture);
-    sceneFramebuffer->SetUseDepthRenderTexture(true);
-
-    // create scene panel camera
-    sceneCamera = new GameObject();
-    Transform *t = sceneCamera->AddComponent<Transform>();
-    sceneCamera->transform = t;
-    t->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-    Camera *cam = sceneCamera->AddComponent<Camera>();
-    cam->SetFramebuffer(dynamic_pointer_cast<Framebuffer>(sceneFramebuffer->GetResource()));
-
     loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read project: " << name << " done.\n";
     return true;
@@ -202,6 +169,7 @@ void Project::Close() {
     libpath.clear();
     if (setting) {
         delete setting;
+        setting = nullptr;
     }
     scenes.clear();
     for (auto &p : assets) {
@@ -226,25 +194,8 @@ void Project::Close() {
         clear = nullptr;
     }
 
-    if (gameTexture){
-        delete gameTexture;
-    }
-    if (gameFramebuffer) {
-        delete gameFramebuffer;
-    }
-    gameFramebufferResource.reset();
-    if (sceneTexture) {
-        delete sceneTexture;
-    }
-    if (sceneFramebuffer) {
-        delete sceneFramebuffer;
-    }
-    if (sceneCamera) {
-        delete sceneCamera;
-    }
-
     loaded = false;
-    cerr << '[' << __FUNCTION__ << ']' << " close projece done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " close project done.\n";
 }
 
 void Project::RemoveAsset(Asset *asset) {

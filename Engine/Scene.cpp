@@ -141,6 +141,7 @@ void Scene::Close() {
     path.clear();
     if (setting) {
         delete setting;
+        setting = nullptr;
     }
     for (Group *group : groups) {
         delete group;

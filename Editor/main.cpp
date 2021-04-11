@@ -71,7 +71,9 @@ int main(int argc, char **argv) {
         window.SwapBuffers();
     }
 
-    window.Destroy();
+    gamePanel.Close();
+    scenePanel.Close();
+    window.Close();
 
     return 0;
 }

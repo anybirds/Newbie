@@ -20,11 +20,6 @@
 #include <Type.hpp>
 
 NAMESPACE(Engine) {
-
-    class ATexture;
-    class AFramebuffer;
-    class Framebuffer;
-    class GameObject;
     
     CLASS_FINAL_ATTR(ProjectSetting, Entity, ENGINE_EXPORT) {
         TYPE(ProjectSetting);
@@ -65,15 +60,6 @@ NAMESPACE(Engine) {
         std::unordered_set<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
 
-        // used for game, scene panel in editor
-        bool useDefaultFramebuffer;
-        ATexture *gameTexture;
-        AFramebuffer *gameFramebuffer;
-        std::shared_ptr<Framebuffer> gameFramebufferResource;
-        ATexture *sceneTexture;
-        AFramebuffer *sceneFramebuffer;
-        GameObject *sceneCamera;
-
         std::unordered_set<Asset *> garbages;
 
     public:
@@ -92,11 +78,6 @@ NAMESPACE(Engine) {
         const std::unordered_set<std::string> &GetAllScenes() const { return scenes; }
         void AddScene(const std::string &path) { scenes.insert(path); }
         void RemoveScene(const std::string &path) { scenes.erase(path); }
-
-        bool GetUseDefaultFramebuffer() const { return useDefaultFramebuffer; }
-        void SetUseDefaultFramebuffer(bool useDefaultFramebuffer) { this->useDefaultFramebuffer = useDefaultFramebuffer; }
-        const std::shared_ptr<Framebuffer> &GetGameFramebuffer() const { return gameFramebufferResource; }
-        GameObject *GetSceneCamera() const { return sceneCamera; }
 
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {

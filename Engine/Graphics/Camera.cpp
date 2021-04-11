@@ -5,7 +5,6 @@
 #include <GameObject.hpp>
 #include <Transform.hpp>
 #include <Scene.hpp>
-#include <Project.hpp>
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
@@ -17,6 +16,8 @@
 using namespace glm;
 using namespace std;
 using namespace Engine;
+
+Framebuffer *Camera::defaultFramebuffer;
 
 Camera::Camera() : 
     dirty(true), orthographic(false), 
@@ -45,8 +46,15 @@ void Camera::Render() {
         }
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     } else {
-        Project &project = Project::GetInstance();
-        if (project.GetUseDefaultFramebuffer()) {
+        if (defaultFramebuffer) {
+            width = defaultFramebuffer->GetWidth(); height = defaultFramebuffer->GetHeight();
+            float framebufferAspectRatio = (float)width / height;
+            if (aspectRatio != framebufferAspectRatio) {
+                aspectRatio = framebufferAspectRatio;
+                dirty = true;
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer->fbo);
+        } else {
             Window &window = Window::GetInstance();
             width = window.GetFramebufferWidth(); height = window.GetFramebufferHeight();
             float windowAspectRatio = (float)width / height;
@@ -55,14 +63,6 @@ void Camera::Render() {
                 dirty = true;
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        } else {
-            width = project.GetGameFramebuffer()->GetWidth(); height = project.GetGameFramebuffer()->GetHeight();
-            float framebufferAspectRatio = (float)width / height;
-            if (aspectRatio != framebufferAspectRatio) {
-                aspectRatio = framebufferAspectRatio;
-                dirty = true;
-            }
-            glBindFramebuffer(GL_FRAMEBUFFER, project.GetGameFramebuffer()->fbo);
         }
     }
 
@@ -112,4 +112,3 @@ void Camera::Render() {
         cerr << '[' << __FUNCTION__ << ']' << " graphics error in Camera: " << GetGameObject()->GetName() << '\n';
     }
 }
-

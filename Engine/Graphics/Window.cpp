@@ -54,7 +54,7 @@ Window::Window() {
     glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
 }
 
-void Window::Destroy() {
+void Window::Close() {
 	glfwDestroyWindow(window);
     glfwTerminate();
 }

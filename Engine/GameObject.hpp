@@ -49,17 +49,26 @@ NAMESPACE(Engine) {
             return nullptr;
         }
         template <class T, 
-        std::enable_if_t<std::is_base_of_v<Component, T> &&
+        std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T> &&
         !std::is_base_of_v<Script, T> && !std::is_base_of_v<Drawer, T> && !std::is_base_of_v<Renderer, T>, bool> = true>
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
-            if (transform) {
-                t->enabled = IsEnabled() && t->IsLocalEnabled();
-            }
+            t->enabled = IsEnabled() && t->IsLocalEnabled();
             components.insert(t);
             return t;
         }
+        template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true>
+        T *AddComponent() {
+            if (transform) {
+                return transform;
+            }
+            T *t = new T();
+            t->gameObject = this;
+            transform = t;
+            components.insert(t);
+            return t;
+        } 
         template <class T, std::enable_if_t<std::is_base_of_v<Script, T>, bool> = true> 
         T *AddComponent() {
             T *t = new T();
@@ -104,7 +113,6 @@ NAMESPACE(Engine) {
 
         friend class Group;
         friend class Scene;
-        friend class Project;
         friend class Component;
     };
 }

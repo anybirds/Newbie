@@ -1,30 +1,56 @@
-#include <Engine.hpp>
-
 #include <imgui/imgui.h>
 
 #include <ScenePanel.hpp>
+#include <Engine.hpp>
 
+using namespace std;
 using namespace Engine;
 
-void ScenePanel::CreateImGui() {
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 480.0f));
+ScenePanel::ScenePanel() : open(true) {
+    Window &window = Window::GetInstance();
 
-    ImGui::Begin("Scene");
+    sceneTexture = new ATexture();
+    sceneTexture->SetWidth(window.GetMonitorWidth());
+    sceneTexture->SetHeight(window.GetMonitorHeight());
+
+    sceneFramebuffer = new AFramebuffer();
+    sceneFramebuffer->SetColorTexture(sceneTexture);
+    sceneFramebuffer->SetUseDepthRenderTexture(true);
+
+    sceneCamera = new GameObject();
+    Transform *t = sceneCamera->AddComponent<Transform>();
+    t->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    cam = sceneCamera->AddComponent<Camera>();
+    cam->SetFramebuffer(dynamic_pointer_cast<Framebuffer>(sceneFramebuffer->GetResource()));
+}
+
+void ScenePanel::Close() {
+    delete sceneCamera;
+    delete sceneFramebuffer;
+    delete sceneTexture;
+}
+
+void ScenePanel::CreateImGui() {
+    if (!open) {
+        return;
+    }
+
+    ImGui::Begin("Scene", &open);
+
     Scene &scene = Scene::GetInstance();
     if (scene.IsLoaded()) {
         Project &project = Project::GetInstance();
-        Camera *cam = project.GetSceneCamera()->GetComponent<Camera>();
-        float imgWidth = ImGui::GetWindowSize().x - 5.0f; 
-        float imgHeight = ImGui::GetWindowSize().y - 5.0f;
-        cam->GetFramebuffer()->SetWidth((int)imgWidth);
-        cam->GetFramebuffer()->SetHeight((int)imgHeight);
+        ImVec2 imgSize = ImGui::GetContentRegionAvail();
+        cam->GetFramebuffer()->SetWidth((int)imgSize.x);
+        cam->GetFramebuffer()->SetHeight((int)imgSize.y);
         try {
             cam->Render();
         } catch(...) {}
         ImGui::Image((void *)(intptr_t)cam->GetFramebuffer()->GetColorTexture()->GetId(), 
-            ImVec2(imgWidth, imgHeight),
-            ImVec2(0.0f, imgHeight / cam->GetFramebuffer()->GetMaxHeight()),
-            ImVec2(imgWidth / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
+            imgSize,
+            ImVec2(0.0f, imgSize.y / cam->GetFramebuffer()->GetMaxHeight()),
+            ImVec2(imgSize.x / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
     }
+
     ImGui::End();
 }

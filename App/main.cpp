@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
     if (!project.Load(pfile)) {
         return 0;
     }
-    project.SetUseDefaultFramebuffer(true); // render to default framebuffer
     window.SetName(project.GetName());
 
     // load the start Scene
@@ -54,6 +53,8 @@ int main(int argc, char **argv) {
 		window.SwapBuffers();
         window.PollEvents();
     }
+
+    window.Close();
 
     return 0;
 }

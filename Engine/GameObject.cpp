@@ -60,7 +60,6 @@ GameObject *GameObject::AddGameObject() {
     t->parent = transform;
 
     child->group = group;
-    child->transform = t;
     return child;
 }
 
