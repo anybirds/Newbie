@@ -10,7 +10,7 @@ using namespace Engine;
 
 namespace Engine {
     void to_json(json &js, const shared_ptr<Resource> &resource) {
-        js = resource->GetSerial();
+        js = resource ? resource->GetSerial() : 0;
     }
 
     void from_json(const json &js, shared_ptr<Resource> &resource) {

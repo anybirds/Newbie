@@ -77,13 +77,6 @@ bool Scene::Load(const string &path) {
 }
 
 bool Scene::Save() {
-    // open json file
-    ofstream fs(Project::GetInstance().GetDirectoy() + "/" + path);
-    if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
-        return false;
-    }
-    
     try {
         json js;
 
@@ -125,6 +118,12 @@ bool Scene::Save() {
                 group);
         }
         
+        // open json file
+        ofstream fs(Project::GetInstance().GetDirectoy() + "/" + path);
+        if (fs.fail()) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
+            return false;
+        }
         fs << js;
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << name << '\n';
@@ -132,7 +131,7 @@ bool Scene::Save() {
         return false;
     }
 
-    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << name << "done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << name << " done.\n";
     return true;
 }
 

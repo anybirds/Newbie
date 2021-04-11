@@ -119,14 +119,7 @@ bool Project::Load(const string &path) {
 bool Project::Save() {
     // save scene
     Scene &scene = Scene::GetInstance();
-    if (!scene.Save()) {
-        return false;
-    }
-
-    // open json file
-    ofstream fs(path);
-    if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << path << '\n';
+    if (scene.IsLoaded() && !scene.Save()) {
         return false;
     }
 
@@ -146,6 +139,12 @@ bool Project::Save() {
             type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
         }
 
+        // open json file
+        ofstream fs(path);
+        if (fs.fail()) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << path << '\n';
+            return false;
+        }
         fs << js;
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot save project: " << name << '\n';
@@ -153,7 +152,7 @@ bool Project::Save() {
         return false;
     }
 
-    cerr << '[' << __FUNCTION__ << ']' << " save project: " << name << "done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " save project: " << name << " done.\n";
     return true;
 }
 

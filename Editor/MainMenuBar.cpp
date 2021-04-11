@@ -19,6 +19,7 @@ void MainMenuBar::CreateImGui() {
     {
         bool project_open = false;
         bool scene_open = false;
+        Project &project = Project::GetInstance();
         if (ImGui::BeginMenu("Project"))
         {
             if (ImGui::MenuItem("New")) {
@@ -27,12 +28,11 @@ void MainMenuBar::CreateImGui() {
             if (ImGui::MenuItem("Open")) {
                 project_open = true;
             }
-            if (ImGui::MenuItem("Save")) {
-                
+            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded())) {
+                project.Save();
             }
             ImGui::EndMenu();
         }
-        Project &project = Project::GetInstance();
         if (ImGui::BeginMenu("Scene", project.IsLoaded())) {
             if (ImGui::MenuItem("New")) {
 
