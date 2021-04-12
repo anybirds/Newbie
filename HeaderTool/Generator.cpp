@@ -11,20 +11,20 @@ using namespace HeaderTool;
 
 Generator::Generator(const string &dir) {
     function<void(const std::string &)> parse = [&parse, this](const std::string &path) {
-        for (auto &p : std::filesystem::directory_iterator(path)) {
+        for (auto &p : std::filesystem::directory_iterator(filesystem::u8path(path))) {
             if (p.is_directory()) {
-                parse(p.path().string());
+                parse(p.path().u8string());
             } else if (p.path().extension() == ".hpp" || p.path().extension() == ".h") {
 
-                cerr << p.path().string() << '\n';
+                cerr << p.path().filename().string() << '\n';
 
-                ifstream ifs(p.path().string());
+                ifstream ifs(p.path());
                 if (ifs.fail()) {
-                    cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << p.path().string() << '\n';
+                    cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << p.path().filename().string() << '\n';
                     throw exception();
                 }
 
-                files.push_back(p.path().string());
+                files.push_back(p.path().u8string());
 
                 Namespace *ns = new Namespace("");
                 namespaces.push_back(ns);
@@ -140,11 +140,11 @@ void Generator::TypeClear() {
 
 void Generator::Generate() {
     for (auto &file : files) {
-        cout << "#include \"" << file << "\"\n";
+        cout << "#include u8\"" << file << "\"\n";
     }
     
-    std::cout << "#include <nlohmann/json.hpp>\n";
-    std::cout << "using json = nlohmann::json;\n";
+    cout << "#include <nlohmann/json.hpp>\n";
+    cout << "using json = nlohmann::json;\n";
 
     Serialize();
     Deserialize();

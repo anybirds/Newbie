@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 #include <Graphics/Shader.hpp>
 #include <Project.hpp>
@@ -37,7 +38,7 @@ void Shader::Apply() {
         throw exception();
     }
 
-    ifstream file(Project::GetInstance().GetDirectoy() + "/" + GetPath());
+    ifstream file(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + GetPath()));
     if (!file.is_open()) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << '\n';
         glDeleteShader(id);

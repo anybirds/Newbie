@@ -45,17 +45,21 @@ NAMESPACE(Engine) {
 
         bool loaded;
         typedef void (*func)();
-    #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
         HINSTANCE lib;
-    #else
+#else
         void *lib;
-    #endif
+#endif
         func init;
         func clear;
         std::string path;
         std::string name;
         std::string directory;
+#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+        std::wstring libpath;
+#else
         std::string libpath;
+#endif
         ProjectSetting *setting;
         std::unordered_set<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;

@@ -32,9 +32,12 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${USER_HEADER} ${USER_SOURCE
 
 add_custom_command(
   OUTPUT generated.cpp 
-  COMMAND HeaderTool ${CMAKE_CURRENT_SOURCE_DIR} > generated.cpp
+  COMMAND HeaderTool "${CMAKE_CURRENT_SOURCE_DIR}" > generated.cpp
   DEPENDS HeaderTool ${USER_HEADER}
 )
+
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_library(User SHARED ${USER_SOURCE} generated.cpp)
 

@@ -1,6 +1,8 @@
 #include <iostream>
+#include <filesystem>
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_WINDOWS_UTF8
 #include <stb_image.h>
 
 #include <Graphics/Texture.hpp>
@@ -42,6 +44,7 @@ void Texture::Apply() {
         stbi_set_flip_vertically_on_load(true);
 
         int width, height, channel;
+
         image = stbi_load((Project::GetInstance().GetDirectoy() + "/" + GetPath()).c_str(), &width, &height, &channel, 0);
         if (!image) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << atexture->GetPath() << '\n';

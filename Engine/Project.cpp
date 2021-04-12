@@ -15,49 +15,59 @@ bool Project::Load(const string &path) {
     Close();
 
     // resolve name, directory
-    this->path = filesystem::absolute(filesystem::path(path)).string();
-    name = filesystem::path(path).filename().stem().string();
-    directory = filesystem::path(path).parent_path().string();
+    auto fspath = filesystem::absolute(filesystem::u8path(path));
+    this->path = fspath.u8string();
+    name = fspath.filename().stem().u8string();
+    directory = fspath.parent_path().u8string();
 
     // compile library
-    string gcmd;
+#if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    wstring gcmd;
+    wstring wdir = filesystem::u8path(directory).wstring();
     if (_MSC_VER >= 1920) {
-        gcmd = "cmake -G \"Visual Studio 16 2019\" -A x64 -B " + directory + "/build " + directory;
+        gcmd = L"cmake -G \"Visual Studio 16 2019\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\"";
     } else if (_MSC_VER >= 1910) {
-        gcmd = "cmake -G \"Visual Studio 15 2017\" -A x64 -B " + directory + "/build " + directory;
+        gcmd = L"cmake -G \"Visual Studio 15 2017\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\"";
     } else {
         cerr << '[' << __FUNCTION__ << ']' << " inappropriate Visual Studio version: " << _MSC_VER << '\n';
         return false;
     }
+    _wsystem(gcmd.c_str());
+    wstring bcmd(L"cmake --build \"" + wdir + L"/build\" --config Release");
+    _wsystem(bcmd.c_str());
+#else
+    string gcmd("cmake -G \"Ninja\" -B \"" + directory + "/build\" \"" + directory + "\"");
     system(gcmd.c_str());
-    string bcmd("cmake --build " + directory + "/build --config Release");
+    string bcmd("cmake --build \"" + directory + "/build\" --config Release");
     system(bcmd.c_str());
-    libpath = directory + "/build/Release/User.dll";
+#endif
     
     // load shared library
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    lib = LoadLibrary((libpath).c_str());
+    libpath = filesystem::u8path(directory).wstring() + L"/build/Release/User.dll";
+    lib = LoadLibraryW((libpath).c_str());
     if (!lib) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << libpath << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library\n";
         return false;
     }
     init = reinterpret_cast<func>(GetProcAddress(lib, "type_init"));
     clear = reinterpret_cast<func>(GetProcAddress(lib, "type_clear"));
 #else
+    libpath = directory + "build/Release/User.dll";
     lib = dlopen((name + ".so").c_str(), RTLD_LAZY);
     if (!lib) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << libpath << '\n';
         return false;
     }
     init = reinterpret_cast<func>(dlsym(lib, "type_init"));
     clear = reinterpret_cast<func>(dlsym(lib, "type_clear"));
 #endif    
     if (!init) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_init function symbol: " << libpath << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_init function symbol\n";
         return false;
     }
     if (!clear) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_clear function symbol: " << libpath << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot resolve type_clear function symbol\n";
         return false;
     }
 
@@ -67,10 +77,10 @@ bool Project::Load(const string &path) {
         cerr << '[' << __FUNCTION__ << ']' << " type_init failed: " << name << '\n';
         return false;
     }
-    cerr << '[' << __FUNCTION__ << ']' << " loading shared library: " << libpath << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " loading shared library done.\n";
 
     // open json file
-    ifstream fs(this->path);
+    ifstream fs(fspath);
     if (fs.fail()) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << this->path << '\n';
         return false;
@@ -140,7 +150,7 @@ bool Project::Save() {
         }
 
         // open json file
-        ofstream fs(path);
+        ofstream fs(filesystem::u8path(path));
         if (fs.fail()) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot open project: " << path << '\n';
             return false;

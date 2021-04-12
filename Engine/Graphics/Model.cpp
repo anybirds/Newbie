@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 
 #include <Graphics/Model.hpp>
 #include <Project.hpp>
@@ -32,7 +34,9 @@ void Model::Apply() {
     }
 
     importer = new Assimp::Importer();
-    const aiScene *scene = importer->ReadFile(Project::GetInstance().GetDirectoy() + "/" + GetPath(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
+    const aiScene *scene = importer->ReadFile(
+        Project::GetInstance().GetDirectoy() + "/" + GetPath(),
+        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         if (scene) { delete scene; }
         cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << GetPath() << '\n';
