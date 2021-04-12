@@ -31,13 +31,17 @@ int main(int argc, char **argv) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
-    io.Fonts->AddFontFromFileTTF("c:/Newbie/Editor/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf", 20.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+    io.Fonts->AddFontFromFileTTF(
+        string(INSTALL_PATH) + "/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf", 
+        20.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 
     ImFontConfig config;
     config.MergeMode = true;
     config.GlyphMinAdvanceX = 18.0f;
     static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-    io.Fonts->AddFontFromFileTTF("c:/Newbie/Editor/Icons/fontawesome-webfont.ttf", 18.0f, &config, icon_ranges);
+    io.Fonts->AddFontFromFileTTF(
+        string(INSTALL_PATH) + "/Icons/fontawesome-webfont.ttf", 
+        18.0f, &config, icon_ranges);
     
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.GetGlfwWindow(), true);

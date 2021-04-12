@@ -36,9 +36,9 @@ bool Project::Load(const string &path) {
     wstring bcmd(L"cmake --build \"" + wdir + L"/build\" --config Release");
     _wsystem(bcmd.c_str());
 #else
-    string gcmd("cmake -G \"Ninja\" -B \"" + directory + "/build\" \"" + directory + "\"");
+    string gcmd("cmake -G \"Unix Makefiles\" -B \"" + directory + "/build\" \"" + directory + "\"");
     system(gcmd.c_str());
-    string bcmd("cmake --build \"" + directory + "/build\" --config Release");
+    string bcmd("cmake --build \"" + directory + "/build\"");
     system(bcmd.c_str());
 #endif
     
@@ -53,7 +53,7 @@ bool Project::Load(const string &path) {
     init = reinterpret_cast<func>(GetProcAddress(lib, "type_init"));
     clear = reinterpret_cast<func>(GetProcAddress(lib, "type_clear"));
 #else
-    libpath = directory + "build/Release/User.dll";
+    libpath = directory + "build/User.dll";
     lib = dlopen((name + ".so").c_str(), RTLD_LAZY);
     if (!lib) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot load project library: " << libpath << '\n';

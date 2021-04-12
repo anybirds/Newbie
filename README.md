@@ -10,15 +10,25 @@ Can one undergraduate student make a fully-functional game engine? Let's do this
 ## Feature
 
 ## Install
+### Windows
 * Install the latest version of [Visual Studio 2019](https://visualstudio.microsoft.com/)
 * Install the latest version of [CMake](https://cmake.org/)
 * Install the latest version of [Git](https://git-scm.com/)
 * Open `Windows PowerShell`
-* Type `cd c:/` in Windows. Type `cd /` in Linux.
+* Goto the directory to install the engine.
 * Type `git clone https://github.com/anybirds/Newbie`
 * Type `cd Newbie`
-* Type `setup.bat` in Windows. Type `setup.sh` in Linux.
-* Run `build/Editor/Release/Editor.exe` in Windows. Run `build/Editor/Release/Editor` in linux.
+* Type `setup.bat`
+* Run `build/Editor/Release/Editor.exe`
+### Linux
+* Install the latest version of [CMake](https://cmake.org/)
+* Install the latest version of [Git](https://git-scm.com/)
+* Open `Linux Shell`
+* Goto the directory to install the engine.
+* Type `git clone https://github.com/anybirds/Newbie`
+* Type `cd Newbie`
+* Type `setup.sh`
+* Run `build/Editor/Editor`
 
 ## Documentation
 All descriptions are directly written to the code itself. [Github Wiki](https://github.com/anybirds/Newbie/wiki) is also available.

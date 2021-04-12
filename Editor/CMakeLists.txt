@@ -5,6 +5,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${EDITOR_SOURCE})
 
 add_executable(Editor ${EDITOR_SOURCE})
 
+target_compile_definitions(Editor -DINSTALL_PATH=u8"${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(Editor PRIVATE Engine glfw GLEW::GLEW ${OPENGL_LIBRARY} assimp::assimp nlohmann_json nlohmann_json::nlohmann_json)
 target_include_directories(Editor
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

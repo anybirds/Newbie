@@ -1,10 +1,7 @@
-# Run cmake -G "Visual Studio 16 2019" -A x64 -B build
-# Run cmake --build build --config Release
-
 cmake_minimum_required(VERSION 3.8)
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE PATH "toolchain file")
+  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE PATH "toolchain file")
 endif()
 
 project(User LANGUAGES CXX)
