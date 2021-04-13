@@ -94,6 +94,10 @@ void FileDialog::CreateImGui() {
                 callback(arg);
                 selected = -1;
                 ImGui::CloseCurrentPopup();
+            } else if (folder) {
+                callback(dir);
+                selected = -1;
+                ImGui::CloseCurrentPopup();
             }
         }
 

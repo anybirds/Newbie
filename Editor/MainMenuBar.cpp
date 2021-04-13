@@ -1,13 +1,13 @@
-#include <Project.hpp>
-
 #include <filesystem>
 #include <string>
 
 #include <imgui/imgui.h>
 
+#include <Project.hpp>
 #include <MainMenuBar.hpp>
 #include <FileDialog.hpp>
 #include <SceneDialog.hpp>
+#include <ProjectDialog.hpp>
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
 
@@ -55,35 +55,23 @@ void MainMenuBar::CreateImGui() {
             ImGui::EndMenu();
         }
 
-        FileDialog &fileDialog = FileDialog::GetInstance();
+        ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {
-            /*
-            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-            ImGui::SetNextWindowSize(ImVec2(480.0f, 0.0f));
-            bool p_open = true;
-            if (ImGui::BeginPopupModal("New Project", &p_open, ImGuiWindowFlags_NoResize)) {
-                ImGui::Text("Name: ");
-                ImGui::SameLine();
-                ImGui::InputText("", name, 128);
-                
-                ImGui::Text("Location: ");
-                ImGui::SameLine();
-                ImGui::InputText("", location, 512);
-                ImGui::SameLine();
-                ImGui::Button("Browse...");
-                
-                ImGui::EndPopup();
-            }
-            */
+            ImGui::OpenPopup("New Project");
         }
+        projectDialog.CreateImGui();
+
+        FileDialog &fileDialog = FileDialog::GetInstance();
         if (project_open) {
             fileDialog.SetFolderDialog(true);
             fileDialog.SetCallback([](const string &path) {
                 // find the project file 
                 string pfile;
-                for (auto &p : filesystem::directory_iterator(filesystem::u8path(path))) {
-                    if (p.path().extension().string() == ".json") {
+                auto fspath = filesystem::u8path(path);
+                for (auto &p : filesystem::directory_iterator(fspath)) {
+                    // find .json file that has the same name with the selected directory
+                    if (p.path().stem().u8string() == fspath.stem().u8string() &&
+                            p.path().extension().string() == ".json") {
                         pfile = p.path().u8string();
                         break;
                     }
@@ -91,9 +79,7 @@ void MainMenuBar::CreateImGui() {
 
                 // load the Project
                 Project &project = Project::GetInstance();
-                if (!project.Load(pfile)) {
-                    return;
-                }
+                project.Load(pfile);
             });
             ImGui::OpenPopup("Open Folder");
         }

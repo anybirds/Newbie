@@ -1,10 +1,7 @@
-#include <iostream>
+#include <imgui/imgui.h>
 
 #include <Project.hpp>
 #include <Scene.hpp>
-
-#include <imgui/imgui.h>
-
 #include <SceneDialog.hpp>
 
 using namespace std;
