@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
     io.Fonts->AddFontFromFileTTF(
-        string(INSTALL_PATH) + "/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf", 
+        (string(NEWBIE_PATH) + "/Editor/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf").c_str(), 
         20.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 
     ImFontConfig config;
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     config.GlyphMinAdvanceX = 18.0f;
     static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     io.Fonts->AddFontFromFileTTF(
-        string(INSTALL_PATH) + "/Icons/fontawesome-webfont.ttf", 
+        (string(NEWBIE_PATH) + "/Editor/Icons/fontawesome-webfont.ttf").c_str(), 
         18.0f, &config, icon_ranges);
     
     ImGui::StyleColorsDark();

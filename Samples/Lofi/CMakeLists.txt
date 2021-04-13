@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE PATH "toolchain file")
+  set(CMAKE_TOOLCHAIN_FILE "${NEWBIE_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE PATH "toolchain file")
 endif()
 
 project(User LANGUAGES CXX)
@@ -15,9 +15,9 @@ find_package(Stb REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-set(HeaderTool_DIR "C:/Newbie/build/HeaderTool")
+set(HeaderTool_DIR "${NEWBIE_PATH}/build/HeaderTool")
 find_package(HeaderTool REQUIRED)
-set(Engine_DIR "C:/Newbie/build/Engine")
+set(Engine_DIR "${NEWBIE_PATH}/build/Engine")
 find_package(Engine REQUIRED)
 
 file(GLOB_RECURSE USER_HEADER "*.hpp")

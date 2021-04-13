@@ -15,7 +15,7 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_library(Engine SHARED ${ENGINE_SOURCE} generated.cpp)
 
-target_compile_definitions(Engine PRIVATE ENGINE_LIBRARY)
+target_compile_definitions(Engine PRIVATE ENGINE_LIBRARY -DNEWBIE_PATH=u8"${CMAKE_SOURCE_DIR}")
 target_link_libraries(Engine PUBLIC glfw GLEW::GLEW ${OPENGL_LIBRARY} assimp::assimp nlohmann_json nlohmann_json::nlohmann_json)
 target_include_directories(Engine
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

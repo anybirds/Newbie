@@ -24,10 +24,11 @@ bool Project::Load(const string &path) {
 #if defined(_MSC_VER) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     wstring gcmd;
     wstring wdir = filesystem::u8path(directory).wstring();
+    wstring nbpath(filesystem::u8path(NEWBIE_PATH).wstring());
     if (_MSC_VER >= 1920) {
-        gcmd = L"cmake -G \"Visual Studio 16 2019\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\"";
+        gcmd = L"cmake -G \"Visual Studio 16 2019\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\" -DNEWBIE_PATH=\"" + nbpath + L"\"";
     } else if (_MSC_VER >= 1910) {
-        gcmd = L"cmake -G \"Visual Studio 15 2017\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\"";
+        gcmd = L"cmake -G \"Visual Studio 15 2017\" -A x64 -B \"" + wdir + L"/build\" \"" + wdir + L"\" -DNEWBIE_PATH=\"" + nbpath + L"\"";
     } else {
         cerr << '[' << __FUNCTION__ << ']' << " inappropriate Visual Studio version: " << _MSC_VER << '\n';
         return false;
@@ -36,7 +37,8 @@ bool Project::Load(const string &path) {
     wstring bcmd(L"cmake --build \"" + wdir + L"/build\" --config Release");
     _wsystem(bcmd.c_str());
 #else
-    string gcmd("cmake -G \"Unix Makefiles\" -B \"" + directory + "/build\" \"" + directory + "\"");
+    string nbpath(NEWBIE_PATH);
+    string gcmd("cmake -G \"Unix Makefiles\" -B \"" + directory + "/build\" \"" + directory + "\" -DNEWBIE_PATH=\"" + nbpath + "\"");
     system(gcmd.c_str());
     string bcmd("cmake --build \"" + directory + "/build\"");
     system(bcmd.c_str());
