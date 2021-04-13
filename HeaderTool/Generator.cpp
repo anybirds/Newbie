@@ -140,7 +140,7 @@ void Generator::TypeClear() {
 
 void Generator::Generate() {
     for (auto &file : files) {
-        cout << "#include u8\"" << file << "\"\n";
+        cout << "#include \"" << file << "\"\n";
     }
     
     cout << "#include <nlohmann/json.hpp>\n";
