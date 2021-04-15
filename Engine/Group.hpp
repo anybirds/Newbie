@@ -32,6 +32,7 @@ NAMESPACE(Engine) {
     public:
         virtual ~Group();
 
+        const std::unordered_set<GameObject *> &GetRootGameObjects() const { return gameObjects; }
         GameObject *FindGameObject(const std::string &name) const;
         GameObject *AddGameObject();
         void RemoveGameObject(GameObject *gameObject);

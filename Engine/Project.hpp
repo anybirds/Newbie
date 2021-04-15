@@ -81,12 +81,6 @@ NAMESPACE(Engine) {
 
         const std::unordered_set<std::string> &GetAllScenes() const { return scenes; }
         void AddScene(const std::string &path) { scenes.insert(path); }
-        std::unordered_set<std::string>::iterator RemoveScene(std::unordered_set<std::string>::iterator it) {
-            if (it == scenes.end()) {
-                return it;
-            }
-            return scenes.erase(it);
-        }
         void RemoveScene(const std::string &path) { scenes.erase(path); }
 
         const std::unordered_map<uint64_t, Asset *> &GetAllAssets() const { return assets; }
@@ -106,7 +100,6 @@ NAMESPACE(Engine) {
             assets.insert({asset->serial, asset});
             return asset;
         }
-        std::unordered_map<uint64_t, Asset *>::iterator RemoveAsset(std::unordered_map<uint64_t, Asset *>::iterator it);
         void RemoveAsset(Asset *asset);
 
         friend class Scene;

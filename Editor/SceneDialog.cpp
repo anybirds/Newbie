@@ -66,11 +66,10 @@ void SceneDialog::CreateImGui() {
         ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         Project &project = Project::GetInstance();
         int index = 0;
-        for (auto it = project.GetAllScenes().begin(); it != project.GetAllScenes().end(); ) {
-            const string &path = *it;
-            if (ImGui::Button(ICON_FA_TIMES)) {
-                it = project.RemoveScene(it);
-                continue;
+        string s;
+        for (const string &path : project.GetAllScenes()) {
+            if (ImGui::Button((string(ICON_FA_TIMES"##") + to_string(index)).c_str())) {
+                s = path;
             }
             ImGui::SameLine();
             if (ImGui::Selectable(path.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
@@ -84,8 +83,11 @@ void SceneDialog::CreateImGui() {
                 }
                 arg = path;
             }
-            it++;
             index++;
+        }
+        if (!s.empty()) {
+            project.RemoveScene(s);
+            selected = -1;
         }
         FileDialog &fileDialog = FileDialog::GetInstance();
         if (ImGui::Button("Add...")) {

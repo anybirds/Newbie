@@ -209,14 +209,10 @@ void Project::Close() {
     cerr << '[' << __FUNCTION__ << ']' << " close project done.\n";
 }
 
-unordered_map<uint64_t, Asset *>::iterator Project::RemoveAsset(unordered_map<uint64_t, Asset *>::iterator it) {
-    if (it == assets.end()) {
-        return it;
-    }
-    garbages.insert(it->second);
-    return assets.erase(it);
-}
-
 void Project::RemoveAsset(Asset *asset) {
-    RemoveAsset(assets.find(asset->GetSerial()));
+    auto it = assets.find(asset->GetSerial());
+    if (it != assets.end()) {
+        assets.erase(it);
+        garbages.insert(it->second);
+    }
 }

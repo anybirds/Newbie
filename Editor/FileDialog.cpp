@@ -93,7 +93,7 @@ void FileDialog::CreateImGui() {
         ImGui::Separator();
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-            if (selected >= 0) {
+            if (selected >= 0 && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
                 callback(arg);
                 selected = -1;
                 ImGui::CloseCurrentPopup();

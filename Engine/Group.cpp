@@ -50,7 +50,6 @@ GameObject *Group::AddGameObject() {
     transform->enabled = true;
 
     gameObject->group = this;
-
     gameObjects.insert(gameObject);
     
     return gameObject;

@@ -20,8 +20,8 @@ void AssetPanel::CreateImGui() {
     Project &project = Project::GetInstance();
     if (project.IsLoaded()) {
         ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
-        for (auto it = project.GetAllAssets().begin(); it != project.GetAllAssets().end(); ) {
-            Asset *asset = it->second;
+        for (auto &p : project.GetAllAssets()) {
+            Asset *asset = p.second;
             const string &name = asset->GetType()->GetName();
             if (name == "AMaterial") {
                 ImGui::Text(ICON_FA_TINT);
@@ -46,8 +46,6 @@ void AssetPanel::CreateImGui() {
             }
             ImGui::SameLine();
             ImGui::Selectable(asset->GetName().c_str());
-
-            it++;
         }
         ImGui::EndChild();   
     }

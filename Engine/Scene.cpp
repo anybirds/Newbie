@@ -161,12 +161,12 @@ Group *Scene::AddGroup() {
     return group;
 }
 
-unordered_set<Group *>::iterator Scene::RemoveGroup(unordered_set<Group *>::iterator it) {
+void Scene::RemoveGroup(Group *group) {
+    auto it = groups.find(group);
     if (it == groups.end()) {
-        return groups.end();
+        return;
     }
     
-    Group *group = *it;
     for (auto it = scripts.begin(); it != scripts.end(); ) {
         Script *script = *it;
         if (script->GetGroup() == group) {
@@ -191,12 +191,8 @@ unordered_set<Group *>::iterator Scene::RemoveGroup(unordered_set<Group *>::iter
             it++;
         }
     }
+    groups.erase(it);
     garbages.insert(group);
-    return groups.erase(it);
-}
-
-void Scene::RemoveGroup(Group *group) {
-    RemoveGroup(groups.find(group));
 }
 
 GameObject *Scene::FindGameObject(const string &name) {
