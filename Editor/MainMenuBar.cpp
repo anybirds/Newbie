@@ -10,6 +10,7 @@
 #include <ProjectDialog.hpp>
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
+#include <AssetPanel.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -52,6 +53,10 @@ void MainMenuBar::CreateImGui() {
             ScenePanel &scenePanel = ScenePanel::GetInstance();
             if (ImGui::MenuItem("Scene", nullptr, ScenePanel::GetInstance().IsOpen())) {
                 scenePanel.Toggle();
+            }
+            AssetPanel &assetPanel = AssetPanel::GetInstance();
+            if (ImGui::MenuItem("Asset", nullptr, AssetPanel::GetInstance().IsOpen())) {
+                assetPanel.Toggle();
             }
             ImGui::EndMenu();
         }

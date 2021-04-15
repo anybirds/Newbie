@@ -4,11 +4,12 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-#include <icons/IconsFontAwesome4.h>
+#include <icons/IconsFontAwesome5.h>
 
 #include <MainMenuBar.hpp>
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
+#include <AssetPanel.hpp>
 
 #include <Graphics/Window.hpp>
 
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
     config.GlyphMinAdvanceX = 18.0f;
     static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     io.Fonts->AddFontFromFileTTF(
-        (string(NEWBIE_PATH) + "/Editor/Icons/fontawesome-webfont.ttf").c_str(), 
+        (string(NEWBIE_PATH) + "/Editor/Icons/fa-solid-900.ttf").c_str(), 
         18.0f, &config, icon_ranges);
     
     ImGui::StyleColorsDark();
@@ -50,6 +51,7 @@ int main(int argc, char **argv) {
     MainMenuBar &mainMenuBar = MainMenuBar::GetInstance();
     GamePanel &gamePanel = GamePanel::GetInstance();
     ScenePanel &scenePanel = ScenePanel::GetInstance();
+    AssetPanel &assetPanel = AssetPanel::GetInstance();
 
     while (!window.ShouldClose()) {
         window.PollEvents();
@@ -61,6 +63,7 @@ int main(int argc, char **argv) {
 
         gamePanel.CreateImGui();
         scenePanel.CreateImGui();
+        assetPanel.CreateImGui();
         mainMenuBar.CreateImGui();
         
         ImGui::ShowDemoWindow();

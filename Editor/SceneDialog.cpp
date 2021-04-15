@@ -2,7 +2,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_stdlib.h>
-#include <Icons/IconsFontAwesome4.h>
+#include <Icons/IconsFontAwesome5.h>
 
 #include <Project.hpp>
 #include <Scene.hpp>

@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <imgui/imgui.h>
-#include <Icons/IconsFontAwesome4.h>
+#include <Icons/IconsFontAwesome5.h>
 
 #include <FileDialog.hpp>
 
@@ -30,7 +30,7 @@ void FileDialog::CreateImGui() {
         }
         split.push_back(make_pair(path.root_name().u8string(), path.root_path()));
 
-        ImGui::BeginChild("file", ImVec2(0.0f, 40.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("File", ImVec2(0.0f, 40.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         for (auto it = split.rbegin(); it != split.rend(); it++) {
             ImGui::SameLine();
             if (it != split.rbegin()) {
@@ -44,7 +44,7 @@ void FileDialog::CreateImGui() {
         ImGui::EndChild();
 
         ImGui::Separator();
-        ImGui::BeginChild("list", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("List", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         int index = 0;
         for (auto &p : filesystem::directory_iterator(filesystem::u8path(dir))) {
             try {

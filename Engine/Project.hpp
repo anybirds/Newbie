@@ -83,6 +83,7 @@ NAMESPACE(Engine) {
         void AddScene(const std::string &path) { scenes.insert(path); }
         void RemoveScene(const std::string &path) { scenes.erase(path); }
 
+        const std::unordered_map<uint64_t, Asset *> &GetAllAssets() const { return assets; }
         template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
         T *GetAsset(uint64_t serial) const {
             auto it = assets.find(serial);

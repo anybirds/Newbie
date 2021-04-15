@@ -3,7 +3,6 @@
 #include <Engine.hpp>
 #include <ScenePanel.hpp>
 
-
 using namespace std;
 using namespace Engine;
 
