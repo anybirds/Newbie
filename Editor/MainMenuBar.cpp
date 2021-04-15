@@ -19,6 +19,7 @@ void MainMenuBar::CreateImGui() {
     {
         bool project_new = false;
         bool project_open = false;
+        bool scene_new = false;
         bool scene_open = false;
         Project &project = Project::GetInstance();
         if (ImGui::BeginMenu("Project"))
@@ -36,7 +37,7 @@ void MainMenuBar::CreateImGui() {
         }
         if (ImGui::BeginMenu("Scene", project.IsLoaded())) {
             if (ImGui::MenuItem("New")) {
-
+                scene_new = true;
             }
             if (ImGui::MenuItem("Open")) {
                 scene_open = true;
@@ -69,9 +70,8 @@ void MainMenuBar::CreateImGui() {
                 string pfile;
                 auto fspath = filesystem::u8path(path);
                 for (auto &p : filesystem::directory_iterator(fspath)) {
-                    // find .json file that has the same name with the selected directory
-                    if (p.path().stem().u8string() == fspath.stem().u8string() &&
-                            p.path().extension().string() == ".json") {
+                    // find file that has the same name with the selected directory
+                    if (p.path().stem().u8string() == fspath.stem().u8string()) {
                         pfile = p.path().u8string();
                         break;
                     }
@@ -86,6 +86,9 @@ void MainMenuBar::CreateImGui() {
         fileDialog.CreateImGui();
 
         SceneDialog &sceneDialog = SceneDialog::GetInstance();
+        if (scene_new) {
+            ImGui::OpenPopup("New Scene");
+        }
         if (scene_open) {
             ImGui::OpenPopup("Open Scene");
         }
