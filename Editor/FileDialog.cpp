@@ -20,6 +20,7 @@ void FileDialog::CreateImGui() {
     } else {
         title = "Open File";
     }
+
     if (ImGui::BeginPopupModal(title.c_str(), &p_open, ImGuiWindowFlags_NoResize)) {
         string temp(dir);
         auto path(filesystem::absolute(filesystem::u8path(dir)));
@@ -30,21 +31,23 @@ void FileDialog::CreateImGui() {
         }
         split.push_back(make_pair(path.root_name().u8string(), path.root_path()));
 
-        ImGui::BeginChild("File", ImVec2(0.0f, 40.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("File", ImVec2(0.0f, 35.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         for (auto it = split.rbegin(); it != split.rend(); it++) {
             ImGui::SameLine();
             if (it != split.rbegin()) {
                 ImGui::Text(ICON_FA_ANGLE_RIGHT);
                 ImGui::SameLine();
             }
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
             if (ImGui::SmallButton(it->first.c_str())) {
                 temp = it->second.u8string();
             }
+            ImGui::PopStyleColor();
         }
         ImGui::EndChild();
 
         ImGui::Separator();
-        ImGui::BeginChild("List", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         int index = 0;
         for (auto &p : filesystem::directory_iterator(filesystem::u8path(dir))) {
             try {

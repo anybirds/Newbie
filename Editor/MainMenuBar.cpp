@@ -11,6 +11,7 @@
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
+#include <GroupPanel.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -58,6 +59,10 @@ void MainMenuBar::CreateImGui() {
             if (ImGui::MenuItem("Asset", nullptr, AssetPanel::GetInstance().IsOpen())) {
                 assetPanel.Toggle();
             }
+            GroupPanel &groupPanel = GroupPanel::GetInstance();
+            if (ImGui::MenuItem("Group", nullptr, GroupPanel::GetInstance().IsOpen())) {
+                groupPanel.Toggle();
+            } 
             ImGui::EndMenu();
         }
 

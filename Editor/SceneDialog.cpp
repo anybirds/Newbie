@@ -39,10 +39,10 @@ void SceneDialog::CreateImGui() {
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
             if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(string(NEWBIE_PATH) + "/Samples/Empty/EmptyScene.json"));
+                auto sample(filesystem::u8path(string(NEWBIE_PATH) + "/Samples/Empty/Main.json"));
                 auto created(filesystem::u8path(location + "/" + name));
                 try {
-                    // copy file "Samples/Empty/EmptyScene.json"
+                    // copy file "Samples/Empty/Main.json"
                     filesystem::copy_file(sample, created);
 
                     // add scene
@@ -59,13 +59,18 @@ void SceneDialog::CreateImGui() {
         ImGui::EndPopup();
     }
 
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(480.0f, 0.0f));
+
     if (ImGui::BeginPopupModal("Open Scene", &p_open, ImGuiWindowFlags_NoResize)) {
-        ImGui::BeginChild("", ImVec2(0.0f, 480.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
         Project &project = Project::GetInstance();
         int index = 0;
-        for (auto &path : project.GetAllScenes()) {
+        for (auto it = project.GetAllScenes().begin(); it != project.GetAllScenes().end(); ) {
+            const string &path = *it;
             if (ImGui::Button(ICON_FA_TIMES)) {
-                project.RemoveScene(path);
+                it = project.RemoveScene(it);
+                continue;
             }
             ImGui::SameLine();
             if (ImGui::Selectable(path.c_str(), selected == index, ImGuiSelectableFlags_AllowDoubleClick)) {
@@ -79,7 +84,7 @@ void SceneDialog::CreateImGui() {
                 }
                 arg = path;
             }
-            
+            it++;
             index++;
         }
         FileDialog &fileDialog = FileDialog::GetInstance();

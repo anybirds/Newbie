@@ -48,10 +48,15 @@ NAMESPACE(Engine) {
         void Close();
 
         bool IsLoaded() const { return loaded; }
-        Group *AddGroup();
-        void RemoveGroup(Group *group);
-        GameObject *FindGameObject(const std::string &name);
         SceneSetting *GetSettiing() { return setting; }
+        
+        const std::unordered_set<Group *> &GetAllGroups() const { return groups; }
+        Group *AddGroup();
+        std::unordered_set<Group *>::iterator RemoveGroup(std::unordered_set<Group *>::iterator it);
+        void RemoveGroup(Group *group);
+
+        GameObject *FindGameObject(const std::string &name);
+        
         
         void Start();
         void Refresh();

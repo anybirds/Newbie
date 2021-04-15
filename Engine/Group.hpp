@@ -21,6 +21,7 @@ NAMESPACE(Engine) {
         TYPE(Group);
 
         PROPERTY_NONE(bool, dirty);
+        PROPERTY(std::string, name, Name);
         PROPERTY_NONE(std::unordered_set<GameObject *>, gameObjects);
 
     private:

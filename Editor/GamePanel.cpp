@@ -29,6 +29,12 @@ void GamePanel::Close() {
 }
 
 void GamePanel::CreateImGui() {
+    glBindFramebuffer(GL_FRAMEBUFFER, gameFramebufferResource->GetId());
+    glViewport(0, 0, gameFramebufferResource->GetMaxWidth(), gameFramebufferResource->GetMaxHeight());
+    glClearColor((GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     Scene &scene = Scene::GetInstance();
     if (scene.IsLoaded()) {
         scene.Render();
@@ -40,18 +46,21 @@ void GamePanel::CreateImGui() {
 
     ImGui::Begin("Game", &open);
 
-    if (scene.IsLoaded()) {
-        Project &project = Project::GetInstance();
-        // todo: set game framebuffer width, height to reference width, height
-
-        ImVec2 imgSize = ImGui::GetContentRegionAvail();
-
-        // todo: do fancy uv stuff to preserve aspect ratio
-        ImGui::Image((void *)(intptr_t)gameFramebufferResource->GetColorTexture()->GetId(), 
-        imgSize,
-        ImVec2(0.0f, 1.0f),
-        ImVec2(1.0f, 0.0f));
+    if (!scene.IsLoaded()) {
+        ImGui::End();
+        return;
     }
+
+    Project &project = Project::GetInstance();
+    // todo: set game framebuffer width, height to reference width, height
+
+    ImVec2 imgSize = ImGui::GetContentRegionAvail();
+
+    // todo: do fancy uv stuff to preserve aspect ratio
+    ImGui::Image((void *)(intptr_t)gameFramebufferResource->GetColorTexture()->GetId(), 
+    imgSize,
+    ImVec2(0.0f, 1.0f),
+    ImVec2(1.0f, 0.0f));
 
     ImGui::End();
 }

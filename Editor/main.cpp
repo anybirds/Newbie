@@ -10,6 +10,7 @@
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
+#include <GroupPanel.hpp>
 
 #include <Graphics/Window.hpp>
 
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
     GamePanel &gamePanel = GamePanel::GetInstance();
     ScenePanel &scenePanel = ScenePanel::GetInstance();
     AssetPanel &assetPanel = AssetPanel::GetInstance();
+    GroupPanel &groupPanel = GroupPanel::GetInstance();
 
     while (!window.ShouldClose()) {
         window.PollEvents();
@@ -61,10 +63,11 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        mainMenuBar.CreateImGui();
         gamePanel.CreateImGui();
         scenePanel.CreateImGui();
         assetPanel.CreateImGui();
-        mainMenuBar.CreateImGui();
+        groupPanel.CreateImGui();
         
         ImGui::ShowDemoWindow();
 

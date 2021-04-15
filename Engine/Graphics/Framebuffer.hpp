@@ -47,6 +47,7 @@ NAMESPACE(Engine) {
         int GetMaxHeight() const { return maxHeight; }
         int GetWidth() const { return width; }
         int GetHeight() const { return height; }
+        GLuint GetId() const { return fbo; }
         void SetWidth(int width);
         void SetHeight(int height);
         std::shared_ptr<Texture> GetColorTexture() const { return colorTexture; }

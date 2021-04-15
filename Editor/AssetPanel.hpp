@@ -18,5 +18,4 @@ public:
     void Toggle() { open ^= true; }
     
     void CreateImGui();
-    
 };

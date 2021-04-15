@@ -13,12 +13,9 @@ GameObject::~GameObject() {
         delete t->GetGameObject();
     }
 
-    unordered_set<Component *> temp(components);
-    for (Component *component : temp) {
-        RemoveComponent(component);
+    for (Component *component : components) {
+        delete component;
     }
-
-    delete transform;
     for (Component *garbage : garbages) {
         delete garbage;
     }

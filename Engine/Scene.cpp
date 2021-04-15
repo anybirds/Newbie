@@ -157,11 +157,46 @@ void Scene::Close() {
 
 Group *Scene::AddGroup() {
     Group *group = new Group();
+    groups.insert(group);
     return group;
 }
 
-void Scene::RemoveGroup(Group *group) {
+unordered_set<Group *>::iterator Scene::RemoveGroup(unordered_set<Group *>::iterator it) {
+    if (it == groups.end()) {
+        return groups.end();
+    }
+    
+    Group *group = *it;
+    for (auto it = scripts.begin(); it != scripts.end(); ) {
+        Script *script = *it;
+        if (script->GetGroup() == group) {
+            it = scripts.erase(it);
+        } else {
+            it++;
+        }
+    }
+    for (auto it = drawers.begin(); it != drawers.end(); ) {
+        Drawer *drawer = *it;
+        if (drawer->GetGroup() == group) {
+            it = drawers.erase(it);
+        } else {
+            it++;
+        }
+    }
+    for (auto it = renderers.begin(); it != renderers.end(); ) {
+        Renderer *renderer = *it;
+        if (renderer->GetGroup() == group) {
+            it = renderers.erase(it);
+        } else {
+            it++;
+        }
+    }
     garbages.insert(group);
+    return groups.erase(it);
+}
+
+void Scene::RemoveGroup(Group *group) {
+    RemoveGroup(groups.find(group));
 }
 
 GameObject *Scene::FindGameObject(const string &name) {

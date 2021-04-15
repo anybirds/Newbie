@@ -1,0 +1,12 @@
+{
+    "setting" : [],
+    "groups" : [ 1 ],
+    "scripts" : [],
+    "renderers" : [],
+    "drawers" : [],
+    "entities" : { 
+        "Group" : {
+            "1" : [ false, "", [] ]
+        }
+    }
+}

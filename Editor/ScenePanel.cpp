@@ -38,19 +38,22 @@ void ScenePanel::CreateImGui() {
     ImGui::Begin("Scene", &open);
 
     Scene &scene = Scene::GetInstance();
-    if (scene.IsLoaded()) {
-        Project &project = Project::GetInstance();
-        ImVec2 imgSize = ImGui::GetContentRegionAvail();
-        cam->GetFramebuffer()->SetWidth((int)imgSize.x);
-        cam->GetFramebuffer()->SetHeight((int)imgSize.y);
-        try {
-            cam->Render();
-        } catch(...) {}
-        ImGui::Image((void *)(intptr_t)cam->GetFramebuffer()->GetColorTexture()->GetId(), 
-            imgSize,
-            ImVec2(0.0f, imgSize.y / cam->GetFramebuffer()->GetMaxHeight()),
-            ImVec2(imgSize.x / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
+    if (!scene.IsLoaded()) {
+        ImGui::End();
+        return;
     }
 
+    Project &project = Project::GetInstance();
+    ImVec2 imgSize = ImGui::GetContentRegionAvail();
+    cam->GetFramebuffer()->SetWidth((int)imgSize.x);
+    cam->GetFramebuffer()->SetHeight((int)imgSize.y);
+    try {
+        cam->Render();
+    } catch(...) {}
+    ImGui::Image((void *)(intptr_t)cam->GetFramebuffer()->GetColorTexture()->GetId(), 
+        imgSize,
+        ImVec2(0.0f, imgSize.y / cam->GetFramebuffer()->GetMaxHeight()),
+        ImVec2(imgSize.x / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
+        
     ImGui::End();
 }
