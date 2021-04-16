@@ -3,6 +3,7 @@
 #include <string>
 
 #include <GameObject.hpp>
+#include <Group.hpp>
 
 class GroupPanel {
 public:
@@ -15,6 +16,8 @@ private:
     std::string rename;
     Engine::GameObject *selectedGameObject;
     Engine::GameObject *renamedGameObject;
+    Engine::Group *selectedGroup;
+    Engine::Group *renamedGroup;
     
 public:
     GroupPanel(const GroupPanel &) = delete;
