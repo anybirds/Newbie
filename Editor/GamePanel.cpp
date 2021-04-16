@@ -1,12 +1,10 @@
-#include <imgui/imgui.h>
-
 #include <Engine.hpp>
 #include <GamePanel.hpp>
 
 using namespace std;
 using namespace Engine;
 
-GamePanel::GamePanel() {
+GamePanel::GamePanel() : Panel("Game") {
     Window &window = Window::GetInstance();
 
     gameTexture = new ATexture();
@@ -28,7 +26,7 @@ void GamePanel::Close() {
     delete gameTexture;
 }
 
-void GamePanel::CreateImGui() {
+void GamePanel::Render() {
     glBindFramebuffer(GL_FRAMEBUFFER, gameFramebufferResource->GetId());
     glViewport(0, 0, gameFramebufferResource->GetMaxWidth(), gameFramebufferResource->GetMaxHeight());
     glClearColor((GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f, (GLclampf) 0.0f);
@@ -39,13 +37,10 @@ void GamePanel::CreateImGui() {
     if (scene.IsLoaded()) {
         scene.Render();
     }
+}
 
-    if (!open) {
-        return;
-    }
-
-    ImGui::Begin("Game", &open);
-
+void GamePanel::ShowContents() {
+    Scene &scene = Scene::GetInstance();
     if (!scene.IsLoaded()) {
         ImGui::End();
         return;
@@ -61,6 +56,4 @@ void GamePanel::CreateImGui() {
     imgSize,
     ImVec2(0.0f, 1.0f),
     ImVec2(1.0f, 0.0f));
-
-    ImGui::End();
 }

@@ -33,6 +33,7 @@ NAMESPACE(Engine) {
         GameObject() : group(nullptr), transform(nullptr) {}
         virtual ~GameObject();
         
+        std::string &GetName() { return name; }
         bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
         bool IsEnabled() const { return transform->IsEnabled(); }
         void SetLocalEnabled(bool localEnabled) { transform->SetLocalEnabled(localEnabled); }

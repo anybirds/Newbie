@@ -1,30 +1,29 @@
 #pragma once
 
-#include <algorithm>
-#include <string>
 #include <functional>
 
-class FileDialog {
+#include <Dialog.hpp>
+
+class FileDialog : public Dialog {
 public:
     static FileDialog &GetInstance() { static FileDialog fileDialog; return fileDialog; }
 
 private:
-    FileDialog() : selected(-1), dir("."), folder(false) {}
-
-    int selected;
-    std::string arg;
-    std::string dir;
+    FileDialog() : Dialog("Open"), folder(false), dir(".") {}
 
     bool folder;
+    std::string dir;
+    std::string arg;
     std::function<void(const std::string &)> callback;
 
 public:
     FileDialog(const FileDialog &) = delete;
     void operator=(const FileDialog &) = delete;
 
-    void CreateImGui();
+    virtual void ShowContents() override;
     
     bool IsFolderDialog() const { return folder; }
-    void SetFolderDialog(bool folder) { this->folder = folder; }
+    void SetFileDialog() { this->folder = false; }
+    void SetFolderDialog() { this->folder = true; }
     void SetCallback(const std::function<void(const std::string &)> &callback) { this->callback = callback; }
 };

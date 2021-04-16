@@ -28,6 +28,8 @@ NAMESPACE(Engine) {
         void Apply();
         virtual std::shared_ptr<Resource> GetResource() = 0;
         
+        std::string &GetName() { return name; }
+        
         friend class Project;
     };
 

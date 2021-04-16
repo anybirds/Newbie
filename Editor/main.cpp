@@ -3,7 +3,6 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
-
 #include <icons/IconsFontAwesome5.h>
 
 #include <MainMenuBar.hpp>
@@ -63,11 +62,12 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        mainMenuBar.CreateImGui();
-        gamePanel.CreateImGui();
-        scenePanel.CreateImGui();
-        assetPanel.CreateImGui();
-        groupPanel.CreateImGui();
+        mainMenuBar.Show();
+        gamePanel.Render(); // render the game
+        gamePanel.Show();
+        scenePanel.Show();
+        assetPanel.Show();
+        groupPanel.Show();
         
         ImGui::ShowDemoWindow();
 

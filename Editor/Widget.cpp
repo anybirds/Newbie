@@ -1,0 +1,25 @@
+#include <Widget.hpp>
+
+#include <GL/glew.h>
+#include <glfw/glfw3.h>
+
+using namespace std;
+
+void Widget::ShowRename(string &str) {
+    if (!ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0))
+            ImGui::SetKeyboardFocusHere();
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+    ImGui::InputText((string("##") + to_string((uint64_t)selected)).c_str(), &str, ImGuiInputTextFlags_AutoSelectAll);
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+}
+
+void Widget::UpdateRename() {
+    if (selected && ImGui::IsKeyPressed(GLFW_KEY_F2)) {
+        rename = true;
+    }
+    if (rename && (ImGui::IsKeyPressed(GLFW_KEY_ENTER) || ImGui::IsMouseClicked(0))) {
+        rename = false;
+    }
+}

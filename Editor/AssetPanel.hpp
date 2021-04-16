@@ -1,28 +1,18 @@
 #pragma once
 
-#include <string>
-
+#include <Panel.hpp>
 #include <Asset.hpp>
 
-class AssetPanel {
+class AssetPanel : public Panel {
 public:
-    static AssetPanel &GetInstance() { static AssetPanel AssetPanel; return AssetPanel; }
+    static AssetPanel &GetInstance() { static AssetPanel assetPanel; return assetPanel; }
 
 private:
-    AssetPanel() : open(true) {}
-
-    bool open;
-    std::string rename;
-    Engine::Asset *selectedAsset;
-    Engine::Asset *renamedAsset;
+    AssetPanel() : Panel("Asset") {}
     
 public:
     AssetPanel(const AssetPanel &) = delete;
     void operator=(const AssetPanel &) = delete;
-
-    bool IsOpen() { return open; }
-    void SetOpen(bool open) { this->open = open; }
-    void Toggle() { open ^= true; }
     
-    void CreateImGui();
+    virtual void ShowContents() override;
 };

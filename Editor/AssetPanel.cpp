@@ -1,26 +1,11 @@
-#include <string>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_stdlib.h>
-#include <Icons/IconsFontAwesome5.h>
-
 #include <AssetPanel.hpp>
 #include <Project.hpp>
 #include <Asset.hpp>
 
-#include <GL/glew.h>
-#include <glfw/glfw3.h>
-
 using namespace std;
 using namespace Engine;
 
-void AssetPanel::CreateImGui() {
-    if (!open) {
-        return;
-    }
-
-    ImGui::Begin("Asset", &open);
-
+void AssetPanel::ShowContents() {
     Project &project = Project::GetInstance();
     if (!project.IsLoaded()) {
         ImGui::End();
@@ -53,29 +38,13 @@ void AssetPanel::CreateImGui() {
             ImGui::Text(ICON_FA_FILE);
         }
         ImGui::SameLine();
-        if (renamedAsset == asset) {
-            if (!ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0))
-                ImGui::SetKeyboardFocusHere();
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-            ImGui::InputText((string("##") + to_string((uint64_t)asset)).c_str(), &rename, ImGuiInputTextFlags_AutoSelectAll);
-            ImGui::PopStyleColor();
-            ImGui::PopStyleVar();
+        if (rename) {
+            ShowRename(asset->GetName());
         } else {
-            if (ImGui::Selectable((asset->GetName() + "##" + to_string((uint64_t)asset)).c_str(), asset == selectedAsset)) {
-                selectedAsset = asset;
+            if (ImGui::Selectable((asset->GetName() + "##" + to_string((uint64_t)asset)).c_str(), (void *)asset == selected)) {
+                selected = (void *)asset;
             }
         }
     }
-    if (selectedAsset && ImGui::IsKeyPressed(GLFW_KEY_F2)) {
-        renamedAsset = selectedAsset;
-        rename = renamedAsset->GetName();
-    }
-    if (renamedAsset && (ImGui::IsKeyPressed(GLFW_KEY_ENTER) || ImGui::IsMouseClicked(0))) {
-        renamedAsset->SetName(rename);
-        renamedAsset = nullptr;
-    }
     ImGui::EndChild();
-
-    ImGui::End();
 }

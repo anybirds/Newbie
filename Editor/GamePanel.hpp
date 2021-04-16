@@ -2,17 +2,16 @@
 
 #include <memory>
 
+#include <Panel.hpp>
 #include <Graphics/Texture.hpp>
 #include <Graphics/Framebuffer.hpp>
 
-class GamePanel {
+class GamePanel : public Panel {
 public:
     static GamePanel &GetInstance() { static GamePanel gamePanel; return gamePanel; }
 
 private:
     GamePanel();
-    
-    bool open;
 
     Engine::ATexture *gameTexture;
     Engine::AFramebuffer *gameFramebuffer;
@@ -22,10 +21,7 @@ public:
     GamePanel(const GamePanel &) = delete;
     void operator=(const GamePanel &) = delete;
 
-    bool IsOpen() { return open; }
-    void SetOpen(bool open) { this->open = open; }
-    void Toggle() { open ^= true; }
-
-    void CreateImGui();
+    virtual void ShowContents() override;
+    void Render();
     void Close();
 };

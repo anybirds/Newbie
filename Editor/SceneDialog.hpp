@@ -1,23 +1,22 @@
 #pragma once
 
-#include <string>
+#include <Dialog.hpp>
 
-class SceneDialog {
+class SceneDialog : public Dialog {
 public:
     static SceneDialog &GetInstance() { static SceneDialog sceneDialog; return sceneDialog; }
 
 private:
-    SceneDialog() : selected(-1) {}
+    SceneDialog() : Dialog("Open Scene"), newScene(false) { width = 480.0f; }
 
+    bool newScene;
     std::string name;
     std::string location;
-
-    int selected;
-    std::string arg;
     
 public:
     SceneDialog(const SceneDialog &) = delete;
     void operator=(const SceneDialog &) = delete;
 
-    void CreateImGui();
+    virtual void ShowContents() override;
+    void SetNewScene() { newScene = true; }
 };

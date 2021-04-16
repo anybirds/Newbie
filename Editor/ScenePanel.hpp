@@ -1,18 +1,17 @@
 #pragma once
 
+#include <Panel.hpp>
 #include <Graphics/Camera.hpp>
 #include <Graphics/Texture.hpp>
 #include <Graphics/Framebuffer.hpp>
 #include <GameObject.hpp>
 
-class ScenePanel {
+class ScenePanel : public Panel {
 public:
     static ScenePanel &GetInstance() { static ScenePanel scenePanel; return scenePanel; }
 
 private:
     ScenePanel();
-
-    bool open;
 
     Engine::ATexture *sceneTexture;
     Engine::AFramebuffer *sceneFramebuffer;
@@ -23,10 +22,6 @@ public:
     ScenePanel(const ScenePanel &) = delete;
     void operator=(const ScenePanel &) = delete;
 
-    bool IsOpen() { return open; }
-    void SetOpen(bool open) { this->open = open; }
-    void Toggle() { open ^= true; }
-    
-    void CreateImGui();
+    virtual void ShowContents() override;
     void Close();
 };

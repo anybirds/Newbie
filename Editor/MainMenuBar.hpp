@@ -1,8 +1,8 @@
 #pragma once
 
-#include <FileDialog.hpp>
+#include <Widget.hpp>
 
-class MainMenuBar {
+class MainMenuBar : public Widget {
 public:
     static MainMenuBar &GetInstance() { static MainMenuBar mainMenuBar; return mainMenuBar; }
 
@@ -13,5 +13,5 @@ public:
     MainMenuBar(const MainMenuBar &) = delete;
     void operator=(const MainMenuBar &) = delete;
 
-    void CreateImGui();
+    virtual void Show() override;
 };

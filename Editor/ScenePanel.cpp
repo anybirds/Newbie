@@ -1,12 +1,10 @@
-#include <imgui/imgui.h>
-
 #include <Engine.hpp>
 #include <ScenePanel.hpp>
 
 using namespace std;
 using namespace Engine;
 
-ScenePanel::ScenePanel() : open(true) {
+ScenePanel::ScenePanel() : Panel("Scene") {
     Window &window = Window::GetInstance();
 
     sceneTexture = new ATexture();
@@ -30,13 +28,7 @@ void ScenePanel::Close() {
     delete sceneTexture;
 }
 
-void ScenePanel::CreateImGui() {
-    if (!open) {
-        return;
-    }
-
-    ImGui::Begin("Scene", &open);
-
+void ScenePanel::ShowContents() {
     Scene &scene = Scene::GetInstance();
     if (!scene.IsLoaded()) {
         ImGui::End();
@@ -54,6 +46,4 @@ void ScenePanel::CreateImGui() {
         imgSize,
         ImVec2(0.0f, imgSize.y / cam->GetFramebuffer()->GetMaxHeight()),
         ImVec2(imgSize.x / cam->GetFramebuffer()->GetMaxWidth(), 0.0f));
-        
-    ImGui::End();
 }

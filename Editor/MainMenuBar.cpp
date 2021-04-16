@@ -1,7 +1,4 @@
 #include <filesystem>
-#include <string>
-
-#include <imgui/imgui.h>
 
 #include <Project.hpp>
 #include <MainMenuBar.hpp>
@@ -16,7 +13,7 @@
 using namespace std;
 using namespace Engine;
 
-void MainMenuBar::CreateImGui() {
+void MainMenuBar::Show() {
     if (ImGui::BeginMainMenuBar())
     {
         bool project_new = false;
@@ -68,13 +65,13 @@ void MainMenuBar::CreateImGui() {
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {
-            ImGui::OpenPopup("New Project");
+            ImGui::OpenPopup("Open Project");
         }
-        projectDialog.CreateImGui();
+        projectDialog.Show();
 
         FileDialog &fileDialog = FileDialog::GetInstance();
         if (project_open) {
-            fileDialog.SetFolderDialog(true);
+            fileDialog.SetFolderDialog();
             fileDialog.SetCallback([](const string &path) {
                 // find the project file 
                 string pfile;
@@ -91,18 +88,18 @@ void MainMenuBar::CreateImGui() {
                 Project &project = Project::GetInstance();
                 project.Load(pfile);
             });
-            ImGui::OpenPopup("Open Folder");
+            ImGui::OpenPopup("Open");
         }
-        fileDialog.CreateImGui();
+        fileDialog.Show();
 
         SceneDialog &sceneDialog = SceneDialog::GetInstance();
         if (scene_new) {
-            ImGui::OpenPopup("New Scene");
+            ImGui::OpenPopup("Open Scene");
         }
         if (scene_open) {
             ImGui::OpenPopup("Open Scene");
         }
-        sceneDialog.CreateImGui();
+        sceneDialog.Show();
 
         ImGui::EndMainMenuBar();
     }
