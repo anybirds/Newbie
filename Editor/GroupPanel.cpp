@@ -1,7 +1,12 @@
+#include <cstdint>
 #include <string>
 #include <functional>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <imgui/imgui.h>
+#include <imgui/imgui_stdlib.h>
 #include <Icons/IconsFontAwesome5.h>
 
 #include <GroupPanel.hpp>
@@ -34,27 +39,57 @@ void GroupPanel::CreateImGui() {
         if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip)) {
             scene.AddGroup();
         }
-
-        function<void(GameObject *)> recurse = [&recurse](GameObject *gameObject) {
+        
+        function<void(GameObject *)> recurse = [&recurse, this](GameObject *gameObject) {
             Transform *transform = gameObject->GetTransform();
-            static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
             if (transform->GetChildren().empty()) {
-                ImGui::TreeNodeEx((void*)(intptr_t)gameObject,
-                    base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen, 
-                    (string(ICON_FA_CUBE) + gameObject->GetName()).c_str());
-            } else if (ImGui::TreeNodeEx((void*)(intptr_t)gameObject, base_flags, (string(ICON_FA_CUBE) + gameObject->GetName()).c_str())) {
+                flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            }
+            if (gameObject == selectedGameObject && gameObject != renamedGameObject) {
+                flags |= ImGuiTreeNodeFlags_Selected;
+            }
+            bool clicked = false;
+            if (ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, "")) {
+                ImGui::SameLine();
+                ImGui::Text(ICON_FA_CUBE);
+                ImGui::SameLine();
+                if (renamedGameObject == gameObject) {
+                    if (!ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0))
+                        ImGui::SetKeyboardFocusHere();
+                    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+                    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+                    ImGui::InputText((string("##") + to_string((uint64_t)gameObject)).c_str(), &rename, ImGuiInputTextFlags_AutoSelectAll);
+                    ImGui::PopStyleColor();
+                    ImGui::PopStyleVar();
+                } else {
+                    if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uint64_t)gameObject)).c_str())) {
+                        clicked = true;
+                    }
+                }
+                if (clicked) {
+                    selectedGameObject = gameObject;
+                    if (renamedGameObject) {
+                        renamedGameObject->SetName(rename);
+                        renamedGameObject = nullptr;
+                    }
+                }
+
                 for (Transform *t : transform->GetChildren()) {
                     recurse(t->GetGameObject());
                 }
-                ImGui::TreePop();
+
+                if (!transform->GetChildren().empty()) {
+                    ImGui::TreePop();
+                }
             }
         };
+        
         unsigned index = 0;
         Group *g = nullptr;
         for (Group *group : scene.GetAllGroups()) {
             bool p_open = true;
             if (ImGui::BeginTabItem((group->GetName() + "##" + to_string(index)).c_str(), &p_open, ImGuiTabItemFlags_None)) {
-                ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
                 for (GameObject *gameObject : group->GetRootGameObjects()) {
                     recurse(gameObject);
                 }
@@ -65,6 +100,14 @@ void GroupPanel::CreateImGui() {
             } else {
                 g = group;
             }
+        }
+        if (selectedGameObject && ImGui::IsKeyPressed(GLFW_KEY_F2)) {
+            renamedGameObject = selectedGameObject;
+            rename = renamedGameObject->GetName();
+        }
+        if (renamedGameObject && ImGui::IsKeyPressed(GLFW_KEY_ENTER)) {
+            renamedGameObject->SetName(rename);
+            renamedGameObject = nullptr;
         }
         if (g) {
             scene.RemoveGroup(g);
