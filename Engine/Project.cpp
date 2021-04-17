@@ -3,8 +3,11 @@
 #include <filesystem>
 #include <cstdlib>
 
+#include <nlohmann/json.hpp>
+
 #include <Project.hpp>
 #include <Scene.hpp>
+
 
 using json = nlohmann::json;
 using namespace std;

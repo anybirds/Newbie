@@ -8,6 +8,11 @@
 using namespace std;
 using namespace Engine;
 
+const string &SceneDialog::GetEmptyScene() {
+    static std::string emptyScene(string(NEWBIE_PATH) + "/Samples/Empty/Main.json");
+    return emptyScene;
+}
+
 void SceneDialog::ShowContents() {
     FileDialog &fileDialog = FileDialog::GetInstance();
     if (ImGui::Button("New")) {
@@ -20,9 +25,10 @@ void SceneDialog::ShowContents() {
             Project &project = Project::GetInstance();
             project.AddScene(filesystem::relative(path, filesystem::u8path(project.GetDirectoy())).u8string());
         });
-        ImGui::OpenPopup("Open");
+        fileDialog.Open();
     }
     fileDialog.Show();
+    ImGui::Separator();
     ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     Project &project = Project::GetInstance();
     const string *deleted = nullptr;
@@ -51,7 +57,7 @@ void SceneDialog::ShowContents() {
     ImGui::Separator();
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-        if (selected >= 0) {
+        if (selected) {
             Scene &scene = Scene::GetInstance();
             scene.Load(*(string *)selected);
             selected = nullptr;
@@ -61,6 +67,7 @@ void SceneDialog::ShowContents() {
 
     if (newScene) {
         ImGui::OpenPopup("New Scene");
+        selected = nullptr;
         newScene = false;
     }
 
@@ -82,7 +89,7 @@ void SceneDialog::ShowContents() {
             fileDialog.SetCallback([this](const string &path) {
                 this->location = path;
             });
-            ImGui::OpenPopup("Open Folder");
+            fileDialog.Open();
         }
         fileDialog.Show();
 
@@ -90,7 +97,7 @@ void SceneDialog::ShowContents() {
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
             if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(string(NEWBIE_PATH) + "/Samples/Empty/Main.json"));
+                auto sample(filesystem::u8path(GetEmptyScene()));
                 auto created(filesystem::u8path(location + "/" + name));
                 try {
                     // copy file "Samples/Empty/Main.json"

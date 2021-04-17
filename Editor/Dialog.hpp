@@ -12,4 +12,5 @@ public:
 
     virtual void Show() override;
     virtual void ShowContents() = 0;
+    virtual void Open();
 };

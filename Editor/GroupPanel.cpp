@@ -14,6 +14,12 @@ void GroupPanel::ShowContents() {
         ImGui::End();
         return;
     }
+    
+    for (Group *group : scene.GetAllGroups()) {
+        if (rename && selected == (void *)group) {
+            ShowRename(group->GetName());
+        }
+    }
 
     if (ImGui::BeginTabBar("Group", 
             ImGuiTabBarFlags_Reorderable | 
@@ -37,7 +43,7 @@ void GroupPanel::ShowContents() {
                 ImGui::SameLine();
                 ImGui::Text(ICON_FA_CUBE);
                 ImGui::SameLine();
-                if (rename) {
+                if (rename && selected == (void *)gameObject) {
                     ShowRename(gameObject->GetName());
                 } else {
                     if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uint64_t)gameObject)).c_str(), (void *)gameObject == selected)) {
@@ -61,9 +67,6 @@ void GroupPanel::ShowContents() {
             if (ImGui::BeginTabItem((group->GetName() + "##" + to_string((uint64_t)group)).c_str(), &p_open, ImGuiTabItemFlags_None)) {
                 if (ImGui::IsItemClicked()) {
                     selected = (void *)group;
-                }   
-                if (rename) {
-                    ShowRename(group->GetName());
                 }
                 for (GameObject *gameObject : group->GetRootGameObjects()) {
                     recurse(gameObject);
@@ -77,6 +80,7 @@ void GroupPanel::ShowContents() {
         if (g) {
             scene.RemoveGroup(g);
         }
+
         ImGui::EndTabBar();
     }
 

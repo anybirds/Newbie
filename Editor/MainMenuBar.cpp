@@ -20,6 +20,7 @@ void MainMenuBar::Show() {
         bool project_open = false;
         bool scene_new = false;
         bool scene_open = false;
+
         Project &project = Project::GetInstance();
         if (ImGui::BeginMenu("Project"))
         {
@@ -65,39 +66,21 @@ void MainMenuBar::Show() {
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {
-            ImGui::OpenPopup("Open Project");
+            projectDialog.SetNewProject();
+            projectDialog.Open();
+        }
+        if (project_open) {
+            projectDialog.Open();
         }
         projectDialog.Show();
 
-        FileDialog &fileDialog = FileDialog::GetInstance();
-        if (project_open) {
-            fileDialog.SetFolderDialog();
-            fileDialog.SetCallback([](const string &path) {
-                // find the project file 
-                string pfile;
-                auto fspath = filesystem::u8path(path);
-                for (auto &p : filesystem::directory_iterator(fspath)) {
-                    // find file that has the same name with the selected directory
-                    if (p.path().stem().u8string() == fspath.stem().u8string()) {
-                        pfile = p.path().u8string();
-                        break;
-                    }
-                }
-
-                // load the Project
-                Project &project = Project::GetInstance();
-                project.Load(pfile);
-            });
-            ImGui::OpenPopup("Open");
-        }
-        fileDialog.Show();
-
         SceneDialog &sceneDialog = SceneDialog::GetInstance();
         if (scene_new) {
-            ImGui::OpenPopup("Open Scene");
+            sceneDialog.SetNewScene();
+            sceneDialog.Open();
         }
         if (scene_open) {
-            ImGui::OpenPopup("Open Scene");
+            sceneDialog.Open();
         }
         sceneDialog.Show();
 

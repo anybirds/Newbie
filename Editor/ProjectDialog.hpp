@@ -1,20 +1,34 @@
 #pragma once
 
-#include <string>
+#include <unordered_set>
 
-class ProjectDialog {
+#include <Dialog.hpp>
+
+class ProjectDialog : public Dialog {
+private:
+    static const std::string &GetProjectsFile();
+    static const std::string &GetEmptyProject();
+
 public:
     static ProjectDialog &GetInstance() { static ProjectDialog ProjectDialog; return ProjectDialog; }
 
 private:
-    ProjectDialog() {}
+    ProjectDialog();
     
+    bool newProject;
     std::string name;
     std::string location;
+    std::unordered_set<std::string> projects;
     
+    std::string GetProjectFile(const std::string &dir) const;
+    void AddProject(const std::string &dir);
+    void RemoveProject(const std::string &dir);
+    void LoadProject(const std::string &dir);
+
 public:
     ProjectDialog(const ProjectDialog &) = delete;
     void operator=(const ProjectDialog &) = delete;
 
-    void CreateImGui();
+    void ShowContents();
+    void SetNewProject() { newProject = true; }
 };

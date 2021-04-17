@@ -6,7 +6,7 @@
     "drawers" : [],
     "entities" : { 
         "Group" : {
-            "1" : [ false, "", [] ]
+            "1" : [ false, "Main", [] ]
         }
     }
 }

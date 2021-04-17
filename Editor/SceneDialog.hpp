@@ -3,11 +3,14 @@
 #include <Dialog.hpp>
 
 class SceneDialog : public Dialog {
+private:
+    static const std::string &GetEmptyScene();
+
 public:
     static SceneDialog &GetInstance() { static SceneDialog sceneDialog; return sceneDialog; }
 
 private:
-    SceneDialog() : Dialog("Open Scene"), newScene(false) { width = 480.0f; }
+    SceneDialog() : Dialog("Open Scene"), newScene(false) { width = 600.0f; }
 
     bool newScene;
     std::string name;

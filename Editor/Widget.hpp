@@ -8,14 +8,16 @@
 
 class Widget {
 protected:
-    bool rename;
-    void *selected;
+    static void *selected;
+    static bool rename;
+    static bool renameClicked;
 
 public:
-    Widget() : rename(false), selected(nullptr) {}
+    static void UpdateRename();
+
+public:
     virtual ~Widget() {}
     virtual void Show() = 0;    
 
     void ShowRename(std::string &str); 
-    void UpdateRename();
 };

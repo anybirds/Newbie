@@ -54,6 +54,10 @@ int main(int argc, char **argv) {
     AssetPanel &assetPanel = AssetPanel::GetInstance();
     GroupPanel &groupPanel = GroupPanel::GetInstance();
 
+    scenePanel.SetOpen(true);
+    assetPanel.SetOpen(true);
+    groupPanel.SetOpen(true);
+
     while (!window.ShouldClose()) {
         window.PollEvents();
 
@@ -68,6 +72,7 @@ int main(int argc, char **argv) {
         scenePanel.Show();
         assetPanel.Show();
         groupPanel.Show();
+        Widget::UpdateRename();
         
         ImGui::ShowDemoWindow();
 

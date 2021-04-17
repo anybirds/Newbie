@@ -13,7 +13,6 @@
 #include <unordered_set>
 #include <vector>
 #include <memory>
-#include <nlohmann/json.hpp>
 
 #include <Entity.hpp>
 #include <Asset.hpp>

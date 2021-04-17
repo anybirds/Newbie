@@ -33,7 +33,7 @@ void FileDialog::ShowContents() {
     ImGui::EndChild();
 
     ImGui::Separator();
-    ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("List", ImVec2(0.0f, 320.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     index = 1;
     for (auto &p : filesystem::directory_iterator(filesystem::u8path(dir))) {
         try {
@@ -79,7 +79,7 @@ void FileDialog::ShowContents() {
     ImGui::Separator();
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-        if (selected >= 0 && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
+        if (selected && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
             callback(arg);
             selected = nullptr;
             ImGui::CloseCurrentPopup();

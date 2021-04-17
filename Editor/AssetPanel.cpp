@@ -38,8 +38,8 @@ void AssetPanel::ShowContents() {
             ImGui::Text(ICON_FA_FILE);
         }
         ImGui::SameLine();
-        if (rename) {
-            ShowRename(asset->GetName());
+        if (rename && selected == (void *)asset) {
+            ShowRename(asset->GetName()); 
         } else {
             if (ImGui::Selectable((asset->GetName() + "##" + to_string((uint64_t)asset)).c_str(), (void *)asset == selected)) {
                 selected = (void *)asset;

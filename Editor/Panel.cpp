@@ -7,6 +7,5 @@ void Panel::Show() {
 
     ImGui::Begin(title.c_str(), &open);
     ShowContents();
-    UpdateRename();
     ImGui::End();
 }
