@@ -10,6 +10,8 @@ GamePanel::GamePanel() : Panel("Game") {
     gameTexture = new ATexture();
     gameTexture->SetWidth(window.GetMonitorWidth());
     gameTexture->SetHeight(window.GetMonitorHeight());
+    gameTexture->SetHorizontalWrap(Texture::CLAMP_TO_BORDER);
+    gameTexture->SetVerticalWrap(Texture::CLAMP_TO_BORDER);
 
     gameFramebuffer = new AFramebuffer();
     gameFramebuffer->SetColorTexture(gameTexture);
@@ -58,6 +60,16 @@ void GamePanel::Update() {
 }
 
 void GamePanel::ShowContents() {
+    ImVec2 imgSize = ImGui::GetContentRegionAvail();
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav;
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    if (ImGui::Begin("Statistics", nullptr, windowFlags))
+    {
+        ImGui::Text("Statistics");
+        ImGui::Text("Screen: %dx%d", int(imgSize.x), int(imgSize.y));
+    }
+    ImGui::End();
+
     Scene &scene = Scene::GetInstance();
     if (!scene.IsLoaded()) {
         ImGui::End();
@@ -65,15 +77,13 @@ void GamePanel::ShowContents() {
     }
 
     Project &project = Project::GetInstance();
-    // todo: set game framebuffer width, height to reference width, height
+    gameFramebufferResource->SetWidth((int)imgSize.x);
+    gameFramebufferResource->SetHeight((int)imgSize.y);
 
-    ImVec2 imgSize = ImGui::GetContentRegionAvail();
-
-    // todo: do fancy uv stuff to preserve aspect ratio
     ImGui::Image((void *)(intptr_t)gameFramebufferResource->GetColorTexture()->GetId(), 
-    imgSize,
-    ImVec2(0.0f, 1.0f),
-    ImVec2(1.0f, 0.0f));
+        imgSize,
+        ImVec2(0.0f, imgSize.y / gameFramebufferResource->GetMaxHeight()),
+        ImVec2(imgSize.x / gameFramebufferResource->GetMaxWidth(), 0.0f));
 }
 
 void GamePanel::ShowPlayPause() {
@@ -83,6 +93,7 @@ void GamePanel::ShowPlayPause() {
         if (running) {
             scene.Load(scene.GetPath());
         } else {
+            open = true;
             scene.Save();
             Time::Init();
             scene.Start();
