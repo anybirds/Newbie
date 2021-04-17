@@ -48,7 +48,9 @@ NAMESPACE(Engine) {
         void Close();
 
         bool IsLoaded() const { return loaded; }
-        SceneSetting *GetSettiing() { return setting; }
+        const std::string &GetName() const { return name; }
+        const std::string &GetPath() const { return path; }
+        SceneSetting *GetSetting() const { return setting; }
         
         const std::unordered_set<Group *> &GetAllGroups() const { return groups; }
         Group *AddGroup();

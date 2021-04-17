@@ -6,7 +6,7 @@ void Dialog::Show() {
     ImGui::SetNextWindowSize(ImVec2(width, 0.0f));
 
     bool p_open = true;
-    if (ImGui::BeginPopupModal(title.c_str(), &p_open, ImGuiWindowFlags_NoResize)) {
+    if (ImGui::BeginPopupModal(title.c_str(), &p_open, flags | ImGuiWindowFlags_NoResize)) {
         ShowContents();
         ImGui::EndPopup();
     }

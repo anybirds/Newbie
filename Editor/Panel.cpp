@@ -5,7 +5,7 @@ void Panel::Show() {
         return;
     }
 
-    ImGui::Begin(title.c_str(), &open);
+    ImGui::Begin(title.c_str(), &open, flags);
     ShowContents();
     ImGui::End();
 }

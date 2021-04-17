@@ -10,7 +10,7 @@ private:
     static const std::string &GetEmptyProject();
 
 public:
-    static ProjectDialog &GetInstance() { static ProjectDialog ProjectDialog; return ProjectDialog; }
+    static ProjectDialog &GetInstance() { static ProjectDialog projectDialog; return projectDialog; }
 
 private:
     ProjectDialog();

@@ -31,7 +31,7 @@ Window::Window() {
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
     mwidth = mode->width; mheight = mode->height;
-    window = glfwCreateWindow(mwidth, mheight, name.c_str(), NULL, NULL);
+    window = glfwCreateWindow(mwidth, mheight, title.c_str(), NULL, NULL);
     if (!window) {
         cerr << '[' << __FUNCTION__ << ']' << " window creation failed."  << '\n';
         throw exception();
@@ -59,9 +59,9 @@ void Window::Close() {
     glfwTerminate();
 }
 
-void Window::SetName(const string &name) {
-    this->name = name;
-    glfwSetWindowTitle(window, name.c_str());
+void Window::SetTitle(const string &title) {
+    this->title = title;
+    glfwSetWindowTitle(window, title.c_str());
 }
 
 bool Window::ShouldClose() {

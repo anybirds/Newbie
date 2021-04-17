@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 
 #include <Project.hpp>
+#include <Graphics/Window.hpp>
 #include <ProjectDialog.hpp>
 #include <FileDialog.hpp>
 
@@ -12,7 +13,7 @@ using namespace std;
 using namespace Engine;
 
 const string &ProjectDialog::GetProjectsFile() {
-    static std::string projectsFile(std::string(NEWBIE_PATH) + "/projects.json"); 
+    static std::string projectsFile(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 
     return projectsFile; 
 }
 
@@ -22,6 +23,7 @@ const string &ProjectDialog::GetEmptyProject() {
 }
 
 ProjectDialog::ProjectDialog() : Dialog("Open Project") {
+    flags = ImGuiWindowFlags_MenuBar;
     width = 600.0f;
 
     try {
@@ -55,7 +57,10 @@ void ProjectDialog::RemoveProject(const string &dir) {
 
 void ProjectDialog::LoadProject(const string &dir) {
     Project &project = Project::GetInstance();
-    project.Load(GetProjectFile(dir));
+    if (project.Load(GetProjectFile(dir))) {
+        Window &window = Window::GetInstance();
+        window.SetTitle(string("Newbie - ") + project.GetName());
+    }
     ImGui::CloseCurrentPopup();
 }
 
@@ -74,21 +79,27 @@ string ProjectDialog::GetProjectFile(const string &dir) const {
 
 void ProjectDialog::ShowContents() {
     FileDialog &fileDialog = FileDialog::GetInstance();
-    if (ImGui::Button("New")) {
-        newProject = true;
+    if (ImGui::BeginMenuBar()) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_MenuBarBg]);
+        if (ImGui::Button("New")) {
+            newProject = true;
+        }
+        if (ImGui::Button("Find...")) {
+            fileDialog.SetFolderDialog();
+            fileDialog.SetCallback([this](const string &path) {
+                AddProject(path);
+            });
+            fileDialog.Open();
+        }
+        ImGui::PopStyleColor();
+        fileDialog.Show();  
+
+        ImGui::EndMenuBar();
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Find...")) {
-        fileDialog.SetFolderDialog();
-        fileDialog.SetCallback([this](const string &path) {
-            AddProject(path);
-        });
-        fileDialog.Open();
-    }
-    fileDialog.Show();
-    ImGui::Separator();
+    
     ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     const string *deleted = nullptr;
+    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
     for (const string &path : projects) {
         if (ImGui::Button((string(ICON_FA_TIMES"##") + to_string((uintptr_t)&path)).c_str())) {
             deleted = &path;
@@ -103,6 +114,7 @@ void ProjectDialog::ShowContents() {
             }
         }
     }
+    ImGui::PopStyleColor();
     if (deleted) {
         selected = nullptr;
         RemoveProject(*deleted);

@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     
     // create OpenGL context and Window
     Window &window = Window::GetInstance();
-    window.SetName("Newbie");
+    window.SetTitle("Newbie");
     
     // setup imgui
     IMGUI_CHECKVERSION();
@@ -38,11 +38,11 @@ int main(int argc, char **argv) {
 
     ImFontConfig config;
     config.MergeMode = true;
-    config.GlyphMinAdvanceX = 18.0f;
+    config.GlyphMinAdvanceX = 16.0f;
     static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     io.Fonts->AddFontFromFileTTF(
         (string(NEWBIE_PATH) + "/Editor/Icons/fa-solid-900.ttf").c_str(), 
-        18.0f, &config, icon_ranges);
+        16.0f, &config, icon_ranges);
     
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.GetGlfwWindow(), true);
@@ -66,14 +66,15 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        gamePanel.Update(); // game loop
+
         mainMenuBar.Show();
-        gamePanel.Render(); // render the game
         gamePanel.Show();
         scenePanel.Show();
         assetPanel.Show();
         groupPanel.Show();
         Widget::UpdateRename();
-        
+
         ImGui::ShowDemoWindow();
 
         // render

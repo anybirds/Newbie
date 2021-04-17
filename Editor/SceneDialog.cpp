@@ -2,6 +2,7 @@
 
 #include <Project.hpp>
 #include <Scene.hpp>
+#include <Graphics/Window.hpp>
 #include <SceneDialog.hpp>
 #include <FileDialog.hpp>
 
@@ -15,23 +16,29 @@ const string &SceneDialog::GetEmptyScene() {
 
 void SceneDialog::ShowContents() {
     FileDialog &fileDialog = FileDialog::GetInstance();
-    if (ImGui::Button("New")) {
-        newScene = true;
+    if (ImGui::BeginMenuBar()) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_MenuBarBg]);
+        if (ImGui::Button("New")) {
+            newScene = true;
+        }
+        if (ImGui::Button("Find...")) {
+            fileDialog.SetFileDialog();
+            fileDialog.SetCallback([](const string &path) {
+                Project &project = Project::GetInstance();
+                project.AddScene(filesystem::relative(path, filesystem::u8path(project.GetDirectoy())).u8string());
+            });
+            fileDialog.Open();
+        }
+        ImGui::PopStyleColor();
+        fileDialog.Show();
+
+        ImGui::EndMenuBar();
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Find...")) {
-        fileDialog.SetFileDialog();
-        fileDialog.SetCallback([](const string &path) {
-            Project &project = Project::GetInstance();
-            project.AddScene(filesystem::relative(path, filesystem::u8path(project.GetDirectoy())).u8string());
-        });
-        fileDialog.Open();
-    }
-    fileDialog.Show();
-    ImGui::Separator();
+    
     ImGui::BeginChild("List", ImVec2(0.0f, 360.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     Project &project = Project::GetInstance();
     const string *deleted = nullptr;
+    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
     for (const string &path : project.GetAllScenes()) {
         if (ImGui::Button((string(ICON_FA_TIMES"##") + to_string((uintptr_t)&path)).c_str())) {
             deleted = &path;
@@ -40,7 +47,10 @@ void SceneDialog::ShowContents() {
         if (ImGui::Selectable(path.c_str(), selected == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {
                 Scene &scene = Scene::GetInstance();
-                scene.Load(path);
+                if (scene.Load(path)) {
+                    Window &window = Window::GetInstance();
+                    window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
+                }
                 selected = nullptr;
                 ImGui::CloseCurrentPopup();
             } else {
@@ -48,6 +58,7 @@ void SceneDialog::ShowContents() {
             }
         }
     }
+    ImGui::PopStyleColor();
     if (deleted) {
         project.RemoveScene(*deleted);
         selected = nullptr;
@@ -59,7 +70,10 @@ void SceneDialog::ShowContents() {
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
         if (selected) {
             Scene &scene = Scene::GetInstance();
-            scene.Load(*(string *)selected);
+            if (scene.Load(*(string *)selected)) {
+                Window &window = Window::GetInstance();
+                window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
+            }
             selected = nullptr;
             ImGui::CloseCurrentPopup();
         }

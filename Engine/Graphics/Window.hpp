@@ -23,7 +23,7 @@ namespace Engine {
         Window();
 
         GLFWwindow *window; 
-        std::string name;
+        std::string title;
         int width;
         int height;
         int fwidth; // framebuffer width
@@ -35,7 +35,7 @@ namespace Engine {
         Window(const Window &) = delete;
         void operator=(const Window &) = delete;
 
-        const std::string &GetName() const { return name; }
+        const std::string &GetTitle() const { return title; }
         int GetWidth() const { return width; }
         int GetHeight() const { return height; }
         int GetFramebufferWidth() const { return fwidth; }
@@ -44,7 +44,7 @@ namespace Engine {
         int GetMonitorHeight() const { return mheight; }
         GLFWwindow *GetGlfwWindow() { return window; }
 
-        void SetName(const std::string &name);
+        void SetTitle(const std::string &title);
 
         bool ShouldClose();
         void SwapBuffers();

@@ -1,6 +1,7 @@
 #include <filesystem>
 
 #include <Project.hpp>
+#include <Scene.hpp>
 #include <MainMenuBar.hpp>
 #include <FileDialog.hpp>
 #include <SceneDialog.hpp>
@@ -22,6 +23,7 @@ void MainMenuBar::Show() {
         bool scene_open = false;
 
         Project &project = Project::GetInstance();
+        GamePanel &gamePanel = GamePanel::GetInstance();
         if (ImGui::BeginMenu("Project"))
         {
             if (ImGui::MenuItem("New")) {
@@ -30,7 +32,7 @@ void MainMenuBar::Show() {
             if (ImGui::MenuItem("Open")) {
                 project_open = true;
             }
-            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded())) {
+            if (ImGui::MenuItem("Save", "Ctrl+S", nullptr, project.IsLoaded() && !gamePanel.IsGameRunning())) {
                 project.Save();
             }
             ImGui::EndMenu();
@@ -63,6 +65,7 @@ void MainMenuBar::Show() {
             } 
             ImGui::EndMenu();
         }
+        gamePanel.ShowPlayPause();
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {

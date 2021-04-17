@@ -19,11 +19,12 @@ using namespace Engine;
 
 bool Scene::Load(const string &path) {
     // close project
+    string backup_path(path);
     Close();
 
     try {
         // get scene file path
-        this->path = path;
+        this->path = backup_path;
         name = filesystem::u8path(this->path).stem().string();
         
         // open json file

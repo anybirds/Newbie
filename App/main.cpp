@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     if (!project.Load(pfile)) {
         return 0;
     }
-    window.SetName(project.GetName());
+    window.SetTitle(project.GetName());
 
     // load the start Scene
     Scene &scene = Scene::GetInstance();

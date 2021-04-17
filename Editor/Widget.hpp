@@ -14,10 +14,9 @@ protected:
 
 public:
     static void UpdateRename();
+    static void ShowRename(std::string &str);
 
 public:
     virtual ~Widget() {}
-    virtual void Show() = 0;    
-
-    void ShowRename(std::string &str); 
+    virtual void Show() = 0;
 };

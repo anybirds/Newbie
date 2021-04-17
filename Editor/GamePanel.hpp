@@ -13,6 +13,8 @@ public:
 private:
     GamePanel();
 
+    bool running;
+    bool paused;
     Engine::ATexture *gameTexture;
     Engine::AFramebuffer *gameFramebuffer;
     std::shared_ptr<Engine::Framebuffer> gameFramebufferResource;
@@ -21,7 +23,9 @@ public:
     GamePanel(const GamePanel &) = delete;
     void operator=(const GamePanel &) = delete;
 
+    bool IsGameRunning() { return running; }
     virtual void ShowContents() override;
-    void Render();
+    void ShowPlayPause();
+    void Update();
     void Close();
 };
