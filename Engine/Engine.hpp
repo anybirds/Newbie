@@ -6,6 +6,7 @@
 #include <Entity.hpp>
 #include <GameObject.hpp>
 #include <Group.hpp>
+#include <Input.hpp>
 #include <Project.hpp>
 #include <Resource.hpp>
 #include <Scene.hpp>

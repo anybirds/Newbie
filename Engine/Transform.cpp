@@ -54,6 +54,18 @@ vec3 Transform::GetScale() const {
     return mat3(parent? parent->GetLocalToWorldMatrix() : mat4(1.0f)) * localScale;
 }
 
+vec3 Transform::GetRight() const {
+    return normalize(vec3(GetLocalToWorldMatrix()[0]));
+}
+
+vec3 Transform::GetUp() const {
+    return normalize(vec3(GetLocalToWorldMatrix()[1]));
+}
+
+vec3 Transform::GetForward() const {
+    return normalize(vec3(GetLocalToWorldMatrix()[2]));
+}
+
 void Transform::SetLocalPosition(const glm::vec3 &localPosition) {
     this->localPosition = localPosition;
     Propagate();
@@ -118,3 +130,6 @@ void Transform::RotateAround(const glm::vec3 &axis, float angle) {
     SetLocalRotation(rotate(GetLocalRotation(), radians(angle), axis));
 }
 
+void Transform::Translate(const glm::vec3 &translation) {
+    SetLocalPosition(localPosition + vec3(GetLocalToWorldMatrix() * vec4(translation, 0.0f)));
+}

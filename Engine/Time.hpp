@@ -9,9 +9,6 @@ namespace Engine {
     class ENGINE_EXPORT Time final {
 	public:
         static Time &GetInstance() { static Time time; return time; }
-        static void Init();
-		static void Tick();
-        static float DeltaTime() { return static_cast<float>(GetInstance().dt); }
 
 	private:
         Time() {}
@@ -22,5 +19,9 @@ namespace Engine {
 	public:
         Time(const Time &) = delete;
         void operator=(const Time &) = delete;
+        
+        void Init();
+        void Tick();
+        float GetDeltaTime() { return static_cast<float>(dt); }
 	};
 }

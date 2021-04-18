@@ -26,6 +26,6 @@ public:
     bool IsGameRunning() { return running; }
     virtual void ShowContents() override;
     void ShowPlayPause();
-    void Update();
+    virtual void Update() override;
     void Close();
 };

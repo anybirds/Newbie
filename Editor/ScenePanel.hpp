@@ -18,10 +18,15 @@ private:
     Engine::GameObject *sceneCamera;
     Engine::Camera *cam;
 
+    bool control;
+    float moveSpeed;
+    float rotateSpeed;
+
 public:
     ScenePanel(const ScenePanel &) = delete;
     void operator=(const ScenePanel &) = delete;
 
     virtual void ShowContents() override;
+    virtual void Update() override;
     void Close();
 };

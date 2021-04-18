@@ -12,6 +12,8 @@
 #include <GroupPanel.hpp>
 
 #include <Graphics/Window.hpp>
+#include <Time.hpp>
+#include <Input.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -57,16 +59,21 @@ int main(int argc, char **argv) {
     scenePanel.SetOpen(true);
     assetPanel.SetOpen(true);
     groupPanel.SetOpen(true);
+    
+    Time &time = Time::GetInstance();
+    time.Init();
+    Input &input = Input::GetInstance();
+    input.Init();
 
     while (!window.ShouldClose()) {
         window.PollEvents();
+        time.Tick();
+        input.Update();
 
         // start the imgui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        gamePanel.Update(); // game loop
 
         mainMenuBar.Show();
         gamePanel.Show();

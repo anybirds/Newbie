@@ -43,8 +43,6 @@ void GamePanel::Update() {
     }
 
     if (running) {
-        Time::Tick();
-
         if (paused) {
             scene.Render();
         } else {
@@ -75,8 +73,7 @@ void GamePanel::ShowContents() {
         ImGui::End();
         return;
     }
-
-    Project &project = Project::GetInstance();
+    
     gameFramebufferResource->SetWidth((int)imgSize.x);
     gameFramebufferResource->SetHeight((int)imgSize.y);
 
@@ -95,7 +92,6 @@ void GamePanel::ShowPlayPause() {
         } else {
             open = true;
             scene.Save();
-            Time::Init();
             scene.Start();
         }
         running ^= true;

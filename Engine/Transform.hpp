@@ -37,6 +37,9 @@ NAMESPACE(Engine) {
         glm::vec3 GetPosition() const;
         glm::quat GetRotation() const;
         glm::vec3 GetScale() const;
+        glm::vec3 GetRight() const;
+        glm::vec3 GetUp() const;
+        glm::vec3 GetForward() const;
 
         void SetLocalPosition(const glm::vec3 &localPosition);
         void SetLocalRotation(const glm::quat &localRotation);
@@ -49,6 +52,7 @@ NAMESPACE(Engine) {
 
         void Rotate(const glm::vec3 &eulerAngles);
         void RotateAround(const glm::vec3 &axis, float angle);
+        void Translate(const glm::vec3 &translation);
 
         friend class Scene;
         friend class GameObject;

@@ -38,12 +38,19 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    
+    Time &time = Time::GetInstance();
+    time.Init();
+    Input &input = Input::GetInstance();
+    input.Init();
+
     // game loop
-    Time::Init();
     scene.Start();
     while (!window.ShouldClose()) {
-        Time::Tick();
-        
+        window.PollEvents();
+        time.Tick();
+        input.Update();
+
         scene.Refresh();
         scene.Update();
         scene.Render();
@@ -51,7 +58,6 @@ int main(int argc, char **argv) {
         scene.Delete();
 
 		window.SwapBuffers();
-        window.PollEvents();
     }
 
     window.Close();

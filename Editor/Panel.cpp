@@ -1,6 +1,7 @@
 #include <Panel.hpp>
 
 void Panel::Show() {
+    Update();
     if (!open) {
         return;
     }
