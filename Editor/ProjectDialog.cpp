@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <cstdint>
 
 #include <nlohmann/json.hpp>
 

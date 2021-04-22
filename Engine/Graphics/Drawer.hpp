@@ -1,27 +1,30 @@
 #pragma once
 
+#include <memory>
+
 #include <Component.hpp>
 
 NAMESPACE(Engine) {
-    
-    class Camera;
 
-    CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
-        TYPE(Drawer);
-    
-        PROPERTY_GET(unsigned, order, Order);
-    
-    public:
-        Drawer() : order(0U) {}
-        virtual void Draw(Camera *camera) = 0;
+	class Material;
+	class Mesh;
+	class Renderer;
 
-        void SetOrder(unsigned order);
-    };
-    
-    class DrawerComparer {
-    public:
-        bool operator()(Drawer *l, Drawer *r) const {
-            return l->GetOrder() < r->GetOrder();
-        }
-    };
+	/*
+	Responsible for rendering objects that have Mesh and Material.
+	*/
+	CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
+		TYPE(Drawer);
+
+        // todo: shader properties
+		
+		PROPERTY(std::shared_ptr<Mesh>, mesh, Mesh);
+		PROPERTY(std::shared_ptr<Material>, material, Material);
+
+	public:
+		virtual void Draw(Renderer *renderer);
+
+		virtual void OnEnable() override;
+		virtual void OnDisable() override;
+	};
 }

@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include <Engine.hpp>
 #include <GamePanel.hpp>
 
@@ -42,17 +44,14 @@ void GamePanel::Update() {
         return;
     }
 
-    if (running) {
-        if (paused) {
-            scene.Render();
-        } else {
-            scene.Refresh();
-            scene.Update();
-            scene.Render();
+    if (running && !paused) {
+        scene.Refresh();
+        scene.Update();
+        scene.Render();
 
-            scene.Delete();
-        }
+        scene.Delete();
     } else {
+        scene.Refresh();
         scene.Render();
     }
 }

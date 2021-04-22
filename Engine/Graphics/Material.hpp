@@ -19,11 +19,16 @@ NAMESPACE(Engine) {
     
         PROPERTY(AShader *, vertexShader, VertexShader);
         PROPERTY(AShader *, fragmentShader, FragmentShader);
+        PROPERTY_GET(unsigned, order, Order);
+
+        // todo: move texture to drawer
         PROPERTY(ATexture *, mainTexture, MainTexture);
 
     public:
         AMaterial();
         virtual std::shared_ptr<Resource> GetResource() override;
+
+        void SetOrder(unsigned order);
     };
 
     class ENGINE_EXPORT Material : public Resource {
@@ -39,7 +44,10 @@ NAMESPACE(Engine) {
         virtual ~Material();
         
         virtual void Apply() override;
+        
+        unsigned GetProgram() const { return program; }
 
+        // todo: move shader property functions to drawer
         int GetInteger(const char *name) const;
         std::vector<int> GetIntegerArray(const char *name) const;
         float GetFloat(const char *name) const;
@@ -60,10 +68,9 @@ NAMESPACE(Engine) {
 
         void UseTextures();
 
+        unsigned GetOrder() const { AMaterial *amaterial = (AMaterial *)asset; return amaterial->GetOrder(); }
         std::shared_ptr<Shader> GetVertexShader() const { return vertexShader; }
         std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }
         std::shared_ptr<Texture> GetMainTexture() const { return mainTexture; }
-
-        friend class MeshDrawer;
     };
 }

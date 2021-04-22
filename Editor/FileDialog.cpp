@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <vector>
+#include <cstdint>
 
 #include <FileDialog.hpp>
 

@@ -25,12 +25,11 @@ NAMESPACE(Engine) {
         PROPERTY_NONE_ATTR(glm::mat4, localToWorldMatrix, mutable);
 
     private:
-        std::unordered_set<Transform *> garbages;
-
         void Propagate();
 
     public:
         Transform();
+        virtual ~Transform();
 
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;
@@ -53,7 +52,7 @@ NAMESPACE(Engine) {
         void Rotate(const glm::vec3 &eulerAngles);
         void RotateAround(const glm::vec3 &axis, float angle);
         void Translate(const glm::vec3 &translation);
-
+        
         friend class Scene;
         friend class GameObject;
 	};

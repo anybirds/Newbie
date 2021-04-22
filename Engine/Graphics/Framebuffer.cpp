@@ -87,3 +87,31 @@ void Framebuffer::SetWidth(int width) {
 void Framebuffer::SetHeight(int height) {
     this->height = min(height, maxHeight);
 }
+
+// todo: various format, type support
+vector<uint8_t> Framebuffer::ReadPixels(int x, int y, int width, int height) {
+    if (!colorTexture) {
+        throw exception();
+    }
+
+    vector<uint8_t> ret;
+    int channels;
+    GLenum format;
+    GLenum type = GL_UNSIGNED_BYTE;
+    switch (colorTexture->GetFormat()) {
+        case Texture::RGB:
+            channels = 3;
+            format = GL_RGB;
+            break;
+        case Texture::RGBA:
+            channels = 4;
+            format = GL_RGBA;
+            break;
+        default:
+            throw exception();
+            break;
+    }
+    ret.resize(width * height * channels);
+    glReadPixels(x, y, width, height, format, type, &ret[0]);
+    return ret;
+}

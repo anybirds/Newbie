@@ -69,7 +69,7 @@ NAMESPACE(Engine) {
         Project(const Project &) = delete;
         void operator=(const Project &) = delete;
         
-        bool Load(const std::string &path);
+        bool Load(std::string path);
         bool Save();
         void Close();
 

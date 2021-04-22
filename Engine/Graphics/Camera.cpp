@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include <glm/gtx/transform.hpp>
 
 #include <GameObject.hpp>
 #include <Transform.hpp>
@@ -19,48 +18,30 @@ using namespace Engine;
 
 Framebuffer *Camera::defaultFramebuffer;
 
-Camera::Camera() : 
-    dirty(true), orthographic(false), 
-    fovy(60.0f), aspectRatio(1.0f), nr(0.1f), fr(1000.0f), size(5.0f) {}
-
-const mat4 &Camera::GetNormalization() {
-    if (dirty) {
-        if (orthographic) {
-            normalization = ortho(-size * aspectRatio, size * aspectRatio, -size, size, nr, fr);
-        } else {
-            normalization = perspective(radians(fovy), aspectRatio, nr, fr);
-        }
-        dirty = false;   
-    }
-    return normalization;
-}
-
 void Camera::Render() {
     int width, height;
+    const shared_ptr<Framebuffer> &framebuffer = GetFramebuffer();
     if (framebuffer) {
         width = framebuffer->GetWidth(); height = framebuffer->GetHeight();
         float framebufferAspectRatio = (float)width / height;
-        if (aspectRatio != framebufferAspectRatio) {
-            aspectRatio = framebufferAspectRatio;
-            dirty = true;
+        if (GetAspectRatio() != framebufferAspectRatio) {
+            SetAspectRatio(framebufferAspectRatio);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     } else {
         if (defaultFramebuffer) {
             width = defaultFramebuffer->GetWidth(); height = defaultFramebuffer->GetHeight();
             float framebufferAspectRatio = (float)width / height;
-            if (aspectRatio != framebufferAspectRatio) {
-                aspectRatio = framebufferAspectRatio;
-                dirty = true;
+            if (GetAspectRatio() != framebufferAspectRatio) {
+                SetAspectRatio(framebufferAspectRatio);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer->fbo);
         } else {
             Window &window = Window::GetInstance();
             width = window.GetFramebufferWidth(); height = window.GetFramebufferHeight();
             float windowAspectRatio = (float)width / height;
-            if (aspectRatio != windowAspectRatio) {
-                aspectRatio = windowAspectRatio;
-                dirty = true;
+            if (GetAspectRatio() != windowAspectRatio) {
+                SetAspectRatio(windowAspectRatio);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }

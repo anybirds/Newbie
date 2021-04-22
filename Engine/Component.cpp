@@ -1,9 +1,6 @@
-#include <functional>
-
 #include <Component.hpp>
 #include <GameObject.hpp>
 #include <Transform.hpp>
-#include <Group.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -12,11 +9,16 @@ Transform *Component::GetTransform() const {
     return gameObject->GetTransform();
 }
 
-Group *Component::GetGroup() const {
-    return GetGameObject()->GetGroup();
+bool Component::IsEnabled() const {
+    bool enabled = IsLocalEnabled();
+    Transform *transform = GetTransform();
+    while (transform) {
+        enabled &= transform->IsLocalEnabled();
+        transform = transform->GetParent();
+    }
+    return enabled;
 }
 
-void Component::SetLocalEnabled(bool localEnabled) {
-    this->localEnabled = localEnabled;
-    GetGroup()->dirty = true;
+void Component::OnRemove() {
+    gameObject->components.erase(this);
 }

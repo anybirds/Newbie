@@ -7,7 +7,9 @@ NAMESPACE(Engine) {
         TYPE(Script);
 
     public:
-        virtual void Start() {}
         virtual void Update() {}
+
+        virtual void OnEnable() override;
+        virtual void OnDisable() override;
     };
 }

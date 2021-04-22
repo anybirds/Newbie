@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <GL/glew.h>
 
 #include <Asset.hpp>
@@ -43,16 +45,19 @@ NAMESPACE(Engine) {
 
         virtual void Apply() override;
 
+        GLuint GetId() const { return fbo; }
         int GetMaxWidth() const { return maxWidth; }
         int GetMaxHeight() const { return maxHeight; }
         int GetWidth() const { return width; }
         int GetHeight() const { return height; }
-        GLuint GetId() const { return fbo; }
-        void SetWidth(int width);
-        void SetHeight(int height);
         std::shared_ptr<Texture> GetColorTexture() const { return colorTexture; }
         std::shared_ptr<Texture> GetDepthTexture() const { return depthTexture; }
         bool GetUseDepthRenderTexture() const { AFramebuffer *aframebuffer = (AFramebuffer *)asset; return aframebuffer->GetUseDepthRenderTexture(); }
+
+        void SetWidth(int width);
+        void SetHeight(int height);
+
+        std::vector<uint8_t> ReadPixels(int x, int y, int width = 1, int height = 1);
 
         friend class Camera;
     };

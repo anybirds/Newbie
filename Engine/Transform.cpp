@@ -3,7 +3,7 @@
 
 #include <Transform.hpp>
 #include <GameObject.hpp>
-#include <Group.hpp>
+#include <Scene.hpp>
 
 using namespace std;
 using namespace glm;
@@ -14,6 +14,10 @@ Transform::Transform() :
     localEulerAngles(0.0f), parent(nullptr), dirty(true), 
     localToWorldMatrix(glm::mat4(1.0f)) {}
     
+Transform::~Transform() {
+    delete GetGameObject(); // GameObject follows Transform
+}
+
 void Transform::Propagate() {
     if (dirty) {
         return;
@@ -99,6 +103,7 @@ void Transform::SetScale(const glm::vec3 &scale) {
 }
 
 void Transform::SetParent(Transform *parent) {
+    // prevent cycles in hierarchy
     Transform *p = parent;
     while (p) {
         if (this == p) {
@@ -106,19 +111,19 @@ void Transform::SetParent(Transform *parent) {
         }
         p = p->parent;
     }
-    Group *group = GetGroup();
+    
+    Scene &scene = Scene::GetInstance();
     if (this->parent) {
         this->parent->children.erase(this);
     } else {
-        group->gameObjects.erase(GetGameObject());
+        scene.roots.erase(GetGameObject());
     }
     if (parent) {
         parent->children.insert(this);
     } else {
-        group->gameObjects.insert(GetGameObject());
+        scene.roots.insert(GetGameObject());
     }
-    this->parent = parent;  
-    group->dirty = true;
+    this->parent = parent;
     Propagate();
 }
 

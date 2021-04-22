@@ -1,6 +1,5 @@
 #pragma once 
 
-#include <iostream>
 #include <string>
 
 #include <GL/glew.h>
@@ -44,7 +43,7 @@ namespace Engine {
         int GetMonitorWidth() const { return mwidth; }
         int GetMonitorHeight() const { return mheight; }
         GLFWwindow *GetGlfwWindow() { return window; }
-
+        
         void SetTitle(const std::string &title);
 
         bool ShouldClose();

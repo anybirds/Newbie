@@ -21,6 +21,11 @@ shared_ptr<Resource> AMaterial::GetResource() {
     return sp;
 }
 
+void AMaterial::SetOrder(unsigned order) {
+    this->order = order;
+    // todo: reorder the drawer map 
+}
+
 Material::Material(AMaterial *amaterial) : Resource(amaterial), program(0) {
     Apply();
 }

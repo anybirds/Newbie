@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <cstdint>
 
 #include <Project.hpp>
 #include <Scene.hpp>

@@ -13,13 +13,12 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-bool Project::Load(const string &path) {
+bool Project::Load(string path) {
     // close project
-    string backup_path(path);
     Close();
 
     // resolve name, directory
-    auto fspath = filesystem::absolute(filesystem::u8path(backup_path));
+    auto fspath = filesystem::absolute(filesystem::u8path(path));
     this->path = fspath.u8string();
     name = fspath.filename().stem().u8string();
     directory = fspath.parent_path().u8string();
