@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <Scene.hpp>
+#include <Graphics/Batch.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Shader.hpp>
 #include <Graphics/Texture.hpp>
@@ -21,11 +23,6 @@ shared_ptr<Resource> AMaterial::GetResource() {
     return sp;
 }
 
-void AMaterial::SetOrder(unsigned order) {
-    this->order = order;
-    // todo: reorder the drawer map 
-}
-
 Material::Material(AMaterial *amaterial) : Resource(amaterial), program(0) {
     Apply();
 }
@@ -35,15 +32,36 @@ Material::~Material() {
 }
 
 void Material::Apply() {
+    Resource::Apply();
     AMaterial *amaterial = (AMaterial *)asset;
+    if (order != amaterial->GetOrder()) {
+        // batch reordering
+        Scene &scene = Scene::GetInstance();
+        auto it = scene.batches.find(order);
+        if (it != scene.batches.end()) {
+            vector<Batch *> batches;
+            for (auto &p : it->second) {
+                if (this == p.first.material) {
+                    batches.push_back(p.second);
+                }
+            }
+            for (Batch *batch : batches) {
+                it->second.erase(batch->GetKey());
+            }
+            for (Batch *batch : batches) {
+                scene.batches[amaterial->GetOrder()].insert(make_pair(batch->GetKey(), batch));
+            }
+        }
+    } 
+    order = amaterial->GetOrder();
     if (amaterial->GetVertexShader()) {
         vertexShader =  dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
     }
     if (amaterial->GetFragmentShader()) {
-        fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());    
+        fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
     }
     if (amaterial->GetMainTexture()) {
-        mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());    
+        mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());
     }
     if (!vertexShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';

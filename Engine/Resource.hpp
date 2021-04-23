@@ -12,17 +12,24 @@ namespace Engine {
     Base class for all the resources like Model, Mesh, Material, Shader, Texture and etc.
     */
     class ENGINE_EXPORT Resource {
+    private:
+        uint64_t serial;
+        std::string name;
+        bool removed;
+
     protected:
         Asset *asset; 
 
     public:
         Resource(Asset *asset) : asset(asset) {}
         
-        virtual void Apply() = 0;
+        virtual void Apply();
 
-        const std::string &GetName() const { return asset->GetName(); }
-        void SetName(const std::string &name) { asset->SetName(name); }
-        const uint64_t GetSerial() const { return asset->GetSerial(); }
+        const std::string &GetName() const { return name; }
+        const uint64_t GetSerial() const { return serial; }
+        bool IsRemoved() const { return removed; }
+
+        friend class Asset;
     };
 
     void ENGINE_EXPORT to_json(nlohmann::json &js, const std::shared_ptr<Resource> &resource);

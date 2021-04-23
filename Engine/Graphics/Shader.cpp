@@ -31,6 +31,11 @@ Shader::~Shader() {
 }
 
 void Shader::Apply() {
+    Resource::Apply();
+    AShader *ashader = (AShader *)asset;
+    path = ashader->GetPath();
+    shaderType = ashader->GetShaderType();
+
     glDeleteShader(id);
     id = glCreateShader(GetShaderType());
     if (!id) {

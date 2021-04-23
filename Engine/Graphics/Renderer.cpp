@@ -17,26 +17,30 @@ const mat4 &Renderer::GetNormalization() {
         } else {
             normalization = perspective(radians(fovy), aspectRatio, nr, fr);
         }
-        dirty = false;   
+        dirty = false;
     }
     return normalization;
 }
 
 void Renderer::SetOrder(unsigned order) {
     Scene &scene = Scene::GetInstance();
-    if (scene.renderers.find(this) != scene.renderers.end()) { 
-        scene.renderers.erase(this);
-        this->order = order;
-        scene.renderers.insert(this);   
+    auto it = scene.renderers.find(this->order);
+    if (it != scene.renderers.end()) {
+        auto &rendset = it->second;
+        if (rendset.find(this) != rendset.end()) {
+            rendset.erase(this);
+            this->order = order;
+            rendset.insert(this);
+        }
     }
 }
 
 void Renderer::OnEnable() {
     Scene &scene = Scene::GetInstance();
-    scene.renderers.insert(this);
+    scene.renderers[order].insert(this);
 }
 
 void Renderer::OnDisable() {
     Scene &scene = Scene::GetInstance();
-    scene.renderers.erase(this);
+    scene.renderers[order].erase(this);
 }

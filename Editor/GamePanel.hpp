@@ -21,7 +21,7 @@ private:
 
 public:
     GamePanel(const GamePanel &) = delete;
-    void operator=(const GamePanel &) = delete;
+    GamePanel &operator=(const GamePanel &) = delete;
 
     bool IsGameRunning() { return running; }
     virtual void ShowContents() override;

@@ -28,6 +28,8 @@ NAMESPACE(Engine) {
     Framebuffer that can have multiple texture attachments 
     */
     class ENGINE_EXPORT Framebuffer : public Resource {
+        PROPERTY_GET(bool, useDepthRenderTexture, UseDepthRenderTexture);
+
     private:
         std::shared_ptr<Texture> colorTexture;
         std::shared_ptr<Texture> depthTexture;
@@ -52,7 +54,6 @@ NAMESPACE(Engine) {
         int GetHeight() const { return height; }
         std::shared_ptr<Texture> GetColorTexture() const { return colorTexture; }
         std::shared_ptr<Texture> GetDepthTexture() const { return depthTexture; }
-        bool GetUseDepthRenderTexture() const { AFramebuffer *aframebuffer = (AFramebuffer *)asset; return aframebuffer->GetUseDepthRenderTexture(); }
 
         void SetWidth(int width);
         void SetHeight(int height);

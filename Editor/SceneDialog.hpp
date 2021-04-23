@@ -4,7 +4,7 @@
 
 class SceneDialog : public Dialog {
 private:
-    static const std::string &GetEmptyScene();
+    static const std::string &GetEmptyScenePath();
 
 public:
     static SceneDialog &GetInstance() { static SceneDialog sceneDialog; return sceneDialog; }
@@ -18,7 +18,7 @@ private:
     
 public:
     SceneDialog(const SceneDialog &) = delete;
-    void operator=(const SceneDialog &) = delete;
+    SceneDialog &operator=(const SceneDialog &) = delete;
 
     virtual void ShowContents() override;
     void SetNewScene() { newScene = true; }

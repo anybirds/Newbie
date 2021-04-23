@@ -29,6 +29,10 @@ Model::~Model() {
 }
 
 void Model::Apply() {
+    Resource::Apply();
+    AModel *amodel = (AModel *)asset;
+    path = amodel->GetPath();
+    
     if (importer) {
         delete importer;
     }

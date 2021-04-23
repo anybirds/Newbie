@@ -21,13 +21,20 @@ NAMESPACE(Engine) {
         PROPERTY_GET(uint64_t, serial, Serial);
         PROPERTY(std::string, name, Name);
         
+    private:
+        bool removed;
+
     protected:
         std::weak_ptr<Resource> resource;
 
     public:
+        Asset() : removed(false) {}
+
         void Apply();
         virtual std::shared_ptr<Resource> GetResource() = 0;
         
+        bool IsRemoved() const { return removed; }
+        void SetRemoved(bool removed);
         std::string &GetName() { return name; }
         
         friend class Project;

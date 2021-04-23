@@ -43,11 +43,4 @@ NAMESPACE(Engine) {
         virtual void OnEnable() override;
         virtual void OnDisable() override;
     };
-    
-    class RendererComparer {
-    public:
-        bool operator()(Renderer *l, Renderer *r) const {
-            return l->GetOrder() < r->GetOrder();
-        }
-    };
 }

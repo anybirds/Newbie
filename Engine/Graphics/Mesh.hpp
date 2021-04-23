@@ -25,6 +25,8 @@ NAMESPACE(Engine) {
     Represents a wireframe in the object space.
     */
     class ENGINE_EXPORT Mesh : public Resource {
+        PROPERTY_GET(uint32_t, index, Index);
+
     private:
         std::shared_ptr<Model> model;
         
@@ -47,7 +49,6 @@ NAMESPACE(Engine) {
         unsigned GetVertexCount() const { return vcnt; }
         unsigned GetElementCount() const { return icnt; }
         unsigned GetFaceCount() const { return icnt / 3; }
-        uint32_t GetIndex() const { AMesh *amesh = (AMesh *)asset; return amesh->GetIndex(); }
         std::shared_ptr<Model> GetModel() const { return model; }
     };
 }

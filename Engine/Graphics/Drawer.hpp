@@ -18,13 +18,16 @@ NAMESPACE(Engine) {
 
         // todo: shader properties
 		
-		PROPERTY(std::shared_ptr<Mesh>, mesh, Mesh);
-		PROPERTY(std::shared_ptr<Material>, material, Material);
+		PROPERTY_GET(std::shared_ptr<Mesh>, mesh, Mesh);
+		PROPERTY_GET(std::shared_ptr<Material>, material, Material);
 
 	public:
 		virtual void Draw(Renderer *renderer);
 
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
+
+		void SetMesh(const std::shared_ptr<Mesh> &mesh);
+		void SetMaterial(const std::shared_ptr<Material> &material);
 	};
 }

@@ -13,12 +13,12 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-const string &ProjectDialog::GetProjectsFile() {
+const string &ProjectDialog::GetProjectsPath() {
     static std::string projectsFile(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 
     return projectsFile; 
 }
 
-const string &ProjectDialog::GetEmptyProject() {
+const string &ProjectDialog::GetEmptyProjectPath() {
     static std::string emptyProject(std::string(NEWBIE_PATH) + "/Samples/Empty");
     return emptyProject;
 }
@@ -28,7 +28,7 @@ ProjectDialog::ProjectDialog() : Dialog("Open Project") {
     width = 600.0f;
 
     try {
-        ifstream fs(GetProjectsFile());
+        ifstream fs(GetProjectsPath());
         if (fs.fail()) {
             throw exception();
         }
@@ -36,7 +36,7 @@ ProjectDialog::ProjectDialog() : Dialog("Open Project") {
         fs >> js;
         projects = js.get<std::unordered_set<std::string>>();
     } catch (...) {
-        ofstream fs(GetProjectsFile());
+        ofstream fs(GetProjectsPath());
         json js = std::unordered_set<std::string>();
         fs << js;
     }
@@ -44,14 +44,14 @@ ProjectDialog::ProjectDialog() : Dialog("Open Project") {
 
 void ProjectDialog::AddProject(const string &dir) {
     projects.insert(dir);
-    ofstream fs(GetProjectsFile());
+    ofstream fs(GetProjectsPath());
     json js(projects);
     fs << js;
 }
 
 void ProjectDialog::RemoveProject(const string &dir) {
     projects.erase(dir);
-    ofstream fs(GetProjectsFile());
+    ofstream fs(GetProjectsPath());
     json js(projects);
     fs << js;
 }
@@ -163,7 +163,7 @@ void ProjectDialog::ShowContents() {
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
             if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(GetEmptyProject()));
+                auto sample(filesystem::u8path(GetEmptyProjectPath()));
                 auto created(filesystem::u8path(location + "/" + name));
                 try {
                     // copy files from "Samples/Empty" (non-recursive)

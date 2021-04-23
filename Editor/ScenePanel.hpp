@@ -47,7 +47,7 @@ private:
     
 public:
     ScenePanel(const ScenePanel &) = delete;
-    void operator=(const ScenePanel &) = delete;
+    ScenePanel &operator=(const ScenePanel &) = delete;
 
     virtual void ShowContents() override;
     virtual void Update() override;

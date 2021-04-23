@@ -23,7 +23,7 @@ namespace Engine {
         };
 
         Input(const Input &) = delete;
-        void operator=(const Input &) = delete;
+        Input &operator=(const Input &) = delete;
         
         void Init();
         void Update();

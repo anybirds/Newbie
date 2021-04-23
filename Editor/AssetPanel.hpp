@@ -12,7 +12,7 @@ private:
     
 public:
     AssetPanel(const AssetPanel &) = delete;
-    void operator=(const AssetPanel &) = delete;
+    AssetPanel &operator=(const AssetPanel &) = delete;
     
     virtual void ShowContents() override;
 };

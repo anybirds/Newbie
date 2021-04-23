@@ -7,7 +7,7 @@
 #include <Graphics/Camera.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
-#include <Graphics/Drawer.hpp>
+#include <Graphics/Batch.hpp>
 #include <Graphics/Framebuffer.hpp>
 #include <Graphics/Texture.hpp>
 #include <Graphics/Window.hpp>
@@ -67,9 +67,9 @@ void Camera::Render() {
     glCullFace(GL_BACK);
 
     Scene &scene = Scene::GetInstance();
-    for (Drawer *drawer : scene.drawers) {
-        if (drawer->IsEnabled()) {
-            drawer->Draw(this);
+    for (auto &order : scene.GetAllBatches()) {
+        for (auto &batch : order.second) {
+            batch.second->Draw(this);
         }
     }
 

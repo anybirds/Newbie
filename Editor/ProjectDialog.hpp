@@ -27,7 +27,7 @@ private:
 
 public:
     ProjectDialog(const ProjectDialog &) = delete;
-    void operator=(const ProjectDialog &) = delete;
+    ProjectDialog &operator=(const ProjectDialog &) = delete;
 
     void ShowContents();
     void SetNewProject() { newProject = true; }

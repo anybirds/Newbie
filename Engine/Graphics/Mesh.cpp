@@ -34,7 +34,9 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Apply() {
-    AMesh *amesh = (AMesh *)asset; 
+    Resource::Apply();
+    AMesh *amesh = (AMesh *)asset;
+    index = amesh->GetIndex();
     if (amesh->GetModel()) {
         model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());    
     }

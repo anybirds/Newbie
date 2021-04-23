@@ -13,7 +13,7 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-bool Project::Load(string path) {
+bool Project::Load(const string &path) {
     // close project
     Close();
 
@@ -150,6 +150,11 @@ bool Project::Save() {
         // write assets
         json &assets = js["assets"];
         for (auto &p : this->assets) {
+            // ignore removed assets
+            if (p.second->IsRemoved()) {
+                continue;
+            }
+        
             Type *type = p.second->GetType();
             type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
         }
@@ -175,25 +180,16 @@ void Project::Close() {
     // close scene
     Scene &scene = Scene::GetInstance();
     scene.Close();
+    Scene &backup = Scene::GetBackup();
+    backup.Close();
 
     // clear out members
-    path.clear();
-    directory.clear();
-    name.clear();
-    libpath.clear();
     if (setting) {
         delete setting;
-        setting = nullptr;
     }
-    scenes.clear();
     for (auto &p : assets) {
         delete p.second;
     }
-    assets.clear(); 
-    for (Asset *garbage : garbages) {
-        delete garbage;
-    }
-    garbages.clear();
 
     // clear out lib and types
     if (lib) {
@@ -203,19 +199,9 @@ void Project::Close() {
 #else
         dlclose(lib);
 #endif
-        lib = nullptr;
-        init = nullptr;
-        clear = nullptr;
-    }
+    }  
 
-    loaded = false;
+    *this = Project();
+
     cerr << '[' << __FUNCTION__ << ']' << " close project done.\n";
-}
-
-void Project::RemoveAsset(Asset *asset) {
-    auto it = assets.find(asset->GetSerial());
-    if (it != assets.end()) {
-        assets.erase(it);
-        garbages.insert(it->second);
-    }
 }

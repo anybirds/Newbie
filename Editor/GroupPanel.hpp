@@ -13,7 +13,7 @@ private:
     
 public:
     GroupPanel(const GroupPanel &) = delete;
-    void operator=(const GroupPanel &) = delete;
+    GroupPanel &operator=(const GroupPanel &) = delete;
 
     virtual void ShowContents();
 };

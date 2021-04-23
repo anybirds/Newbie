@@ -18,16 +18,16 @@ NAMESPACE(Engine) {
     };
 
     class ENGINE_EXPORT Model : public Resource {
+        PROPERTY_GET(std::string, path, Path);
+
     private:
         Assimp::Importer *importer;
-    
+
     public:
         Model(AModel *amodel);
         virtual ~Model();
 
         virtual void Apply() override;
-
-        const std::string &GetPath() const { AModel *amodel = (AModel *)asset; return amodel->GetPath(); }
 
         friend class Scene;
         friend class Mesh;

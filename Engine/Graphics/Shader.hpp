@@ -20,9 +20,12 @@ NAMESPACE(Engine) {
     };
 
     class ENGINE_EXPORT Shader : public Resource {
+        PROPERTY_GET(std::string, path, Path);
+        PROPERTY_GET(unsigned, shaderType, ShaderType);
+        
     private:
         GLuint id;
-        
+
     public:
         enum { VERTEX = GL_VERTEX_SHADER, FRAGMENT = GL_FRAGMENT_SHADER };
 
@@ -32,7 +35,5 @@ NAMESPACE(Engine) {
         virtual void Apply() override;
 
         GLuint GetId() const { return id; }
-        const std::string &GetPath() const { AShader *ashader = (AShader *)asset; return ashader->GetPath(); }
-        unsigned GetShaderType() const { AShader *ashader = (AShader *)asset; return ashader->GetShaderType(); }
     };
 }

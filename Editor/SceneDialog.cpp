@@ -10,7 +10,7 @@
 using namespace std;
 using namespace Engine;
 
-const string &SceneDialog::GetEmptyScene() {
+const string &SceneDialog::GetEmptyScenePath() {
     static std::string emptyScene(string(NEWBIE_PATH) + "/Samples/Empty/Main.json");
     return emptyScene;
 }
@@ -112,7 +112,7 @@ void SceneDialog::ShowContents() {
         ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
         if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
             if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(GetEmptyScene()));
+                auto sample(filesystem::u8path(GetEmptyScenePath()));
                 auto created(filesystem::u8path(location + "/" + name));
                 try {
                     // copy file "Samples/Empty/Main.json"

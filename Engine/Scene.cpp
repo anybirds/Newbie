@@ -17,31 +17,50 @@ using json = nlohmann::json;
 using namespace std;
 using namespace Engine;
 
-Scene Scene::backup;
-
-void Scene::SaveBackup() {
-
+void Scene::ToBackup() {
+    Scene &scene = GetInstance();
+    Scene &backup = GetBackup();
+    backup.CloseImmediate();
+    backup = scene;
+    scene = Scene();
 }
 
-void Scene::LoadBackup() {
-
+void Scene::FromBackup() {
+    Scene &scene = GetInstance();
+    Scene &backup = GetBackup();
+    scene.CloseImmediate();
+    scene = backup;
+    backup = Scene();
 }
 
-bool Scene::Load(string path) {
-    // close project
-    Close();
+bool Scene::Load(const string &path) {
+    flags |= LOAD;
+    this->loadPath = path;
+}
 
+bool Scene::Save() {
+    flags |= SAVE;
+}
+
+void Scene::Close() {
+    flags |= CLOSE;
+}
+
+bool Scene::LoadImmediate(const string &path) {
     try {
+        // open json file
+        ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
+        if (fs.fail()) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file: " << path << '\n';
+            return false;
+        }
+
+        // move to backup in order to maintain duplicate resource and handle failure cases
+        ToBackup();
+
         // get scene file path
         this->path = path;
         name = filesystem::u8path(this->path).stem().string();
-        
-        // open json file
-        ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + this->path));
-        if (fs.fail()) {
-            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene file: " << this->path << '\n';
-            return false;
-        }
 
         // read json object
         json js;
@@ -64,7 +83,17 @@ bool Scene::Load(string path) {
                 for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                     Drawer *drawer = (Drawer *)Entity::temp.at(stoll(j.key()));
                     type->Deserialize(j.value(), (Entity *)drawer);
-                    batches[BatchKey{drawer->GetMesh().get(), drawer->GetMaterial().get()}].GetDrawers().insert(drawer);
+                    Batch *batch;
+                    BatchKey key{drawer->GetMesh().get(), drawer->GetMaterial().get()};
+                    auto &batchmap = batches[drawer->GetMaterial()->GetOrder()];
+                    auto it = batchmap.find(key);
+                    if (it == batchmap.end()) {
+                        batch = new Batch(key);
+                        batchmap.insert(make_pair(key, batch));
+                    } else {
+                        batch = it->second;
+                    }
+                    batch->AddDrawer(drawer);
                 }
             } else {
                 for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
@@ -83,16 +112,18 @@ bool Scene::Load(string path) {
         Entity::temp.clear();
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << name << '\n';
-        Close();
+        FromBackup();
         return false;
     }
     
+    GetBackup().CloseImmediate();
+
     loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read scene: " << name << " done.\n";
     return true;
 }
 
-bool Scene::Save() {
+bool Scene::SaveImmediate() {
     try {
         json js;
 
@@ -105,12 +136,22 @@ bool Scene::Save() {
         // write entities
         json& entities = js["entities"];
         function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
+            // ignore removed GameObjects
+            if (gameObject->IsRemoved()) {
+                return;
+            }
+
             Transform *transform = gameObject->GetTransform();
             for (Transform *t : transform->children) {
                 recurse(t->GetGameObject());
             }
 
             for (Component *component : gameObject->components) {
+                // ignore removed Components
+                if (component->IsRemoved()) {
+                    continue;
+                }
+
                 Type *type = component->GetType();
                     type->Serialize(
                         entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
@@ -138,7 +179,6 @@ bool Scene::Save() {
         fs << js;
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << name << '\n';
-        Close();
         return false;
     }
 
@@ -146,19 +186,34 @@ bool Scene::Save() {
     return true;
 }
 
-void Scene::Close() {
-    name.clear();
-    path.clear();
+void Scene::CloseImmediate() {
     if (setting) {
         delete setting;
-        setting = nullptr;
     }
-    for (GameObject *root : roots) {
-        delete root;
-    }
-    roots.clear();
+    
+    function<void(GameObject *)> recurse = [this, &recurse](GameObject *gameObject) {
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->GetChildren()) {
+            recurse(t->GetGameObject());
+        }
 
-    loaded = false;
+        auto components = gameObject->components;
+        for (Component *component : components) {
+            delete component;
+        }
+    };
+    for (GameObject *root : roots) {
+        recurse(root);
+    }
+
+    for (auto &order : batches) {
+        for (auto &batch : order.second) {
+            delete batch.second;
+        }
+    }
+
+    *this = Scene();
+
     cerr << '[' << __FUNCTION__ << ']' << " close scene done\n";
 }
 
@@ -192,6 +247,19 @@ GameObject *Scene::FindGameObject(const string &name) {
     return nullptr;
 }
 
+void Scene::Flags() {
+    if (flags | CLOSE) {
+        CloseImmediate();
+    }
+    if (flags | LOAD) {
+        LoadImmediate(loadPath);
+    }
+    if (flags | SAVE) {
+        SaveImmediate();
+    }
+    flags = 0U; 
+}
+
 void Scene::Enable() {
     for (Component *component : enables) {
         try {
@@ -222,14 +290,8 @@ void Scene::Remove() {
             component->OnRemove();
         } catch(...) {}
     }
-}
-
-void Scene::Destroy() {
     for (Component *component : removes) {
-        try {
-            component->OnDestroy();
-            delete component;
-        } catch(...) {}
+        delete component;
     }
 }
 
@@ -242,21 +304,25 @@ void Scene::Update() {
 }
 
 void Scene::Render() {
-    for (Renderer *renderer : renderers) {
-        try {
-            renderer->Render();
-        } catch(...) {}
+    for (auto &order : renderers) {
+        for (Renderer *renderer : order.second) {
+            try {
+                renderer->Render();
+            } catch(...) {}
+        }
     }
 }
 
 void Scene::PauseLoop() {
+    Flags();
+
     enables.clear();
     disables.clear();
 
     function<void(GameObject *, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled) {
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
-            recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());    
+            recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());
         }
 
         for (Component *component : gameObject->components) {
@@ -281,15 +347,20 @@ void Scene::PauseLoop() {
 }
 
 void Scene::PlayLoop() {
+    Flags();
+
     adds.clear();
     removes.clear();
     enables.clear();
     disables.clear();
 
-    function<void(GameObject *, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled) {
+    function<void(GameObject *, bool, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool added, bool removed) {
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
-            recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());    
+            recurse(t->GetGameObject(), 
+                enabled && t->IsLocalEnabled(), 
+                added || (t->flags & Component::Add), 
+                removed || (t->flags & Component::Remove));
         }
 
         for (Component *component : gameObject->components) {
@@ -301,22 +372,21 @@ void Scene::PlayLoop() {
                 disables.push_back(component);
                 component->enabled = false;
             }
-            if (component->flags & Component::Add) {
+            if (added || (component->flags & Component::Add)) {
                 adds.push_back(component);
             }
-            if (component->flags & Component::Remove) {
+            if (removed || (component->flags & Component::Remove)) {
                 removes.push_back(component);
             }
         }
     };
 
     for (GameObject *root : roots) {
-        recurse(root, true);
+        recurse(root, true, false, false);
     }
 
     Disable();
     Remove();
-    Destroy();
     Add();
     Enable();
     Update();

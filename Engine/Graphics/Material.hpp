@@ -19,7 +19,7 @@ NAMESPACE(Engine) {
     
         PROPERTY(AShader *, vertexShader, VertexShader);
         PROPERTY(AShader *, fragmentShader, FragmentShader);
-        PROPERTY_GET(unsigned, order, Order);
+        PROPERTY(unsigned, order, Order);
 
         // todo: move texture to drawer
         PROPERTY(ATexture *, mainTexture, MainTexture);
@@ -27,11 +27,11 @@ NAMESPACE(Engine) {
     public:
         AMaterial();
         virtual std::shared_ptr<Resource> GetResource() override;
-
-        void SetOrder(unsigned order);
     };
 
     class ENGINE_EXPORT Material : public Resource {
+        PROPERTY_GET(unsigned, order, Order);
+
     private:
         std::shared_ptr<Shader> vertexShader;
         std::shared_ptr<Shader> fragmentShader;
@@ -68,7 +68,6 @@ NAMESPACE(Engine) {
 
         void UseTextures();
 
-        unsigned GetOrder() const { AMaterial *amaterial = (AMaterial *)asset; return amaterial->GetOrder(); }
         std::shared_ptr<Shader> GetVertexShader() const { return vertexShader; }
         std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }
         std::shared_ptr<Texture> GetMainTexture() const { return mainTexture; }

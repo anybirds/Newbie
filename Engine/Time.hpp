@@ -5,23 +5,23 @@
 namespace Engine {
     /*
     static class that manages time by utilizing glfw functions.
-	*/
+    */
     class ENGINE_EXPORT Time final {
-	public:
+    public:
         static Time &GetInstance() { static Time time; return time; }
 
-	private:
+    private:
         Time() {}
         
         double dt;
         double prev;
 
-	public:
+    public:
         Time(const Time &) = delete;
-        void operator=(const Time &) = delete;
+        Time &operator=(const Time &) = delete;
         
         void Init();
         void Tick();
         float GetDeltaTime() { return static_cast<float>(dt); }
-	};
+    };
 }

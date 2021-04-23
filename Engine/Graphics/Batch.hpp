@@ -2,7 +2,6 @@
 
 #include <unordered_set>
 
-#include <Entity.hpp>
 #include <Graphics/Material.hpp>
 
 namespace Engine {
@@ -10,27 +9,26 @@ namespace Engine {
     class Mesh;
     class Material;
     class Drawer;
-
+    class Renderer;
+    
     struct BatchKey {
         Mesh *mesh;
         Material *material;
     };
     
-    class Batch : public Entity {
+    class Batch {
     private:
         BatchKey key;
         std::unordered_set<Drawer *> drawers;
     
     public:
-        std::unordered_set<Drawer *> &GetDrawers() { return drawers; }
-        void Refresh();
-        void Add(Drawer *drawer);
-        void Remove(Drawer *drawer);
-    };
+        Batch(const BatchKey &key) : key(key) {}
+        virtual ~Batch();
 
-    class BatchComparer {
-        bool operator()(const BatchKey &l, const BatchKey &r) {
-            return l.material->GetOrder() < r.material->GetOrder();
-        }
+        const BatchKey &GetKey() const { return key; }
+        void Refresh();
+        void AddDrawer(Drawer *drawer);
+        void RemoveDrawer(Drawer *drawer);
+        void Draw(Renderer *renderer);
     };
 }

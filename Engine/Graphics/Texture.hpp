@@ -29,9 +29,18 @@ NAMESPACE(Engine) {
 	Represents a texture that has been created by loading images.
 	*/
     class ENGINE_EXPORT Texture : public Resource {
+        PROPERTY_GET(std::string, path, Path);
+        PROPERTY_GET(int, width, Width);
+        PROPERTY_GET(int, height, Height);
+        PROPERTY_GET(unsigned, format, Format);
+        PROPERTY_GET(int, horizontalWrap, HorizontalWrap);
+        PROPERTY_GET(int, verticalWrap, VerticalWrap);
+        PROPERTY_GET(int, minFilter, MinFilter);
+        PROPERTY_GET(int, magFilter, MagFilter);
+        
     private:
         GLuint id;
-        
+
     public:
         enum { 
             NEAREST = GL_NEAREST, LINEAR = GL_LINEAR, 
@@ -46,13 +55,5 @@ NAMESPACE(Engine) {
         virtual void Apply() override;
 
         int GetId() const { return id; }
-        const std::string &GetPath() const { ATexture *atexture = (ATexture *)asset; return atexture->GetPath(); }
-        int GetWidth() const { ATexture *atexture = (ATexture *)asset; return atexture->GetWidth(); }
-        int GetHeight() const { ATexture *atexture = (ATexture *)asset; return atexture->GetHeight(); }
-        int GetFormat() const { ATexture *atexture = (ATexture *)asset; return atexture->GetFormat(); }
-        int GetHorizontalWrap() const { ATexture *atexture = (ATexture *)asset; return atexture->GetHorizontalWrap(); }
-        int GetVerticalWrap() const { ATexture *atexture = (ATexture *)asset; return atexture->GetVerticalWrap(); }
-        int GetMinFilter() const { ATexture *atexture = (ATexture *)asset; return atexture->GetMinFilter(); }
-        int GetMagFilter() const { ATexture *atexture = (ATexture *)asset; return atexture->GetMagFilter(); }
     };
 }

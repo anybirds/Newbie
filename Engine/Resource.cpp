@@ -23,3 +23,8 @@ namespace Engine {
         }
     }
 }
+
+void Resource::Apply() {
+    serial = asset->GetSerial();
+    name = asset->GetName();
+}

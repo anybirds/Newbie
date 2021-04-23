@@ -30,12 +30,14 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::Apply() {
+    Resource::Apply();
     AFramebuffer *aframebuffer = (AFramebuffer *)asset;
+    useDepthRenderTexture = aframebuffer->GetUseDepthRenderTexture();
     if (aframebuffer->GetColorTexture()) {
-        colorTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetColorTexture()->GetResource());    
+        colorTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetColorTexture()->GetResource());
     }
     if (aframebuffer->GetDepthTexture()) {
-        depthTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetDepthTexture()->GetResource());    
+        depthTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetDepthTexture()->GetResource());
     }
 
     glDeleteFramebuffers(1, &fbo);
@@ -67,7 +69,7 @@ void Framebuffer::Apply() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         cerr << '[' << __FUNCTION__ << ']' << " incomplete Framebuffer: " << GetName() << '\n';
         glDeleteFramebuffers(1, &fbo);
-        throw exception();    
+        throw exception();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

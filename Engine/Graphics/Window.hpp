@@ -33,7 +33,7 @@ namespace Engine {
 
     public:
         Window(const Window &) = delete;
-        void operator=(const Window &) = delete;
+        Window &operator=(const Window &) = delete;
 
         const std::string &GetTitle() const { return title; }
         int GetWidth() const { return width; }

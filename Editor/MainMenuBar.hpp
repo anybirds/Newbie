@@ -11,7 +11,7 @@ private:
 
 public:
     MainMenuBar(const MainMenuBar &) = delete;
-    void operator=(const MainMenuBar &) = delete;
+    MainMenuBar &operator=(const MainMenuBar &) = delete;
 
     virtual void Show() override;
 };

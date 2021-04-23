@@ -26,7 +26,7 @@ NAMESPACE(Engine) {
             Remove = 1 << 1, // to be removed?
         };
         void SetFlags(uint8_t flags) { this->flags |= flags; }
-        void ClearFlags() { flags = 0; }
+        void ClearFlags() { flags = 0U; }
         
     public:
         Component() : flags(Add), localEnabled(true), enabled(false), gameObject(nullptr) {}
@@ -42,7 +42,6 @@ NAMESPACE(Engine) {
         virtual void OnDisable() {}
         virtual void OnAdd() {}
         virtual void OnRemove();
-        virtual void OnDestroy() {}
 
         friend class Scene;
 		friend class GameObject;

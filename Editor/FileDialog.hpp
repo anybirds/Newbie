@@ -18,7 +18,7 @@ private:
 
 public:
     FileDialog(const FileDialog &) = delete;
-    void operator=(const FileDialog &) = delete;
+    FileDialog &operator=(const FileDialog &) = delete;
 
     virtual void ShowContents() override;
 

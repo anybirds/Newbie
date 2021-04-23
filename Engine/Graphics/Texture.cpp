@@ -36,9 +36,19 @@ Texture::~Texture() {
 }
 
 void Texture::Apply() {
+    Resource::Apply();
+    ATexture *atexture = (ATexture *)asset;
+    path = atexture->GetPath();
+    width = atexture->GetWidth();
+    height = atexture->GetHeight();
+    format = atexture->GetFormat();
+    horizontalWrap = atexture->GetHorizontalWrap();
+    verticalWrap = atexture->GetVerticalWrap();
+    minFilter = atexture->GetMinFilter();
+    magFilter = atexture->GetMagFilter();
+    
     glDeleteTextures(1, &id);
 
-    ATexture *atexture = (ATexture *)asset;
     unsigned char *image = nullptr;
     if (!GetPath().empty()) {
         stbi_set_flip_vertically_on_load(true);

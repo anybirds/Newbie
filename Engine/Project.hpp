@@ -16,7 +16,6 @@
 
 #include <Entity.hpp>
 #include <Asset.hpp>
-#include <Type.hpp>
 
 NAMESPACE(Engine) {
     
@@ -40,7 +39,8 @@ NAMESPACE(Engine) {
         static Project &GetInstance() { static Project project; return project; }
         
     private:
-        Project() {}
+        Project() : loaded(false), lib(nullptr), init(nullptr), clear(nullptr), setting(nullptr) {}
+        Project &operator=(const Project &) = default;
 
         bool loaded;
         typedef void (*func)();
@@ -63,13 +63,10 @@ NAMESPACE(Engine) {
         std::unordered_set<std::string> scenes;
         std::unordered_map<uint64_t, Asset *> assets;
 
-        std::unordered_set<Asset *> garbages;
-
     public:
         Project(const Project &) = delete;
-        void operator=(const Project &) = delete;
         
-        bool Load(std::string path);
+        bool Load(const std::string &path);
         bool Save();
         void Close();
 
@@ -99,7 +96,7 @@ NAMESPACE(Engine) {
             assets.insert({asset->serial, asset});
             return asset;
         }
-        void RemoveAsset(Asset *asset);
+        void RemoveAsset(Asset *asset) { asset->SetRemoved(true); assets.erase(asset->GetSerial()); delete asset; }
 
         friend class Scene;
     };

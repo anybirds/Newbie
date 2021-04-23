@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <set>
 #include <unordered_set>
@@ -23,15 +24,25 @@ NAMESPACE(Engine) {
     Abstraction of a scene that has multiple Groups of GameObjects.
     */
     class ENGINE_EXPORT Scene final {
+    private:
+        static void ToBackup();
+        static void FromBackup();
+
     public:
         static Scene &GetInstance() { static Scene scene; return scene; }
-
-        static Scene backup;
-        static void SaveBackup();
-        static void LoadBackup();
+        static Scene &GetBackup() { static Scene backup; return backup; }
  
     private:
-        Scene() {}
+        Scene() : flags(0U), loaded(false), setting(nullptr) {}
+        Scene &operator=(const Scene &) = default;
+
+        enum {
+            LOAD = 1,
+            SAVE = 1 << 1,
+            CLOSE = 1 << 2,
+        };
+        uint8_t flags;
+        std::string loadPath;
 
         bool loaded;
         std::string name;
@@ -39,19 +50,20 @@ NAMESPACE(Engine) {
         SceneSetting *setting;
         std::unordered_set<GameObject *> roots;
         std::unordered_set<Script *> scripts;
-        std::multiset<Renderer *, RendererComparer> renderers;
-        std::map<BatchKey, Batch, BatchComparer> batches;
+        std::map<int, std::set<Renderer *>> renderers;
+        std::map<int, std::map<BatchKey, Batch *>> batches;
         
         std::vector<Component *> adds;
         std::vector<Component *> removes;
         std::vector<Component *> enables;
         std::vector<Component *> disables;
 
+        void Flags();
+        
         void Enable();
         void Disable();
         void Add();
         void Remove();
-        void Destroy();
 
         void Start();
         void Update();
@@ -59,17 +71,20 @@ NAMESPACE(Engine) {
 
     public:
         Scene(const Scene &) = delete;
-        void operator=(const Scene &) = delete;
 
-        bool Load(std::string path);
+        bool Load(const std::string &path);
         bool Save();
         void Close();
+        bool LoadImmediate(const std::string &path);
+        bool SaveImmediate();
+        void CloseImmediate();
 
         bool IsLoaded() const { return loaded; }
         const std::string &GetName() const { return name; }
         const std::string &GetPath() const { return path; }
         SceneSetting *GetSetting() const { return setting; }
         
+        const std::map<int, std::map<BatchKey, Batch *>> &GetAllBatches() const { return batches; }
         const std::unordered_set<GameObject *> &GetRootGameObjects() const { return roots; }
         GameObject *AddGameObject();
         GameObject *AddGameObject(GameObject *gameObject);
@@ -84,5 +99,6 @@ NAMESPACE(Engine) {
         friend class Script;
         friend class Renderer;
         friend class Drawer;
+        friend class Material;
     };
 }
