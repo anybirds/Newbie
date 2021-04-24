@@ -16,11 +16,14 @@ void RotateScript::Update() {
         drawer->SetLocalEnabled(true);
     }
 
-    // mad recursive copy every frame
-    Scene &scene = Scene::GetInstance();
-    GameObject *square = scene.FindGameObject("square");
-    GameObject *child = square->AddGameObject(square);
-    child->GetTransform()->SetLocalPosition(vec3(0.0f, 0.0f, 1.0f));
-    GameObject *copy = scene.AddGameObject(square);
-    copy->GetTransform()->SetLocalPosition(vec3(0.0f, 5.0f, 0.0f));
+    if (copy) {
+        Scene &scene = Scene::GetInstance();
+        GameObject *square = scene.FindGameObject("square");
+        GameObject *child = square->AddGameObject(square);
+        child->SetName("child");
+        child->GetTransform()->SetLocalPosition(vec3(0.0f, 0.0f, 1.0f));
+        GameObject *copyed = scene.AddGameObject(square);
+        copyed->GetTransform()->SetLocalPosition(vec3(0.0f, 5.0f, 0.0f));
+        copy = false;
+    }
 }

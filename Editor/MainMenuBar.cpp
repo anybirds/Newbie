@@ -38,10 +38,10 @@ void MainMenuBar::Show() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Scene", project.IsLoaded())) {
-            if (ImGui::MenuItem("New")) {
+            if (ImGui::MenuItem("New", nullptr, nullptr, !gamePanel.IsGameRunning())) {
                 scene_new = true;
             }
-            if (ImGui::MenuItem("Open")) {
+            if (ImGui::MenuItem("Open", nullptr, nullptr, !gamePanel.IsGameRunning())) {
                 scene_open = true;
             }
             ImGui::EndMenu();

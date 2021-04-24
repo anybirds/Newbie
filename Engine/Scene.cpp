@@ -226,14 +226,17 @@ GameObject *Scene::AddGameObject() {
 GameObject *Scene::AddGameObject(GameObject *gameObject) {
     GameObject *root = new GameObject();
     root->SetName(gameObject->GetName());
-    root->AddComponent<Transform>();
+    Transform *t = root->AddComponent<Transform>();
+    t->SetLocalPosition(gameObject->GetTransform()->GetLocalPosition());
+    t->SetLocalRotation(gameObject->GetTransform()->GetLocalRotation());
+    t->SetLocalScale(gameObject->GetTransform()->GetLocalScale());
     for (Component *component : gameObject->components) {
         root->AddComponent(component);
     }
-    roots.insert(root);
     for (Transform *t : gameObject->GetTransform()->GetChildren()) {
         root->AddGameObject(t->GetGameObject());
     }
+    roots.insert(root);
     return root;
 }
 

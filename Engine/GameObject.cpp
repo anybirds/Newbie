@@ -30,7 +30,10 @@ GameObject *GameObject::AddGameObject() {
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
     GameObject *add = new GameObject();
     add->SetName(gameObject->GetName());
-    add->AddComponent<Transform>();
+    Transform *t = add->AddComponent<Transform>();
+    t->SetLocalPosition(gameObject->GetTransform()->GetLocalPosition());
+    t->SetLocalRotation(gameObject->GetTransform()->GetLocalRotation());
+    t->SetLocalScale(gameObject->GetTransform()->GetLocalScale());
     for (Component *component : gameObject->components) {
         add->AddComponent(component);
     }
