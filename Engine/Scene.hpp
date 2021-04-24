@@ -51,7 +51,6 @@ NAMESPACE(Engine) {
         std::map<int, std::unordered_set<Renderer *>> renderers;
         std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> batches;
         
-        std::vector<Component *> adds;
         std::vector<Component *> removes;
         std::vector<Component *> enables;
         std::vector<Component *> disables;
@@ -60,7 +59,6 @@ NAMESPACE(Engine) {
         
         void Enable();
         void Disable();
-        void Add();
         void Remove();
 
         void Update();

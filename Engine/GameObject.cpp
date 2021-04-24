@@ -6,6 +6,19 @@
 using namespace std;
 using namespace Engine;
 
+Component *GameObject::AddComponent(Component *component) {
+    if (dynamic_cast<Transform *>(component)) {
+        return transform;
+    }
+
+    Component *t = (Component *)component->GetCopy();
+    t->gameObject = this;
+    t->enabled = false;
+    t->OnAdd();
+    components.insert(t);
+    return t;
+}
+
 GameObject *GameObject::AddGameObject() {
     GameObject *child = new GameObject();
     Transform *t = child->AddComponent<Transform>();
@@ -15,7 +28,18 @@ GameObject *GameObject::AddGameObject() {
 }
 
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
-    return nullptr;
+    GameObject *add = new GameObject();
+    add->SetName(gameObject->GetName());
+    add->AddComponent<Transform>();
+    for (Component *component : gameObject->components) {
+        add->AddComponent(component);
+    }
+    for (Transform *t : gameObject->GetTransform()->GetChildren()) {
+        add->AddGameObject(t->GetGameObject());
+    }
+    add->transform->parent = transform;
+    transform->children.insert(add->transform);
+    return add;
 }
 
 GameObject *GameObject::FindGameObject(const string &name) const {

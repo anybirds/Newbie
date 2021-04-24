@@ -28,5 +28,7 @@ namespace Engine {
         void AddDrawer(Drawer *drawer);
         void RemoveDrawer(Drawer *drawer);
         void Draw(Renderer *renderer);
+        
+        friend class Drawer;
     };
 }

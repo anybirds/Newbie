@@ -89,6 +89,7 @@ void GamePanel::ShowPlayPause() {
     if (ImGui::Selectable(ICON_FA_PLAY, running, 0, ImVec2(16.0f, 0.0f)) && scene.IsLoaded()) {
         string path = filesystem::relative(filesystem::u8path(GetBackupScenePath()), filesystem::u8path(Project::GetInstance().GetDirectoy())).u8string();
         if (running) {
+            open = false;
             Scene::FromBackup();
         } else {
             open = true;

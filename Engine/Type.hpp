@@ -46,7 +46,9 @@
     private: \
     static void Serialize(nlohmann::json &, const Engine::Entity *); \
     static void Deserialize(nlohmann::json &, Engine::Entity *); \
-    friend void ::type_init()
+    virtual Entity *GetCopy() const { return Engine::copy<T>(this); } \
+    friend void ::type_init() 
+    
 
 /* serializing and deserializing possible for glm vector and matrix types */
 namespace glm {
@@ -74,6 +76,16 @@ namespace Engine {
     template <typename T,
     std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
     Entity *instantiate() {
+        return nullptr;
+    }
+    template <typename T,
+    std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
+    Entity *copy(const T *t) {
+        return (Entity *)new T(*t);
+    }
+    template <typename T,
+    std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
+    Entity *copy(const T *t) {
         return nullptr;
     }
 

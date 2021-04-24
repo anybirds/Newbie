@@ -30,18 +30,20 @@ NAMESPACE(Engine) {
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
         T *GetComponent() const {
             for (Component *component : components) {
-                if (!component->IsRemoved() && T *t = dynamic_cast<T *>(component)) {
+                T *t = dynamic_cast<T *>(component);
+                if (!component->IsRemoved() && t) {
                     return t;
                 }
             }
             return nullptr;
-        }
+        } 
+        Component *AddComponent(Component *component);
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
-            t->SetFlags(Component::ADD);
             components.insert(t);
+            t->OnAdd();
             return t;
         }
         template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
@@ -52,9 +54,9 @@ NAMESPACE(Engine) {
             }
             T *t = new T();
             t->gameObject = this;
-            t->SetFlags(Component::ADD);
             components.insert(t);
             transform = t;
+            t->OnAdd();
             return t;
         }
 

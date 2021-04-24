@@ -99,19 +99,15 @@ bool Scene::LoadImmediate(const string &path, bool useBackup) {
             }
 
             for (Component *component : gameObject->components) {
-                adds.push_back(component);
+                component->OnAdd();
                 if (enabled && component->IsLocalEnabled()) {
-                    enables.push_back(component);
+                    component->OnEnable();
                 }
             }
         };
         for (GameObject *root : roots) {
             recurse(root, root->IsLocalEnabled());
         }
-        Add();
-        Enable();
-        adds.clear();
-        enables.clear();
 
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
@@ -222,22 +218,32 @@ void Scene::CloseImmediate() {
 
 GameObject *Scene::AddGameObject() {
     GameObject *root = new GameObject();
-    Transform *transform = root->AddComponent<Transform>();
+    root->AddComponent<Transform>();
     roots.insert(root);
     return root;
 }
 
 GameObject *Scene::AddGameObject(GameObject *gameObject) {
-    return nullptr;
+    GameObject *root = new GameObject();
+    root->SetName(gameObject->GetName());
+    root->AddComponent<Transform>();
+    for (Component *component : gameObject->components) {
+        root->AddComponent(component);
+    }
+    roots.insert(root);
+    for (Transform *t : gameObject->GetTransform()->GetChildren()) {
+        root->AddGameObject(t->GetGameObject());
+    }
+    return root;
 }
 
 void Scene::RemoveGameObject(GameObject *gameObject) {
-    gameObject->GetTransform()->SetFlags(Component::REMOVE);
+    gameObject->GetTransform()->removed = true;
     gameObject->GetTransform()->SetLocalEnabled(false);
 }
 
 void Scene::RemoveComponent(Component *component) {
-    component->SetFlags(Component::REMOVE);
+    component->removed = true;
     component->SetLocalEnabled(false);
 }
 
@@ -262,18 +268,16 @@ void Scene::Flags() {
     }
     flags = 0U; 
 
-    adds.clear();
     removes.clear();
     enables.clear();
     disables.clear();
 
-    function<void(GameObject *, bool, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool added, bool removed) {
+    function<void(GameObject *, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool removed) {
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
             recurse(t->GetGameObject(), 
                 enabled && t->IsLocalEnabled(), 
-                added || (t->flags & Component::ADD), 
-                removed || (t->flags & Component::REMOVE));
+                removed || t->IsRemoved());
         }
 
         for (Component *component : gameObject->components) {
@@ -284,17 +288,14 @@ void Scene::Flags() {
                 disables.push_back(component);
                 component->enabled = false;
             }
-            if (added || (component->flags & Component::ADD)) {
-                adds.push_back(component);
-            }
-            if (removed || (component->flags & Component::REMOVE)) {
+            if (removed || component->IsRemoved()) {
                 removes.push_back(component);
             }
         }
     };
 
     for (GameObject *root : roots) {
-        recurse(root, root->IsLocalEnabled(), root->GetTransform()->flags & Component::ADD, root->GetTransform()->flags & Component::REMOVE);
+        recurse(root, root->IsLocalEnabled(), root->IsRemoved());
     }
 }
 
@@ -310,14 +311,6 @@ void Scene::Disable() {
     for (Component *component : disables) {
         try {
             component->OnDisable();
-        } catch(...) {}
-    }
-}
-
-void Scene::Add() {
-    for (Component *component : adds) {
-        try {
-            component->OnAdd();
         } catch(...) {}
     }
 }
@@ -356,7 +349,6 @@ void Scene::Loop() {
 
     Disable();
     Remove();
-    Add();
     Enable();
     Update();
     Render();

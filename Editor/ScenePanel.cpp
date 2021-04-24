@@ -15,7 +15,7 @@ const std::string &ScenePanel::GetSelectFragmentShader() {
     return selectFragmentShader;
 }
 
-ScenePanel::ScenePanel() : Panel("Scene"), moveSpeed(5.0f), rotateSpeed(0.125f) {
+ScenePanel::ScenePanel() : Panel("Scene"), moveSpeed(10.0f), rotateSpeed(1.0f) {
     Window &window = Window::GetInstance();
 
     sceneTexture = new ATexture();
@@ -86,8 +86,9 @@ void ScenePanel::Update() {
             transform->Translate(vec3(0.0f, move, 0.0f));
         }
 
+        Window &window = Window::GetInstance();
         Input &input = Input::GetInstance();
-        transform->Rotate(-rotateSpeed * vec3(input.GetDeltaMouseCursorY(), input.GetDeltaMouseCursorX(), 0.0f));
+        transform->Rotate(360.0f * -rotateSpeed * vec3(input.GetDeltaMouseCursorY() / window.GetWidth(), input.GetDeltaMouseCursorX() / window.GetHeight(), 0.0f));
     }
 }
 

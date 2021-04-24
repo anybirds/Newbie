@@ -81,7 +81,16 @@ void Drawer::OnDisable() {
     }
 
     Scene &scene = Scene::GetInstance();
-    scene.batches[material->GetOrder()][make_pair(mesh.get(), material.get())]->RemoveDrawer(this);
+    auto i = scene.batches.find(material->GetOrder());
+    auto j = i->second.find(make_pair(mesh.get(), material.get()));
+    j->second->RemoveDrawer(this);
+    if (j->second->drawers.empty()) {
+        i->second.erase(j);
+        delete j->second;
+        if (i->second.empty()) {
+            scene.batches.erase(i);
+        }
+    }
 }
 
 void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
@@ -91,6 +100,13 @@ void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
         auto j = i->second.find(make_pair(this->mesh.get(), material.get()));
         if (j != i->second.end()) {
             j->second->RemoveDrawer(this);
+            if (j->second->drawers.empty()) {
+                i->second.erase(j);
+                delete j->second;
+                if (i->second.empty()) {
+                    scene.batches.erase(i);
+                }
+            }
             i->second[make_pair(mesh.get(), material.get())]->AddDrawer(this);
         }
     }
@@ -104,6 +120,13 @@ void Drawer::SetMaterial(const shared_ptr<Material> &material) {
         auto j = i->second.find(make_pair(mesh.get(), this->material.get()));
         if (j != i->second.end()) {
             j->second->RemoveDrawer(this);
+            if (j->second->drawers.empty()) {
+                i->second.erase(j);
+                delete j->second;
+                if (i->second.empty()) {
+                    scene.batches.erase(i);
+                }
+            }
             scene.batches[material->GetOrder()][make_pair(mesh.get(), material.get())]->AddDrawer(this);
         }
     }

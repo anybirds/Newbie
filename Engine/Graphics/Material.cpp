@@ -48,6 +48,9 @@ void Material::Apply() {
             for (Batch *batch : batches) {
                 it->second.erase(make_pair(batch->GetMesh(), batch->GetMaterial()));
             }
+            if (it->second.empty()) {
+                scene.batches.erase(it);
+            }
             for (Batch *batch : batches) {
                 scene.batches[amaterial->GetOrder()].insert(make_pair(make_pair(batch->GetMesh(), batch->GetMaterial()), batch));
             }
