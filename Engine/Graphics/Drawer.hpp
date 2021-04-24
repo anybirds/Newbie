@@ -10,14 +10,9 @@ NAMESPACE(Engine) {
 	class Mesh;
 	class Renderer;
 
-	/*
-	Responsible for rendering objects that have Mesh and Material.
-	*/
 	CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
 		TYPE(Drawer);
 
-        // todo: shader properties
-		
 		PROPERTY_GET(std::shared_ptr<Mesh>, mesh, Mesh);
 		PROPERTY_GET(std::shared_ptr<Material>, material, Material);
 

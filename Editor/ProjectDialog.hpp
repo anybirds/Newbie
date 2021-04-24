@@ -6,8 +6,8 @@
 
 class ProjectDialog : public Dialog {
 private:
-    static const std::string &GetProjectsFile();
-    static const std::string &GetEmptyProject();
+    static const std::string &GetProjectsPath();
+    static const std::string &GetEmptyProjectPath();
 
 public:
     static ProjectDialog &GetInstance() { static ProjectDialog projectDialog; return projectDialog; }

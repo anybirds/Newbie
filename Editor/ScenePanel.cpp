@@ -11,7 +11,7 @@ const std::string &ScenePanel::GetSelectVertexShader() {
 }
 
 const std::string &ScenePanel::GetSelectFragmentShader() {
-    static std::string selectFragmentShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/select_frag.glsl"); 
+    static std::string selectFragmentShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/select_frag.glsl");
     return selectFragmentShader;
 }
 
@@ -101,15 +101,12 @@ void ScenePanel::ShowContents() {
     ImVec2 imgSize = ImGui::GetContentRegionAvail();
     try {
         if (clicked) {
+            /*
             selectFramebufferResource->SetWidth((int)imgSize.x);
             selectFramebufferResource->SetHeight((int)imgSize.y);
             camera->SetFramebuffer(selectFramebufferResource);
-            // todo: object selection 
-            // copy drawers vector out 
-            // camera->Render(selectMaterial); // replacement material 
             selectFramebufferResource->ReadPixels(clickX, clickY);
-            // int to byte array, byte array to int
-            // get gameobject by id
+            */
         }
         sceneFramebufferResource->SetWidth((int)imgSize.x);
         sceneFramebufferResource->SetHeight((int)imgSize.y);

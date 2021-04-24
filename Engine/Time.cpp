@@ -10,7 +10,7 @@ void Time::Init() {
     prev = glfwGetTime();
 }
 
-void Time::Tick() {
+void Time::Update() {
 	double curr = glfwGetTime();
     dt = curr - prev;
     prev = curr;

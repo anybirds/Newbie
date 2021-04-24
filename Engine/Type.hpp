@@ -77,9 +77,6 @@ namespace Engine {
         return nullptr;
     }
 
-    /*
-    Type information needed for object serialization and deserialization.
-    */
     class ENGINE_EXPORT Type final {
     public:
         typedef Entity *(*FInstantiate)();

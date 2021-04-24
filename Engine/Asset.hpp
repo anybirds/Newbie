@@ -12,9 +12,6 @@ NAMESPACE(Engine) {
 
     class Resource;
 
-    /*
-    Menifest to how to instantiate the Resource object.
-    */
     CLASS_ATTR(Asset, Entity, ENGINE_EXPORT) {
         TYPE(Asset);
 

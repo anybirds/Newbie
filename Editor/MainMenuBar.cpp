@@ -9,7 +9,7 @@
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
-#include <GroupPanel.hpp>
+#include <HierarchyPanel.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -52,16 +52,16 @@ void MainMenuBar::Show() {
                 gamePanel.Toggle();
             }
             ScenePanel &scenePanel = ScenePanel::GetInstance();
-            if (ImGui::MenuItem("Scene", nullptr, ScenePanel::GetInstance().IsOpen())) {
+            if (ImGui::MenuItem("Scene", nullptr, scenePanel.IsOpen())) {
                 scenePanel.Toggle();
             }
             AssetPanel &assetPanel = AssetPanel::GetInstance();
-            if (ImGui::MenuItem("Asset", nullptr, AssetPanel::GetInstance().IsOpen())) {
+            if (ImGui::MenuItem("Asset", nullptr, assetPanel.IsOpen())) {
                 assetPanel.Toggle();
             }
-            GroupPanel &groupPanel = GroupPanel::GetInstance();
-            if (ImGui::MenuItem("Group", nullptr, GroupPanel::GetInstance().IsOpen())) {
-                groupPanel.Toggle();
+            HierarchyPanel &hierarchyPanel = HierarchyPanel::GetInstance();
+            if (ImGui::MenuItem("Group", nullptr, hierarchyPanel.IsOpen())) {
+                hierarchyPanel.Toggle();
             } 
             ImGui::EndMenu();
         }

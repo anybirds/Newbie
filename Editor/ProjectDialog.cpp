@@ -14,13 +14,13 @@ using namespace std;
 using namespace Engine;
 
 const string &ProjectDialog::GetProjectsPath() {
-    static std::string projectsFile(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 
-    return projectsFile; 
+    static std::string projectsPath(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 
+    return projectsPath; 
 }
 
 const string &ProjectDialog::GetEmptyProjectPath() {
-    static std::string emptyProject(std::string(NEWBIE_PATH) + "/Samples/Empty");
-    return emptyProject;
+    static std::string emptyProjectPath(std::string(NEWBIE_PATH) + "/Samples/Empty");
+    return emptyProjectPath;
 }
 
 ProjectDialog::ProjectDialog() : Dialog("Open Project") {

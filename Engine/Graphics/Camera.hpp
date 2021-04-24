@@ -9,10 +9,6 @@ NAMESPACE(Engine) {
 
     class Framebuffer;
 
-    /*
-    Featured by its normalization matrix.
-    Specify camera properties that affect the normalization matrix.
-    */
     CLASS_ATTR(Camera, Renderer, ENGINE_EXPORT) {
         TYPE(Camera);
 

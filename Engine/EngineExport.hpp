@@ -27,3 +27,7 @@ extern "C" {
 #else
 #  define ENGINE_EXPORT DECL_IMPORT
 #endif
+
+#if !defined(NEWBIE_PATH)
+#  define NEWBIE_PATH ""
+#endif

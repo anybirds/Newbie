@@ -15,6 +15,10 @@ void AssetPanel::ShowContents() {
     ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     for (auto &p : project.GetAllAssets()) {
         Asset *asset = p.second;
+        if (asset->IsRemoved()) {
+            continue;
+        }
+        
         const string &name = asset->GetType()->GetName();
         if (name == "AMaterial") {
             ImGui::Text(ICON_FA_TINT);

@@ -3,9 +3,6 @@
 #include <EngineExport.hpp>
 
 namespace Engine {
-    /*
-    static class that manages time by utilizing glfw functions.
-    */
     class ENGINE_EXPORT Time final {
     public:
         static Time &GetInstance() { static Time time; return time; }
@@ -21,7 +18,8 @@ namespace Engine {
         Time &operator=(const Time &) = delete;
         
         void Init();
-        void Tick();
-        float GetDeltaTime() { return static_cast<float>(dt); }
+        void Update();
+        double GetTime() const { return prev; }
+        float GetDeltaTime() const { return static_cast<float>(dt); }
     };
 }

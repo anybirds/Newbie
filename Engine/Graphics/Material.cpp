@@ -41,15 +41,15 @@ void Material::Apply() {
         if (it != scene.batches.end()) {
             vector<Batch *> batches;
             for (auto &p : it->second) {
-                if (this == p.first.material) {
+                if (this == p.first.second) {
                     batches.push_back(p.second);
                 }
             }
             for (Batch *batch : batches) {
-                it->second.erase(batch->GetKey());
+                it->second.erase(make_pair(batch->GetMesh(), batch->GetMaterial()));
             }
             for (Batch *batch : batches) {
-                scene.batches[amaterial->GetOrder()].insert(make_pair(batch->GetKey(), batch));
+                scene.batches[amaterial->GetOrder()].insert(make_pair(make_pair(batch->GetMesh(), batch->GetMaterial()), batch));
             }
         }
     } 

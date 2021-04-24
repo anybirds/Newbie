@@ -55,7 +55,14 @@ void Texture::Apply() {
 
         int width, height, channel;
 
-        image = stbi_load((Project::GetInstance().GetDirectoy() + "/" + GetPath()).c_str(), &width, &height, &channel, 0);
+        string absolute;
+        Project &project = Project::GetInstance();
+        if (project.IsLoaded()) {
+            absolute = project.GetDirectoy() + "/" + GetPath();
+        } else {
+            absolute = GetPath();
+        }
+        image = stbi_load(absolute.c_str(), &width, &height, &channel, 0);
         if (!image) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << atexture->GetPath() << '\n';
             throw exception();

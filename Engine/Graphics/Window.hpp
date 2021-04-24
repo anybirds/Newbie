@@ -8,9 +8,6 @@
 #include <EngineExport.hpp>
 
 namespace Engine {
-    /*
-    Abstraction of a cross-platform window.
-    */
     class ENGINE_EXPORT Window final {
     public:
         static Window &GetInstance() { static Window window; return window; }

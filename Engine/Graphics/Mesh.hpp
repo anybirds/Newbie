@@ -21,9 +21,6 @@ NAMESPACE(Engine) {
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
-    /*
-    Represents a wireframe in the object space.
-    */
     class ENGINE_EXPORT Mesh : public Resource {
         PROPERTY_GET(uint32_t, index, Index);
 

@@ -1,5 +1,3 @@
-#include <GL/glew.h>
-
 #include <iostream>
 #include <fstream>
 #include <functional>
@@ -12,6 +10,7 @@
 #include <Scene.hpp>
 #include <Script.hpp>
 #include <Graphics/Drawer.hpp>
+#include <Graphics/Renderer.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -33,12 +32,12 @@ void Scene::FromBackup() {
     backup = Scene();
 }
 
-bool Scene::Load(const string &path) {
+void Scene::Load(const string &path) {
     flags |= LOAD;
     this->loadPath = path;
 }
 
-bool Scene::Save() {
+void Scene::Save() {
     flags |= SAVE;
 }
 
@@ -46,7 +45,7 @@ void Scene::Close() {
     flags |= CLOSE;
 }
 
-bool Scene::LoadImmediate(const string &path) {
+bool Scene::LoadImmediate(const string &path, bool useBackup) {
     try {
         // open json file
         ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -56,7 +55,7 @@ bool Scene::LoadImmediate(const string &path) {
         }
 
         // move to backup in order to maintain duplicate resource and handle failure cases
-        ToBackup();
+        if (useBackup) { ToBackup(); }
 
         // get scene file path
         this->path = path;
@@ -78,27 +77,8 @@ bool Scene::LoadImmediate(const string &path) {
 
         for (json::iterator i = entities.begin(); i != entities.end(); i++) {
             const Type *type = Type::GetType(i.key());
-            if (type == Drawer::StaticType()) {
-                // read drawers and batches
-                for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                    Drawer *drawer = (Drawer *)Entity::temp.at(stoll(j.key()));
-                    type->Deserialize(j.value(), (Entity *)drawer);
-                    Batch *batch;
-                    BatchKey key{drawer->GetMesh().get(), drawer->GetMaterial().get()};
-                    auto &batchmap = batches[drawer->GetMaterial()->GetOrder()];
-                    auto it = batchmap.find(key);
-                    if (it == batchmap.end()) {
-                        batch = new Batch(key);
-                        batchmap.insert(make_pair(key, batch));
-                    } else {
-                        batch = it->second;
-                    }
-                    batch->AddDrawer(drawer);
-                }
-            } else {
-                for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                    type->Deserialize(j.value(), Entity::temp.at(stoll(j.key())));
-                }
+            for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+                type->Deserialize(j.value(), Entity::temp.at(stoll(j.key())));
             }
         }
         
@@ -110,16 +90,39 @@ bool Scene::LoadImmediate(const string &path) {
         SceneSetting::StaticType()->Deserialize(js["setting"], setting);
 
         Entity::temp.clear();
+
+        // process components
+        function<void(GameObject *, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled) {
+            Transform *transform = gameObject->GetTransform();
+            for (Transform *t : transform->GetChildren()) {
+                recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());
+            }
+
+            for (Component *component : gameObject->components) {
+                adds.push_back(component);
+                if (enabled && component->IsLocalEnabled()) {
+                    enables.push_back(component);
+                }
+            }
+        };
+        for (GameObject *root : roots) {
+            recurse(root, root->IsLocalEnabled());
+        }
+        Add();
+        Enable();
+        adds.clear();
+        enables.clear();
+
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << name << '\n';
-        FromBackup();
+        cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
+        if (useBackup) { FromBackup(); }
         return false;
     }
     
-    GetBackup().CloseImmediate();
+    if (useBackup) { GetBackup().CloseImmediate(); }
 
     loaded = true;
-    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << name << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " read scene: " << path << " done.\n";
     return true;
 }
 
@@ -173,16 +176,16 @@ bool Scene::SaveImmediate() {
         // open json file
         ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
         if (fs.fail()) {
-            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << name << '\n';
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << path << '\n';
             return false;
         }
         fs << js;
     } catch(...) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << name << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << path << '\n';
         return false;
     }
 
-    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << name << " done.\n";
+    cerr << '[' << __FUNCTION__ << ']' << " save scene: " << path << " done.\n";
     return true;
 }
 
@@ -225,16 +228,16 @@ GameObject *Scene::AddGameObject() {
 }
 
 GameObject *Scene::AddGameObject(GameObject *gameObject) {
-    
+    return nullptr;
 }
 
 void Scene::RemoveGameObject(GameObject *gameObject) {
-    gameObject->GetTransform()->SetFlags(Component::Remove);
+    gameObject->GetTransform()->SetFlags(Component::REMOVE);
     gameObject->GetTransform()->SetLocalEnabled(false);
 }
 
 void Scene::RemoveComponent(Component *component) {
-    component->SetFlags(Component::Remove);
+    component->SetFlags(Component::REMOVE);
     component->SetLocalEnabled(false);
 }
 
@@ -248,16 +251,51 @@ GameObject *Scene::FindGameObject(const string &name) {
 }
 
 void Scene::Flags() {
-    if (flags | CLOSE) {
+    if (flags & CLOSE) {
         CloseImmediate();
     }
-    if (flags | LOAD) {
+    if (flags & LOAD) {
         LoadImmediate(loadPath);
     }
-    if (flags | SAVE) {
+    if (flags & SAVE) {
         SaveImmediate();
     }
     flags = 0U; 
+
+    adds.clear();
+    removes.clear();
+    enables.clear();
+    disables.clear();
+
+    function<void(GameObject *, bool, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool added, bool removed) {
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->GetChildren()) {
+            recurse(t->GetGameObject(), 
+                enabled && t->IsLocalEnabled(), 
+                added || (t->flags & Component::ADD), 
+                removed || (t->flags & Component::REMOVE));
+        }
+
+        for (Component *component : gameObject->components) {
+            if (!component->enabled && (enabled && component->IsLocalEnabled())) {
+                enables.push_back(component);
+                component->enabled = true;
+            } else if (component->enabled && !(enabled && component->IsLocalEnabled())) {
+                disables.push_back(component);
+                component->enabled = false;
+            }
+            if (added || (component->flags & Component::ADD)) {
+                adds.push_back(component);
+            }
+            if (removed || (component->flags & Component::REMOVE)) {
+                removes.push_back(component);
+            }
+        }
+    };
+
+    for (GameObject *root : roots) {
+        recurse(root, root->IsLocalEnabled(), root->GetTransform()->flags & Component::ADD, root->GetTransform()->flags & Component::REMOVE);
+    }
 }
 
 void Scene::Enable() {
@@ -313,77 +351,8 @@ void Scene::Render() {
     }
 }
 
-void Scene::PauseLoop() {
+void Scene::Loop() {
     Flags();
-
-    enables.clear();
-    disables.clear();
-
-    function<void(GameObject *, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled) {
-        Transform *transform = gameObject->GetTransform();
-        for (Transform *t : transform->GetChildren()) {
-            recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());
-        }
-
-        for (Component *component : gameObject->components) {
-            if (!component->enabled && (enabled && component->IsLocalEnabled())) {
-                enables.push_back(component);
-                component->enabled = true;
-            }
-            if (component->enabled && !(enabled && component->IsLocalEnabled())) {
-                disables.push_back(component);
-                component->enabled = false;
-            }
-        }
-    };
-
-    for (GameObject *root : roots) {
-        recurse(root, true);
-    }
-
-    Disable();
-    Enable();
-    Render();
-}
-
-void Scene::PlayLoop() {
-    Flags();
-
-    adds.clear();
-    removes.clear();
-    enables.clear();
-    disables.clear();
-
-    function<void(GameObject *, bool, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool added, bool removed) {
-        Transform *transform = gameObject->GetTransform();
-        for (Transform *t : transform->GetChildren()) {
-            recurse(t->GetGameObject(), 
-                enabled && t->IsLocalEnabled(), 
-                added || (t->flags & Component::Add), 
-                removed || (t->flags & Component::Remove));
-        }
-
-        for (Component *component : gameObject->components) {
-            if (!component->enabled && (enabled && component->IsLocalEnabled())) {
-                enables.push_back(component);
-                component->enabled = true;
-            }
-            if (component->enabled && !(enabled && component->IsLocalEnabled())) {
-                disables.push_back(component);
-                component->enabled = false;
-            }
-            if (added || (component->flags & Component::Add)) {
-                adds.push_back(component);
-            }
-            if (removed || (component->flags & Component::Remove)) {
-                removes.push_back(component);
-            }
-        }
-    };
-
-    for (GameObject *root : roots) {
-        recurse(root, true, false, false);
-    }
 
     Disable();
     Remove();

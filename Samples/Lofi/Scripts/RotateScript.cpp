@@ -1,4 +1,5 @@
 #include "RotateScript.hpp"
+#include <iostream>
 
 using namespace glm;
 using namespace Engine;
@@ -6,5 +7,5 @@ using namespace Engine;
 void RotateScript::Update() {
     float dt = Time::GetInstance().GetDeltaTime();
     Transform *transform = GetTransform();
-    transform->RotateAround(vec3(0.0f, 0.0f, 1.0f), rate * dt); 
+    transform->RotateAround(vec3(0.0f, 0.0f, 1.0f), rate * dt);
 }

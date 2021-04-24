@@ -37,9 +37,16 @@ void Model::Apply() {
         delete importer;
     }
 
+    string absolute;
+    Project &project = Project::GetInstance();
+    if (project.IsLoaded()) {
+        absolute = Project::GetInstance().GetDirectoy() + "/" + GetPath();
+    } else {
+        absolute = GetPath();
+    }
     importer = new Assimp::Importer();
     const aiScene *scene = importer->ReadFile(
-        Project::GetInstance().GetDirectoy() + "/" + GetPath(),
+        absolute,
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         if (scene) { delete scene; }

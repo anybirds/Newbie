@@ -8,10 +8,6 @@
 #include <Component.hpp>
 
 NAMESPACE(Engine) {	
-
-    /*
-    Represents a single frame in 3D space that has position, rotation, scale and hierarchical parent information.
-    */
     CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
         TYPE(Transform);
 

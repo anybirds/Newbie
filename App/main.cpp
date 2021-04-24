@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
     // load the start Scene
     Scene &scene = Scene::GetInstance();
-    if (!scene.Load(project.GetSetting()->GetStartScene())) {
+    if (!scene.LoadImmediate(project.GetSetting()->GetStartScene())) {
         return 0;
     }
 
@@ -45,17 +45,12 @@ int main(int argc, char **argv) {
     input.Init();
 
     // game loop
-    scene.Start();
     while (!window.ShouldClose()) {
         window.PollEvents();
-        time.Tick();
+        time.Update();
         input.Update();
 
-        scene.Refresh();
-        scene.Update();
-        scene.Render();
-
-        scene.Delete();
+        scene.PlayLoop();
 
 		window.SwapBuffers();
     }

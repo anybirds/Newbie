@@ -10,11 +10,12 @@ GameObject *GameObject::AddGameObject() {
     GameObject *child = new GameObject();
     Transform *t = child->AddComponent<Transform>();
     t->parent = transform;
+    transform->children.insert(t);
     return child;
 }
 
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
-
+    return nullptr;
 }
 
 GameObject *GameObject::FindGameObject(const string &name) const {

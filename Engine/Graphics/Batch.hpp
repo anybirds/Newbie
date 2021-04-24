@@ -11,21 +11,19 @@ namespace Engine {
     class Drawer;
     class Renderer;
     
-    struct BatchKey {
-        Mesh *mesh;
-        Material *material;
-    };
-    
     class Batch {
     private:
-        BatchKey key;
+        Mesh *mesh;
+        Material *material;
         std::unordered_set<Drawer *> drawers;
     
     public:
-        Batch(const BatchKey &key) : key(key) {}
+        Batch(Mesh *mesh, Material *material) : mesh(mesh), material(material) {}
         virtual ~Batch();
 
-        const BatchKey &GetKey() const { return key; }
+        Mesh *GetMesh() const { return mesh; }
+        Material *GetMaterial() const { return material; }
+        
         void Refresh();
         void AddDrawer(Drawer *drawer);
         void RemoveDrawer(Drawer *drawer);

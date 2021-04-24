@@ -9,7 +9,7 @@
 #include <GamePanel.hpp>
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
-#include <GroupPanel.hpp>
+#include <HierarchyPanel.hpp>
 
 #include <Graphics/Window.hpp>
 #include <Time.hpp>
@@ -54,11 +54,11 @@ int main(int argc, char **argv) {
     GamePanel &gamePanel = GamePanel::GetInstance();
     ScenePanel &scenePanel = ScenePanel::GetInstance();
     AssetPanel &assetPanel = AssetPanel::GetInstance();
-    GroupPanel &groupPanel = GroupPanel::GetInstance();
+    HierarchyPanel &hierarchyPanel = HierarchyPanel::GetInstance();
 
     scenePanel.SetOpen(true);
     assetPanel.SetOpen(true);
-    groupPanel.SetOpen(true);
+    hierarchyPanel.SetOpen(true);
     
     Time &time = Time::GetInstance();
     time.Init();
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
     while (!window.ShouldClose()) {
         window.PollEvents();
-        time.Tick();
+        time.Update();
         input.Update();
 
         // start the imgui frame
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         gamePanel.Show();
         scenePanel.Show();
         assetPanel.Show();
-        groupPanel.Show();
+        hierarchyPanel.Show();
         Widget::UpdateRename();
 
         ImGui::ShowDemoWindow();

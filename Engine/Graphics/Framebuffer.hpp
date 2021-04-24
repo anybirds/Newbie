@@ -24,9 +24,6 @@ NAMESPACE(Engine) {
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
-    /*
-    Framebuffer that can have multiple texture attachments 
-    */
     class ENGINE_EXPORT Framebuffer : public Resource {
         PROPERTY_GET(bool, useDepthRenderTexture, UseDepthRenderTexture);
 

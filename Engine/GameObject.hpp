@@ -10,9 +10,6 @@ NAMESPACE(Engine) {
     class Component;
     class Transform;
 
-    /*
-    Abstraction of an object in the scene.
-    */
     CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
         TYPE(GameObject);
 
@@ -39,19 +36,25 @@ NAMESPACE(Engine) {
             }
             return nullptr;
         }
-        template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true> 
+        template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
+        T *AddComponent() {
+            T *t = new T();
+            t->gameObject = this;
+            t->SetFlags(Component::ADD);
+            components.insert(t);
+            return t;
+        }
+        template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
         T *AddComponent() {
             // prohibit adding multiple transforms
-            if (std::is_same_v<Transform, T> && transform) {
+            if (transform) {
                 return transform;
             }
             T *t = new T();
             t->gameObject = this;
-            t->SetFlags(Component::Add);
+            t->SetFlags(Component::ADD);
             components.insert(t);
-            if (std::is_same_v<Transform, T>) {
-                gameObject->transform = t;
-            }
+            transform = t;
             return t;
         }
 

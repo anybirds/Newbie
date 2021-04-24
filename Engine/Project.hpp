@@ -31,9 +31,6 @@ NAMESPACE(Engine) {
         friend class Project;
     };
     
-    /*
-    Abstraction of a user project that includes User module, used Assets, and Scenes.
-    */
     class ENGINE_EXPORT Project final {
     public:
         static Project &GetInstance() { static Project project; return project; }

@@ -25,9 +25,6 @@ NAMESPACE(Engine) {
         virtual std::shared_ptr<Resource> GetResource() override;
     };
 
-    /*
-	Represents a texture that has been created by loading images.
-	*/
     class ENGINE_EXPORT Texture : public Resource {
         PROPERTY_GET(std::string, path, Path);
         PROPERTY_GET(int, width, Width);

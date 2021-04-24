@@ -8,9 +8,6 @@
 
 namespace Engine {
 
-    /*
-    Base class for all the resources like Model, Mesh, Material, Shader, Texture and etc.
-    */
     class ENGINE_EXPORT Resource {
     private:
         uint64_t serial;

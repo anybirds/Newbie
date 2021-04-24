@@ -11,8 +11,8 @@ using namespace std;
 using namespace Engine;
 
 const string &SceneDialog::GetEmptyScenePath() {
-    static std::string emptyScene(string(NEWBIE_PATH) + "/Samples/Empty/Main.json");
-    return emptyScene;
+    static std::string emptyScenePath(string(NEWBIE_PATH) + "/Samples/Empty/Main.json");
+    return emptyScenePath;
 }
 
 void SceneDialog::ShowContents() {
@@ -48,7 +48,7 @@ void SceneDialog::ShowContents() {
         if (ImGui::Selectable(path.c_str(), selected == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {
                 Scene &scene = Scene::GetInstance();
-                if (scene.Load(path)) {
+                if (scene.LoadImmediate(path)) {
                     Window &window = Window::GetInstance();
                     window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
                 }
@@ -71,7 +71,7 @@ void SceneDialog::ShowContents() {
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
         if (selected) {
             Scene &scene = Scene::GetInstance();
-            if (scene.Load(*(string *)selected)) {
+            if (scene.LoadImmediate(*(string *)selected)) {
                 Window &window = Window::GetInstance();
                 window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
             }

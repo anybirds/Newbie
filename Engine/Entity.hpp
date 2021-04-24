@@ -6,9 +6,6 @@
 
 NAMESPACE(Engine) {
     
-    /*
-    Base class for all serializable types
-    */
     CLASS_ENTITY(Entity, , ENGINE_EXPORT) {
         TYPE(Entity);
 

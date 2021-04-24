@@ -43,7 +43,15 @@ void Shader::Apply() {
         throw exception();
     }
 
-    ifstream file(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + GetPath()));
+    ifstream file;
+    string absolute;
+    Project &project = Project::GetInstance();
+    if (project.IsLoaded()) {
+        absolute = Project::GetInstance().GetDirectoy() + "/" + GetPath();
+    } else {
+        absolute = GetPath();
+    }
+    file.open(filesystem::u8path(absolute));
     if (!file.is_open()) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << '\n';
         glDeleteShader(id);

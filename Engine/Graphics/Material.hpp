@@ -17,10 +17,9 @@ NAMESPACE(Engine) {
     CLASS_ATTR(AMaterial, Asset, ENGINE_EXPORT) {
         TYPE(AMaterial);
     
+        PROPERTY(unsigned, order, Order);
         PROPERTY(AShader *, vertexShader, VertexShader);
         PROPERTY(AShader *, fragmentShader, FragmentShader);
-        PROPERTY(unsigned, order, Order);
-
         // todo: move texture to drawer
         PROPERTY(ATexture *, mainTexture, MainTexture);
 
@@ -47,7 +46,6 @@ NAMESPACE(Engine) {
         
         unsigned GetProgram() const { return program; }
 
-        // todo: move shader property functions to drawer
         int GetInteger(const char *name) const;
         std::vector<int> GetIntegerArray(const char *name) const;
         float GetFloat(const char *name) const;
