@@ -13,6 +13,7 @@
 NAMESPACE(Engine) {
 
     class GameObject;
+    class Transform;
     class Component;
     class Script;
     class Renderer;
@@ -42,12 +43,13 @@ NAMESPACE(Engine) {
         bool loaded;
         std::string name;
         std::string path;
-        std::unordered_set<GameObject *> roots;
+        std::vector<GameObject *> roots;
         std::unordered_set<Script *> scripts;
         std::map<int, std::unordered_set<Renderer *>> renderers;
         std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> batches;
         
-        std::vector<Component *> removes;
+        std::vector<Component *> removeComps;
+        std::vector<Transform *> removeTrans;
         std::vector<Component *> enables;
         std::vector<Component *> disables;
 
@@ -58,6 +60,7 @@ NAMESPACE(Engine) {
         void Enable();
         void Disable();
         void Remove();
+        void Destroy();
 
         void Render();
         void Update();
@@ -78,7 +81,7 @@ NAMESPACE(Engine) {
         void SetPath(const std::string &path) { this->path = path; }
         
         const std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> &GetAllBatches() const { return batches; }
-        const std::unordered_set<GameObject *> &GetRootGameObjects() const { return roots; }
+        const std::vector<GameObject *> &GetRootGameObjects() const { return roots; }
         GameObject *AddGameObject();
         GameObject *AddGameObject(GameObject *gameObject);
         void RemoveGameObject(GameObject *gameObject);

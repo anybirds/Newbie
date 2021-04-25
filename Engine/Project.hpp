@@ -93,7 +93,8 @@ NAMESPACE(Engine) {
             assets.insert({asset->serial, asset});
             return asset;
         }
-        void RemoveAsset(Asset *asset) { asset->SetRemoved(true); assets.erase(asset->GetSerial()); delete asset; }
+        void RemoveAsset(Asset *asset) { assets.erase(asset->GetSerial()); }
+        void DestroyAsset(Asset *asset) { assets.erase(asset->GetSerial()); delete asset; }
 
         friend class Scene;
     };

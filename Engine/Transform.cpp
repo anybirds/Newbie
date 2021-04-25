@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -16,16 +17,6 @@ Transform::Transform() :
     
 Transform::~Transform() {
     delete GetGameObject(); // GameObject follows Transform
-}
-
-void Transform::OnRemove() {
-    Component::OnRemove();
-    if (parent) {
-        parent->children.erase(this);
-    } else {
-        Scene &scene = Scene::GetInstance();
-        scene.roots.erase(GetGameObject());
-    }
 }
 
 void Transform::Propagate() {
@@ -124,14 +115,14 @@ void Transform::SetParent(Transform *parent) {
     
     Scene &scene = Scene::GetInstance();
     if (this->parent) {
-        this->parent->children.erase(this);
+        this->parent->children.erase(find(this->parent->children.begin(), this->parent->children.end(), this));
     } else {
-        scene.roots.erase(GetGameObject());
+        scene.roots.erase(find(scene.roots.begin(), scene.roots.end(), GetGameObject()));
     }
     if (parent) {
-        parent->children.insert(this);
+        parent->children.push_back(this);
     } else {
-        scene.roots.insert(GetGameObject());
+        scene.roots.push_back(GetGameObject());
     }
     this->parent = parent;
     Propagate();

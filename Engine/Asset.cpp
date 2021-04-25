@@ -12,13 +12,6 @@ void Asset::Apply() {
     }
 }
 
-void Asset::SetRemoved(bool removed) {
-    this->removed = removed;
-    if (shared_ptr<Resource> sp = resource.lock()) {
-        sp->removed = true;
-    }
-}
-
 void Engine::from_json(const json &js, Entity *&entity) {
     uint64_t key = js.get<uint64_t>();
     if (key) {

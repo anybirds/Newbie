@@ -18,9 +18,6 @@ void HierarchyPanel::ShowContents() {
         
     function<void(GameObject *)> recurse = [&recurse, this](GameObject *gameObject) {
         Transform *transform = gameObject->GetTransform();
-        if (transform->IsRemoved()) {
-            return;
-        }
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
         if (transform->GetChildren().empty()) {

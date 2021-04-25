@@ -18,7 +18,3 @@ bool Component::IsEnabled() const {
     }
     return enabled;
 }
-
-void Component::OnRemove() {
-    gameObject->components.erase(this);
-}

@@ -150,11 +150,6 @@ bool Project::Save() {
         // write assets
         json &assets = js["assets"];
         for (auto &p : this->assets) {
-            // ignore removed assets
-            if (p.second->IsRemoved()) {
-                continue;
-            }
-        
             Type *type = p.second->GetType();
             type->Serialize(assets[type->GetName()][to_string(p.first)], p.second);
         }

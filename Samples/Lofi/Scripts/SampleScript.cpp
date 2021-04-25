@@ -15,7 +15,8 @@ void SampleScript::Start() {
 
     GameObject *copy = scene.AddGameObject(square);
     copy->GetTransform()->SetLocalPosition(vec3(0.0f, 5.0f, 0.0f));
-    copy->FindGameObject("girl")->GetComponent<SampleScript>()->SetLocalEnabled(false);
+    scene.RemoveComponent(copy->FindGameObject("girl")->GetComponent<SampleScript>());
+    scene.RemoveGameObject(child);
 }
 
 void SampleScript::Update() {

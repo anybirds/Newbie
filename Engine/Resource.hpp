@@ -12,7 +12,6 @@ namespace Engine {
     private:
         uint64_t serial;
         std::string name;
-        bool removed;
 
     protected:
         Asset *asset; 
@@ -24,7 +23,6 @@ namespace Engine {
 
         const std::string &GetName() const { return name; }
         const uint64_t GetSerial() const { return serial; }
-        bool IsRemoved() const { return removed; }
 
         friend class Asset;
     };

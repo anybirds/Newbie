@@ -1,6 +1,6 @@
 #pragma once 
 
-#include <unordered_set>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -16,7 +16,7 @@ NAMESPACE(Engine) {
         PROPERTY_GET(glm::vec3, localScale, LocalScale);
         PROPERTY_GET(glm::vec3, localEulerAngles, LocalEulerAngles);
         PROPERTY_GET(Transform *, parent, Parent);
-        PROPERTY_GET(std::unordered_set<Transform *>, children, Children);
+        PROPERTY_GET(std::vector<Transform *>, children, Children);
         PROPERTY_NONE_ATTR(bool, dirty, mutable);
         PROPERTY_NONE_ATTR(glm::mat4, localToWorldMatrix, mutable);
 
@@ -26,9 +26,7 @@ NAMESPACE(Engine) {
     public:
         Transform();
         virtual ~Transform();
-        
-        virtual void OnRemove() override;
-        
+
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;
         glm::vec3 GetPosition() const;

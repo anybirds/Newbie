@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
         time.Update();
         input.Update();
 
-        scene.PlayLoop();
+        scene.Loop();
 
 		window.SwapBuffers();
     }
