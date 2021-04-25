@@ -29,9 +29,10 @@ NAMESPACE(Engine) {
         
         Transform *GetTransform() const;
         
+        virtual void OnTrack() {}
+        virtual void OnUntrack() {}
         virtual void OnEnable() {}
         virtual void OnDisable() {}
-        virtual void OnAdd() {}
         virtual void OnRemove();
 
         friend class Scene;

@@ -41,12 +41,12 @@
 
 #define TYPE(T) \
     public: \
-    static Engine::Type *StaticType(Engine::Type *t = nullptr) { static Engine::Type *type; type = t ? t : type; return type; } \
+    static Engine::Type *&StaticType() { static Engine::Type *type; return type; } \
+    static void SetType(Engine::Type *type) { StaticType() = type; } \
     virtual Engine::Type *GetType() const { return T::StaticType(); } \
     private: \
     static void Serialize(nlohmann::json &, const Engine::Entity *); \
     static void Deserialize(nlohmann::json &, Engine::Entity *); \
-    virtual Entity *GetCopy() const { return Engine::copy<T>(this); } \
     friend void ::type_init() 
     
 
@@ -78,16 +78,6 @@ namespace Engine {
     Entity *instantiate() {
         return nullptr;
     }
-    template <typename T,
-    std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
-    Entity *copy(const T *t) {
-        return (Entity *)new T(*t);
-    }
-    template <typename T,
-    std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
-    Entity *copy(const T *t) {
-        return nullptr;
-    }
 
     class ENGINE_EXPORT Type final {
     public:
@@ -96,10 +86,14 @@ namespace Engine {
         typedef void (*FDeserialize)(nlohmann::json &, Entity *);
 
     private:
-        static std::unordered_map<std::string, const Type *> types;
+        static std::unordered_map<std::string, const Type *> &GetAllTypes() {
+            static std::unordered_map<std::string, const Type *> types;
+            return types;
+        }
 
     public:
         static const Type *GetType(const std::string &name) {
+            auto &types = GetAllTypes();
             auto it = types.find(name);
             if (it == types.end()) {
                 return nullptr;

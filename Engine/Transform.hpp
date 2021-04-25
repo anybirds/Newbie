@@ -26,7 +26,9 @@ NAMESPACE(Engine) {
     public:
         Transform();
         virtual ~Transform();
-
+        
+        virtual void OnRemove() override;
+        
         glm::mat4 GetLocalToWorldMatrix() const;
         glm::mat4 GetWorldToLocalMatrix() const;
         glm::vec3 GetPosition() const;

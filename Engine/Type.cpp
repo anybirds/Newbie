@@ -65,13 +65,11 @@ namespace glm {
     }
 }
 
-unordered_map<string, const Type *> Type::types;
-
 Type::Type(const string &name, FInstantiate instantiate, FSerialize serialize, FDeserialize deserialize)
     : name(name), instantiate(instantiate), serialize(serialize), deserialize(deserialize) {
-    types.insert({name, this});
+    GetAllTypes().insert({name, this});
 }
 
 Type::~Type() {
-    types.erase(name);
+    GetAllTypes().erase(name);
 }

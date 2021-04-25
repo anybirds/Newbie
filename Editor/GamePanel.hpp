@@ -7,9 +7,6 @@
 #include <Graphics/Framebuffer.hpp>
 
 class GamePanel : public Panel {
-private:
-    static const std::string &GetBackupScenePath();
-
 public:
     static GamePanel &GetInstance() { static GamePanel gamePanel; return gamePanel; }
 

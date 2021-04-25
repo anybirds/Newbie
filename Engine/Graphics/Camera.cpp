@@ -16,8 +16,6 @@ using namespace glm;
 using namespace std;
 using namespace Engine;
 
-Framebuffer *Camera::defaultFramebuffer;
-
 void Camera::Render() {
     int width, height;
     const shared_ptr<Framebuffer> &framebuffer = GetFramebuffer();
@@ -29,6 +27,7 @@ void Camera::Render() {
         }
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->fbo);
     } else {
+        Framebuffer *defaultFramebuffer = GetDefaultFramebuffer();
         if (defaultFramebuffer) {
             width = defaultFramebuffer->GetWidth(); height = defaultFramebuffer->GetHeight();
             float framebufferAspectRatio = (float)width / height;

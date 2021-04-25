@@ -7,11 +7,6 @@
 using namespace std;
 using namespace Engine;
 
-const std::string &GamePanel::GetBackupScenePath() {
-    static std::string backupScenePath(std::string(NEWBIE_PATH) + "/build/Editor/backup.json"); 
-    return backupScenePath; 
-}
-
 GamePanel::GamePanel() : Panel("Game") {
     Window &window = Window::GetInstance();
 
@@ -53,7 +48,7 @@ void GamePanel::Update() {
     if (running && !paused) {
         scene.Loop();
     } else {
-        scene.Render();
+        scene.PauseLoop();
     }
 }
 
@@ -87,19 +82,13 @@ void GamePanel::ShowPlayPause() {
     Scene &scene = Scene::GetInstance();
     ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
     if (ImGui::Selectable(ICON_FA_PLAY, running, 0, ImVec2(16.0f, 0.0f)) && scene.IsLoaded()) {
-        string path = filesystem::relative(filesystem::u8path(GetBackupScenePath()), filesystem::u8path(Project::GetInstance().GetDirectoy())).u8string();
         if (running) {
             open = false;
             Scene::FromBackup();
         } else {
             open = true;
             Scene::ToBackup();
-            Scene &backup = Scene::GetBackup();
-            string original = backup.GetPath();
-            backup.SetPath(path);
-            backup.SaveImmediate();
-            backup.SetPath(original);
-            scene.LoadImmediate(path, false);
+            Scene::LoadBackup();
         }
         running ^= true;
         paused = false;

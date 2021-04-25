@@ -19,8 +19,8 @@ NAMESPACE(Engine) {
 	public:
 		virtual void Draw(Renderer *renderer);
 
-		virtual void OnEnable() override;
-		virtual void OnDisable() override;
+		virtual void OnTrack() override;
+		virtual void OnUntrack() override;
 
 		void SetMesh(const std::shared_ptr<Mesh> &mesh);
 		void SetMaterial(const std::shared_ptr<Material> &material);

@@ -12,12 +12,13 @@ NAMESPACE(Engine) {
     CLASS_ATTR(Camera, Renderer, ENGINE_EXPORT) {
         TYPE(Camera);
 
-    private:
-        static Framebuffer *defaultFramebuffer;
-    
     public:
+        static Framebuffer *&GetDefaultFramebuffer() {
+            static Framebuffer *defaultFramebuffer;
+            return defaultFramebuffer;
+        }
         static void SetDefaultFramebuffer(const std::shared_ptr<Framebuffer> &defaultFramebuffer) {
-            Camera::defaultFramebuffer = defaultFramebuffer.get();
+            GetDefaultFramebuffer() = defaultFramebuffer.get();
         }
 
     public:

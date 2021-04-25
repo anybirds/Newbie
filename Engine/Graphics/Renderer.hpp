@@ -40,7 +40,7 @@ NAMESPACE(Engine) {
         void SetFar(float fr) { this->fr = fr; dirty = true; }
         void SetSize(float size) { this->size = size; dirty = true; }
 
-        virtual void OnEnable() override;
-        virtual void OnDisable() override;
+        virtual void OnTrack() override;
+        virtual void OnUntrack() override;
     };
 }

@@ -22,7 +22,12 @@ void Asset::SetRemoved(bool removed) {
 void Engine::from_json(const json &js, Entity *&entity) {
     uint64_t key = js.get<uint64_t>();
     if (key) {
-        entity = reinterpret_cast<Entity *>(Entity::temp.at(key));
+        auto it = Entity::GetMap().find(key);
+        if (it == Entity::GetMap().end()) {
+            entity = reinterpret_cast<Entity *>(key * (uint64_t)!Entity::GetNullify());
+        } else {
+            entity = reinterpret_cast<Entity *>(it->second);
+        }
     } else {
         entity = nullptr;
     }

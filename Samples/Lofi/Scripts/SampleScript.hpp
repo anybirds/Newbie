@@ -3,13 +3,12 @@
 #include <Engine.hpp>
 #include <UserExport.hpp>
 
-CLASS_ATTR(RotateScript, Engine::Script, USER_EXPORT) {
-    TYPE(RotateScript);
+CLASS_ATTR(SampleScript, Engine::Script, USER_EXPORT) {
+    TYPE(SampleScript);
 
     PROPERTY(float, rate, Rate);
-private:
-    bool copy = true;
 
 public:
+    virtual void Start() override;
     virtual void Update() override;
 };

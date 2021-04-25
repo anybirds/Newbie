@@ -18,6 +18,16 @@ Transform::~Transform() {
     delete GetGameObject(); // GameObject follows Transform
 }
 
+void Transform::OnRemove() {
+    Component::OnRemove();
+    if (parent) {
+        parent->children.erase(this);
+    } else {
+        Scene &scene = Scene::GetInstance();
+        scene.roots.erase(GetGameObject());
+    }
+}
+
 void Transform::Propagate() {
     if (dirty) {
         return;

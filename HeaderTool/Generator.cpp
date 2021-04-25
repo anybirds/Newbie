@@ -104,7 +104,7 @@ void Generator::TypeInit() {
             cout << "}\n";
         }
         for (Class *cs : ns->classes) {
-            cout << "  " << cs->name << "::StaticType(new Engine::Type(\""
+            cout << "  " << cs->name << "::SetType(new Engine::Type(\""
                 << cs->name << "\", "
                 << "Engine::instantiate<" << cs->name << ", true>, "
                 << cs->name << "::Serialize, "

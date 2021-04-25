@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <nlohmann/json.hpp>
 
 #include <Transform.hpp>
 
@@ -17,10 +18,16 @@ NAMESPACE(Engine) {
         PROPERTY_GET(Transform *, transform, Transform);
         PROPERTY_NONE(std::unordered_set<Component *>, components);
 
+    private:
+        static void ToJson(nlohmann::json &js, std::unordered_set<GameObject *> &roots);
+        static void FromJson(nlohmann::json &js, std::unordered_set<GameObject *> &roots);
+        GameObject *GetCopy();
+
     public:
         GameObject() : transform(nullptr) {}
         
         std::string &GetName() { return name; }
+        const std::unordered_set<Component *> &GetAllComponents() { return components; }
         bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
         bool IsEnabled() const { return transform->IsEnabled(); }
         void SetLocalEnabled(bool localEnabled) { transform->SetLocalEnabled(localEnabled); }
@@ -36,14 +43,12 @@ NAMESPACE(Engine) {
                 }
             }
             return nullptr;
-        } 
-        Component *AddComponent(Component *component);
+        }
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
         T *AddComponent() {
             T *t = new T();
             t->gameObject = this;
             components.insert(t);
-            t->OnAdd();
             return t;
         }
         template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
@@ -56,7 +61,6 @@ NAMESPACE(Engine) {
             t->gameObject = this;
             components.insert(t);
             transform = t;
-            t->OnAdd();
             return t;
         }
 

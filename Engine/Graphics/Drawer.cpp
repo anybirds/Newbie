@@ -56,7 +56,7 @@ void Drawer::Draw(Renderer *renderer) {
     glUseProgram(0);
 }
 
-void Drawer::OnEnable() {
+void Drawer::OnTrack() {
     if (!material) {
         return;
     }
@@ -75,7 +75,7 @@ void Drawer::OnEnable() {
     batch->AddDrawer(this);
 }
 
-void Drawer::OnDisable() {
+void Drawer::OnUntrack() {
     if (!material) {
         return;
     }

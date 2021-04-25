@@ -2,21 +2,82 @@
 
 #include <GameObject.hpp>
 #include <Component.hpp>
+#include <Asset.hpp>
 
 using namespace std;
 using namespace Engine;
+using json = nlohmann::json;
 
-Component *GameObject::AddComponent(Component *component) {
-    if (dynamic_cast<Transform *>(component)) {
-        return transform;
+void GameObject::ToJson(json &js, unordered_set<GameObject *> &roots) {
+    js["roots"] = roots;
+
+    // write entities
+    json& entities = js["entities"];
+    function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
+        // ignore removed GameObjects
+        if (gameObject->IsRemoved()) {
+            return;
+        }
+
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->children) {
+            recurse(t->GetGameObject());
+        }
+
+        for (Component *component : gameObject->components) {
+            // ignore removed Components
+            if (component->IsRemoved()) {
+                continue;
+            }
+
+            Type *type = component->GetType();
+                type->Serialize(
+                    entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
+                    component); 
+        }
+
+        GameObject::StaticType()->Serialize(
+            entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+            gameObject);
+    };
+    for (GameObject *root : roots) {
+        recurse(root);
+    }
+}
+
+void GameObject::FromJson(json &js, unordered_set<GameObject *> &roots) {
+    GetMap().clear();
+
+    // read entities
+    json &entities = js["entities"];
+    for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+        const Type *type = Type::GetType(i.key());
+        for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+            Entity *entity = type->Instantiate();
+            GetMap().insert({stoll(j.key()), entity});
+        }
     }
 
-    Component *t = (Component *)component->GetCopy();
-    t->gameObject = this;
-    t->enabled = false;
-    t->OnAdd();
-    components.insert(t);
-    return t;
+    for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+        const Type *type = Type::GetType(i.key());
+        for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+            type->Deserialize(j.value(), GetMap().at(stoll(j.key())));
+        }
+    }
+    
+    // read roots 
+    roots = js["roots"].get<unordered_set<GameObject *>>();
+    
+    GetMap().clear();
+}
+
+GameObject *GameObject::GetCopy() {
+    json js;
+    unordered_set<GameObject *> roots;
+    ToJson(js, unordered_set<GameObject *>{this});
+    SetNullify(false);
+    FromJson(js, roots);
+    return *roots.begin();
 }
 
 GameObject *GameObject::AddGameObject() {
@@ -28,21 +89,12 @@ GameObject *GameObject::AddGameObject() {
 }
 
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
-    GameObject *add = new GameObject();
-    add->SetName(gameObject->GetName());
-    Transform *t = add->AddComponent<Transform>();
-    t->SetLocalPosition(gameObject->GetTransform()->GetLocalPosition());
-    t->SetLocalRotation(gameObject->GetTransform()->GetLocalRotation());
-    t->SetLocalScale(gameObject->GetTransform()->GetLocalScale());
-    for (Component *component : gameObject->components) {
-        add->AddComponent(component);
-    }
-    for (Transform *t : gameObject->GetTransform()->GetChildren()) {
-        add->AddGameObject(t->GetGameObject());
-    }
-    add->transform->parent = transform;
-    transform->children.insert(add->transform);
-    return add;
+    GameObject *child = gameObject->GetCopy();
+    Transform *t = child->GetTransform();
+    t->parent = transform;
+    t->Propagate();
+    transform->children.insert(t);
+    return child;
 }
 
 GameObject *GameObject::FindGameObject(const string &name) const {

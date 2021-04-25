@@ -32,6 +32,18 @@ void Scene::FromBackup() {
     backup = Scene();
 }
 
+void Scene::LoadBackup() {
+    Scene &scene = GetInstance();
+    Scene &backup = GetBackup();
+    scene.name = backup.name;
+    scene.path = backup.path;
+    scene.loaded = true;
+    json js;
+    GameObject::ToJson(js, backup.roots);
+    Entity::SetNullify(true);
+    GameObject::FromJson(js, scene.roots);
+}
+
 void Scene::Load(const string &path) {
     flags |= LOAD;
     this->loadPath = path;
@@ -45,7 +57,7 @@ void Scene::Close() {
     flags |= CLOSE;
 }
 
-bool Scene::LoadImmediate(const string &path, bool useBackup) {
+bool Scene::LoadImmediate(const string &path) {
     try {
         // open json file
         ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -55,7 +67,7 @@ bool Scene::LoadImmediate(const string &path, bool useBackup) {
         }
 
         // move to backup in order to maintain duplicate resource and handle failure cases
-        if (useBackup) { ToBackup(); }
+        ToBackup();
 
         // get scene file path
         this->path = path;
@@ -65,57 +77,16 @@ bool Scene::LoadImmediate(const string &path, bool useBackup) {
         json js;
         fs >> js;
         
-        // read entities
-        json &entities = js["entities"];
-        for (json::iterator i = entities.begin(); i != entities.end(); i++) {
-            const Type *type = Type::GetType(i.key());
-            for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                Entity *entity = type->Instantiate();
-                Entity::temp.insert({stoll(j.key()), entity});
-            }
-        }
-
-        for (json::iterator i = entities.begin(); i != entities.end(); i++) {
-            const Type *type = Type::GetType(i.key());
-            for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
-                type->Deserialize(j.value(), Entity::temp.at(stoll(j.key())));
-            }
-        }
-        
-        // read roots 
-        roots = js["roots"].get<unordered_set<GameObject *>>();
-
-        // read scene setting
-        setting = (SceneSetting *)SceneSetting::StaticType()->Instantiate();
-        SceneSetting::StaticType()->Deserialize(js["setting"], setting);
-
-        Entity::temp.clear();
-
-        // process components
-        function<void(GameObject *, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled) {
-            Transform *transform = gameObject->GetTransform();
-            for (Transform *t : transform->GetChildren()) {
-                recurse(t->GetGameObject(), enabled && t->IsLocalEnabled());
-            }
-
-            for (Component *component : gameObject->components) {
-                component->OnAdd();
-                if (enabled && component->IsLocalEnabled()) {
-                    component->OnEnable();
-                }
-            }
-        };
-        for (GameObject *root : roots) {
-            recurse(root, root->IsLocalEnabled());
-        }
-
+        // read roots
+        Entity::SetNullify(true);
+        GameObject::FromJson(js, roots);
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
-        if (useBackup) { FromBackup(); }
+        FromBackup();
         return false;
     }
     
-    if (useBackup) { GetBackup().CloseImmediate(); }
+    GetBackup().CloseImmediate();
 
     loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read scene: " << path << " done.\n";
@@ -126,48 +97,8 @@ bool Scene::SaveImmediate() {
     try {
         json js;
 
-        // write scene setting
-        SceneSetting::StaticType()->Serialize(js["setting"], setting);
-
         // write roots
-        js["roots"] = roots;
-
-        // write entities
-        json& entities = js["entities"];
-        function<void(GameObject *)> recurse = [&recurse, &entities](GameObject *gameObject) {
-            // ignore removed GameObjects
-            if (gameObject->IsRemoved()) {
-                return;
-            }
-
-            Transform *transform = gameObject->GetTransform();
-            for (Transform *t : transform->children) {
-                recurse(t->GetGameObject());
-            }
-
-            for (Component *component : gameObject->components) {
-                // ignore removed Components
-                if (component->IsRemoved()) {
-                    continue;
-                }
-
-                Type *type = component->GetType();
-                    type->Serialize(
-                        entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
-                        component); 
-            }
-
-            GameObject::StaticType()->Serialize(
-                entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
-                gameObject);
-        };
-        for (GameObject *root : roots) {
-            recurse(root);
-            
-            GameObject::StaticType()->Serialize(
-                entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(root))], 
-                root);
-        }
+        GameObject::ToJson(js, roots);
         
         // open json file
         ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -186,10 +117,6 @@ bool Scene::SaveImmediate() {
 }
 
 void Scene::CloseImmediate() {
-    if (setting) {
-        delete setting;
-    }
-    
     function<void(GameObject *)> recurse = [this, &recurse](GameObject *gameObject) {
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
@@ -213,7 +140,7 @@ void Scene::CloseImmediate() {
 
     *this = Scene();
 
-    cerr << '[' << __FUNCTION__ << ']' << " close scene done\n";
+    cerr << '[' << __FUNCTION__ << ']' << " close scene done.\n";
 }
 
 GameObject *Scene::AddGameObject() {
@@ -224,18 +151,10 @@ GameObject *Scene::AddGameObject() {
 }
 
 GameObject *Scene::AddGameObject(GameObject *gameObject) {
-    GameObject *root = new GameObject();
-    root->SetName(gameObject->GetName());
-    Transform *t = root->AddComponent<Transform>();
-    t->SetLocalPosition(gameObject->GetTransform()->GetLocalPosition());
-    t->SetLocalRotation(gameObject->GetTransform()->GetLocalRotation());
-    t->SetLocalScale(gameObject->GetTransform()->GetLocalScale());
-    for (Component *component : gameObject->components) {
-        root->AddComponent(component);
-    }
-    for (Transform *t : gameObject->GetTransform()->GetChildren()) {
-        root->AddGameObject(t->GetGameObject());
-    }
+    GameObject *root = gameObject->GetCopy();
+    Transform *t = root->GetTransform();
+    t->parent = nullptr;
+    t->Propagate();
     roots.insert(root);
     return root;
 }
@@ -302,6 +221,18 @@ void Scene::Flags() {
     }
 }
 
+void Scene::Track() {
+    for (Component *component : enables) {
+        component->OnTrack();
+    }
+}
+
+void Scene::Untrack() {
+    for (Component *component : disables) {
+        component->OnUntrack();
+    }
+}
+
 void Scene::Enable() {
     for (Component *component : enables) {
         try {
@@ -332,7 +263,12 @@ void Scene::Remove() {
 void Scene::Update() {
     for (Script *script : scripts) {
         try {
-            script->Update();
+            if (script->start) {
+                script->Start();
+                script->start = false;
+            } else {
+                script->Update();
+            }
         } catch(...) {}
     }
 }
@@ -350,9 +286,19 @@ void Scene::Render() {
 void Scene::Loop() {
     Flags();
 
+    Untrack();
     Disable();
     Remove();
+    Track();
     Enable();
     Update();
+    Render();
+}
+
+void Scene::PauseLoop() {
+    Flags();
+
+    Untrack();
+    Track();
     Render();
 }

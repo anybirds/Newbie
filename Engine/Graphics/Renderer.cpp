@@ -35,12 +35,12 @@ void Renderer::SetOrder(unsigned order) {
     }
 }
 
-void Renderer::OnEnable() {
+void Renderer::OnTrack() {
     Scene &scene = Scene::GetInstance();
     scene.renderers[order].insert(this);
 }
 
-void Renderer::OnDisable() {
+void Renderer::OnUntrack() {
     Scene &scene = Scene::GetInstance();
     scene.renderers[order].erase(this);
 }

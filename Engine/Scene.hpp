@@ -19,19 +19,16 @@ NAMESPACE(Engine) {
     class Material;
     class Mesh;
 
-    CLASS_FINAL_ATTR(SceneSetting, Entity, ENGINE_EXPORT) {
-        TYPE(SceneSetting);
-    };
-
     class ENGINE_EXPORT Scene final {
     public:
         static Scene &GetInstance() { static Scene scene; return scene; }
         static Scene &GetBackup() { static Scene backup; return backup; }
         static void ToBackup();
         static void FromBackup();
+        static void LoadBackup();
 
     private:
-        Scene() : flags(0U), loaded(false), setting(nullptr) {}
+        Scene() : flags(0U), loaded(false) {}
         Scene &operator=(const Scene &) = default;
 
         enum {
@@ -45,7 +42,6 @@ NAMESPACE(Engine) {
         bool loaded;
         std::string name;
         std::string path;
-        SceneSetting *setting;
         std::unordered_set<GameObject *> roots;
         std::unordered_set<Script *> scripts;
         std::map<int, std::unordered_set<Renderer *>> renderers;
@@ -57,10 +53,13 @@ NAMESPACE(Engine) {
 
         void Flags();
         
+        void Track();
+        void Untrack();
         void Enable();
         void Disable();
         void Remove();
 
+        void Render();
         void Update();
 
     public:
@@ -69,7 +68,7 @@ NAMESPACE(Engine) {
         void Load(const std::string &path);
         void Save();
         void Close();
-        bool LoadImmediate(const std::string &path, bool useBackup = true);
+        bool LoadImmediate(const std::string &path);
         bool SaveImmediate();
         void CloseImmediate();
 
@@ -77,7 +76,6 @@ NAMESPACE(Engine) {
         const std::string &GetName() const { return name; }
         const std::string &GetPath() const { return path; }
         void SetPath(const std::string &path) { this->path = path; }
-        SceneSetting *GetSetting() const { return setting; }
         
         const std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> &GetAllBatches() const { return batches; }
         const std::unordered_set<GameObject *> &GetRootGameObjects() const { return roots; }
@@ -87,8 +85,8 @@ NAMESPACE(Engine) {
         void RemoveComponent(Component *component);
         GameObject *FindGameObject(const std::string &name);
 
-        void Render();
         void Loop();
+        void PauseLoop();
 
         friend class Transform;
         friend class Script;
