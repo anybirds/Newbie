@@ -8,6 +8,7 @@
 #include <Graphics/Window.hpp>
 #include <ProjectDialog.hpp>
 #include <FileDialog.hpp>
+#include <NewDialog.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -131,65 +132,35 @@ void ProjectDialog::ShowContents() {
         }
     }
 
+    NewDialog &newDialog = NewDialog::GetInstance();
     if (newProject) {
-        ImGui::OpenPopup("New Project");
+        newDialog.SetCallback([this](const string &path)->bool {
+            auto sample(filesystem::u8path(GetEmptyProjectPath()));
+            auto created(filesystem::u8path(path));
+            string name = created.stem().u8string();
+            try {
+                // copy files from "Samples/Empty" (non-recursive)
+                filesystem::copy(sample, created);
+
+                // rename project file
+                filesystem::path proj;
+                for (auto &p : filesystem::directory_iterator(created)) {
+                    // find Empty.json file
+                    if (p.path().filename().string() == "Empty.json") {
+                        proj = p;
+                        proj.replace_filename(filesystem::u8path(name + ".json"));
+                        filesystem::rename(p, proj);
+                        break;
+                    }
+                }
+
+                AddProject(created.u8string());
+            } catch (...) { return false; }
+            return true;
+        });
+        newDialog.Open();
         selected = nullptr;
         newProject = false;
     }
-
-    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(ImVec2(480.0f, 0.0f));
-
-    bool p_open = true;
-    if (ImGui::BeginPopupModal("New Project", &p_open, ImGuiWindowFlags_NoResize)) {
-        ImGui::Text("Name :");
-        ImGui::InputText("##Name", &name);
-        
-        ImGui::Text("Location :");
-        ImGui::InputText("##Location", &location);
-        ImGui::SameLine();
-        FileDialog &fileDialog = FileDialog::GetInstance();
-        if (ImGui::Button("Browse...")) {
-            fileDialog.SetFolderDialog();
-            fileDialog.SetCallback([this](const string &path) {
-                this->location = path;
-            });
-            fileDialog.Open();
-        }
-        fileDialog.Show();
-
-        ImGui::Separator();
-        ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
-        if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
-            if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(GetEmptyProjectPath()));
-                auto created(filesystem::u8path(location + "/" + name));
-                try {
-                    // copy files from "Samples/Empty" (non-recursive)
-                    filesystem::copy(sample, created);
-
-                    // rename project file
-                    filesystem::path proj;
-                    for (auto &p : filesystem::directory_iterator(created)) {
-                        // find Empty.json file
-                        if (p.path().filename().string() == "Empty.json") {
-                            proj = p;
-                            proj.replace_filename(filesystem::u8path(name + ".json"));
-                            filesystem::rename(p, proj);
-                            break;
-                        }
-                    }
-
-                    AddProject(created.u8string());
-
-                    name.clear();
-                    location.clear();
-                    ImGui::CloseCurrentPopup();
-                } catch (...) {}
-            }
-        }
-
-        ImGui::EndPopup();
-    }
+    newDialog.Show();
 }

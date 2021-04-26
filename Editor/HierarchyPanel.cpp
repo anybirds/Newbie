@@ -30,8 +30,17 @@ void HierarchyPanel::ShowContents() {
         if (rename && selected == (void *)gameObject) {
             ShowRename(gameObject->GetName());
         } else {
-            if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uint64_t)gameObject)).c_str(), (void *)gameObject == selected)) {
+            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uint64_t)gameObject)).c_str(), (void *)gameObject == selected);
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
                 selected = (void *)gameObject;
+            }
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+            {
+                ImGui::SetDragDropPayload("GameObject", &selected, sizeof(GameObject *));
+                ImGui::Text(ICON_FA_CUBE);
+                ImGui::SameLine();
+                ImGui::Text(((GameObject *)selected)->GetName().c_str());
+                ImGui::EndDragDropSource();
             }
         }
         if (open) {

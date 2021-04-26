@@ -6,6 +6,7 @@
 #include <Graphics/Window.hpp>
 #include <SceneDialog.hpp>
 #include <FileDialog.hpp>
+#include <NewDialog.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -80,55 +81,24 @@ void SceneDialog::ShowContents() {
         }
     }
 
+    NewDialog &newDialog = NewDialog::GetInstance();
     if (newScene) {
-        ImGui::OpenPopup("New Scene");
+        newDialog.SetCallback([](const string &path)->bool {
+            auto sample(filesystem::u8path(GetEmptyScenePath()));
+            auto created(filesystem::u8path(path));
+            try {
+                // copy file "Samples/Empty/Main.json"
+                filesystem::copy_file(sample, created);
+
+                // add scene
+                Project &project = Project::GetInstance();
+                project.AddScene(filesystem::relative(created, filesystem::u8path(project.GetDirectoy())).u8string());
+            } catch (...) { return false; }
+            return true;
+        });
+        newDialog.Open();
         selected = nullptr;
         newScene = false;
     }
-
-    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(ImVec2(480.0f, 0.0f));
-
-    bool p_open = true;
-    if (ImGui::BeginPopupModal("New Scene", &p_open, ImGuiWindowFlags_NoResize)) {
-        ImGui::Text("File Name :");
-        ImGui::InputText("##Name", &name);
-        
-        ImGui::Text("Location :");
-        ImGui::InputText("##Location", &location);
-        ImGui::SameLine();
-        FileDialog &fileDialog = FileDialog::GetInstance();
-        if (ImGui::Button("Browse...")) {
-            fileDialog.SetFolderDialog();
-            fileDialog.SetCallback([this](const string &path) {
-                this->location = path;
-            });
-            fileDialog.Open();
-        }
-        fileDialog.Show();
-
-        ImGui::Separator();
-        ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
-        if (ImGui::Button("Create", ImVec2(80.0f, 0.0f))) {
-            if (!name.empty() && !location.empty()) {
-                auto sample(filesystem::u8path(GetEmptyScenePath()));
-                auto created(filesystem::u8path(location + "/" + name));
-                try {
-                    // copy file "Samples/Empty/Main.json"
-                    filesystem::copy_file(sample, created);
-
-                    // add scene
-                    Project &project = Project::GetInstance();
-                    project.AddScene(filesystem::relative(created, filesystem::u8path(project.GetDirectoy())).u8string());
-
-                    name.clear();
-                    location.clear();
-                    ImGui::CloseCurrentPopup();
-                } catch (...) {}
-            }
-        }
-
-        ImGui::EndPopup();
-    }
+    newDialog.Show();
 }

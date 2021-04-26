@@ -18,9 +18,9 @@ NAMESPACE(Engine) {
         PROPERTY_GET(Transform *, transform, Transform);
         PROPERTY_NONE(std::vector<Component *>, components);
 
-    private:
-        static void ToJson(nlohmann::json &js, std::vector<GameObject *> &roots);
-        static void FromJson(nlohmann::json &js, std::vector<GameObject *> &roots);
+    public:
+        static void ToJson(nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify);
+        static void FromJson(nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify);
         GameObject *GetCopy();
 
     public:

@@ -39,9 +39,8 @@ void Scene::LoadBackup() {
     scene.path = backup.path;
     scene.loaded = true;
     json js;
-    GameObject::ToJson(js, backup.roots);
-    Entity::SetNullify(true);
-    GameObject::FromJson(js, scene.roots);
+    GameObject::ToJson(js, backup.roots, false);
+    GameObject::FromJson(js, scene.roots, true);
 }
 
 void Scene::Load(const string &path) {
@@ -78,8 +77,7 @@ bool Scene::LoadImmediate(const string &path) {
         fs >> js;
         
         // read roots
-        Entity::SetNullify(true);
-        GameObject::FromJson(js, roots);
+        GameObject::FromJson(js, roots, true);
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
         FromBackup();
@@ -98,7 +96,7 @@ bool Scene::SaveImmediate() {
         json js;
 
         // write roots
-        GameObject::ToJson(js, roots);
+        GameObject::ToJson(js, roots, false);
         
         // open json file
         ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -268,14 +266,14 @@ void Scene::Remove() {
     for (size_t i = 0; i < removeTrans.size(); i++) {
         size_t j = i;
         do {
-            removeTrans[j]->flags |= Component::MARKED;
+            removeTrans[j]->flags |= Component::DESTROYED;
             j++;
         } while (j < removeTrans.size() && removeTrans[j - 1]->GetParent() == removeTrans[j]->GetParent());
         Transform *transform = removeTrans[i]->GetParent();
         size_t l = 0;
         if (transform) {
             for (size_t k = 0; k < transform->children.size(); k++) {
-                if (transform->children[k]->flags & Component::MARKED) {
+                if (transform->children[k]->flags & Component::DESTROYED) {
                     continue;
                 }
                 transform->children[l] = transform->children[k];
@@ -284,7 +282,7 @@ void Scene::Remove() {
             transform->children.resize(l);
         } else {
             for (size_t k = 0; k < roots.size(); k++) {
-                if (roots[k]->GetTransform()->flags & Component::MARKED) {
+                if (roots[k]->GetTransform()->flags & Component::DESTROYED) {
                     continue;
                 }
                 roots[l] = roots[k];
@@ -297,13 +295,13 @@ void Scene::Remove() {
     for (size_t i = 0; i < removeComps.size(); i++) {
         size_t j = i;
         do {
-            removeComps[j]->flags |= Component::MARKED;
+            removeComps[j]->flags |= Component::DESTROYED;
             j++;
         } while (j < removeComps.size() && removeComps[j - 1]->GetGameObject() == removeComps[j]->GetGameObject());
         GameObject *gameObject = removeComps[i]->GetGameObject();
         size_t l = 0;
         for (size_t k = 0; k < gameObject->components.size(); k++) {
-            if (gameObject->components[k]->flags & Component::MARKED) {
+            if (gameObject->components[k]->flags & Component::DESTROYED) {
                 continue;
             }
             gameObject->components[l] = gameObject->components[k];

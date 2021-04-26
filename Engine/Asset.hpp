@@ -39,7 +39,16 @@ NAMESPACE(Engine) {
     template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T> &&
     !std::is_base_of_v<Asset, T>, bool> = true>
     void to_json(nlohmann::json &js, const T *t) {
-        js = reinterpret_cast<uint64_t>(t);
+        if (Entity::GetNullify()) {
+            auto it = Entity::GetMap().find((uint64_t)t);
+            if (it == Entity::GetMap().end()) {
+                js = 0U;
+            } else {
+                js = it->second;
+            }
+        } else {
+            js = reinterpret_cast<uint64_t>(t);
+        }
     }
 
     template <typename T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>

@@ -1,8 +1,12 @@
+#include <fstream>
+
 #include <AssetPanel.hpp>
+#include <NewDialog.hpp>
 #include <Project.hpp>
-#include <Asset.hpp>
+#include <Prefab.hpp>
 
 using namespace std;
+using json = nlohmann::json;
 using namespace Engine;
 
 void AssetPanel::ShowContents() {
@@ -34,6 +38,11 @@ void AssetPanel::ShowContents() {
         } else if (name == "AFramebuffer") {
             ImGui::Text(ICON_FA_DESKTOP);
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
+        } else if (name == "APrefab") {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+            ImGui::Text(ICON_FA_CUBE);
+            ImGui::PopStyleColor();
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
         } else {
             ImGui::Text(ICON_FA_FILE);
         }
@@ -41,10 +50,39 @@ void AssetPanel::ShowContents() {
         if (rename && selected == (void *)asset) {
             ShowRename(asset->GetName()); 
         } else {
-            if (ImGui::Selectable((asset->GetName() + "##" + to_string((uint64_t)asset)).c_str(), (void *)asset == selected)) {
+            ImGui::Selectable((asset->GetName() + "##" + to_string((uint64_t)asset)).c_str(), (void *)asset == selected);
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
                 selected = (void *)asset;
             }
         }
     }
     ImGui::EndChild();
+    NewDialog &newDialog = NewDialog::GetInstance();
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
+        {
+            IM_ASSERT(payload->DataSize == sizeof(GameObject *));
+            gameObject = *(GameObject **)payload->Data;
+            newDialog.SetCallback([this, &project](const string &path)->bool {
+                try {
+                    json js;
+                    GameObject::ToJson(js, vector<GameObject *>{this->gameObject}, true);
+                    ofstream fs(path);
+                    if (fs.fail()) {
+                        return false;
+                    }
+                    fs << js;
+                    APrefab *aprefab = project.AddAsset<APrefab>();
+                    aprefab->SetName(gameObject->GetName());
+                    aprefab->SetPath(path);
+                } catch (...) { return false; }
+                return true;
+            });
+            newDialog.Open();
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    newDialog.Show();
 }

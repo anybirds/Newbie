@@ -19,7 +19,7 @@ NAMESPACE(Engine) {
         enum : uint8_t {
             ENABLED = 1,
             REMOVED = 1 << 1,
-            MARKED = 1 << 2
+            DESTROYED = 1 << 2
         };
         uint8_t flags;
 

@@ -10,8 +10,8 @@ NAMESPACE(Engine) {
         TYPE(Entity);
 
     public:
-        static std::unordered_map<uint64_t, Entity *> &GetMap() {
-            static std::unordered_map<uint64_t, Entity *> map;
+        static std::unordered_map<uint64_t, uint64_t> &GetMap() {
+            static std::unordered_map<uint64_t, uint64_t> map;
             return map;
         }
         static bool &GetNullify() { static bool nullify; return nullify; }

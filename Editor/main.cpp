@@ -75,12 +75,12 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        Widget::UpdateRename();
         mainMenuBar.Show();
         gamePanel.Show();
         scenePanel.Show();
         assetPanel.Show();
         hierarchyPanel.Show();
-        Widget::UpdateRename();
 
         ImGui::ShowDemoWindow();
 
