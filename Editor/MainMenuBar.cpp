@@ -60,12 +60,16 @@ void MainMenuBar::Show() {
                 assetPanel.Toggle();
             }
             HierarchyPanel &hierarchyPanel = HierarchyPanel::GetInstance();
-            if (ImGui::MenuItem("Group", nullptr, hierarchyPanel.IsOpen())) {
+            if (ImGui::MenuItem("Hierarchy", nullptr, hierarchyPanel.IsOpen())) {
                 hierarchyPanel.Toggle();
             } 
             ImGui::EndMenu();
         }
         gamePanel.ShowPlayPause();
+        AssetPanel &assetPanel = AssetPanel::GetInstance();
+        if (assetPanel.IsPreview()) {
+            assetPanel.ShowPreviewOff();
+        }
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {

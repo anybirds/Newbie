@@ -56,7 +56,7 @@ void Scene::Close() {
     flags |= CLOSE;
 }
 
-bool Scene::LoadImmediate(const string &path) {
+bool Scene::LoadImmediate(const string &path, bool restore) {
     try {
         // open json file
         ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -84,7 +84,9 @@ bool Scene::LoadImmediate(const string &path) {
         return false;
     }
     
-    GetBackup().CloseImmediate();
+    if (!restore) {
+        GetBackup().CloseImmediate();
+    }
 
     loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read scene: " << path << " done.\n";

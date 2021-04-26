@@ -1,4 +1,5 @@
 #include <Prefab.hpp>
+#include <GameObject.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -14,10 +15,14 @@ shared_ptr<Resource> APrefab::GetResource() {
     return sp;
 }
 
+void APrefab::SetPrefab(GameObject *gameObject) { 
+    gameObject->prefab = dynamic_pointer_cast<Prefab>(GetResource()); 
+}
+
 Prefab::Prefab(APrefab *aprefab) : Resource(aprefab) {
     Apply();
 }
 
 void Prefab::Apply() {
-    
+    Resource::Apply();
 }

@@ -4,6 +4,9 @@
 #include <Resource.hpp>
 
 NAMESPACE(Engine) {
+
+    class GameObject;
+
     CLASS_FINAL_ATTR(APrefab, Asset, ENGINE_EXPORT) {
         TYPE(APrefab);
 
@@ -11,9 +14,10 @@ NAMESPACE(Engine) {
     
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
+        void SetPrefab(GameObject *gameObject);
     };
 
-    class Prefab : public Resource {
+    class ENGINE_EXPORT Prefab : public Resource {
         PROPERTY_GET(std::string, path, Path);
 
     public:

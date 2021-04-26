@@ -13,7 +13,7 @@ void GameObject::ToJson(json &js, vector<GameObject *> &roots, bool nullify) {
     SetNullify(nullify);
 
     if (nullify) {
-        uint64_t id = 0;
+        uint64_t id = 1;
         function<void(GameObject *)> recurse = [&recurse, &id](GameObject *gameObject) {
             Transform *transform = gameObject->GetTransform();
             for (Transform *t : transform->children) {

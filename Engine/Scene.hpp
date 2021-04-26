@@ -71,7 +71,7 @@ NAMESPACE(Engine) {
         void Load(const std::string &path);
         void Save();
         void Close();
-        bool LoadImmediate(const std::string &path);
+        bool LoadImmediate(const std::string &path, bool restore = false);
         bool SaveImmediate();
         void CloseImmediate();
 

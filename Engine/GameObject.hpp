@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <nlohmann/json.hpp>
 
 #include <Transform.hpp>
@@ -10,6 +11,7 @@ NAMESPACE(Engine) {
     
     class Component;
     class Transform;
+    class Prefab;
 
     CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
         TYPE(GameObject);
@@ -17,6 +19,7 @@ NAMESPACE(Engine) {
         PROPERTY(std::string, name, Name);
         PROPERTY_GET(Transform *, transform, Transform);
         PROPERTY_NONE(std::vector<Component *>, components);
+        PROPERTY_GET(std::shared_ptr<Prefab>, prefab, Prefab);
 
     public:
         static void ToJson(nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify);
@@ -69,5 +72,6 @@ NAMESPACE(Engine) {
         friend class Scene;
         friend class Component;
         friend class Transform;
+        friend class APrefab;
     };
 }

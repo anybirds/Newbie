@@ -25,7 +25,13 @@ void HierarchyPanel::ShowContents() {
         }
         bool open = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, "");
         ImGui::SameLine();
-        ImGui::Text(ICON_FA_CUBE);
+        if (gameObject->GetPrefab()) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+            ImGui::Text(ICON_FA_CUBE);
+            ImGui::PopStyleColor();
+        } else {
+            ImGui::Text(ICON_FA_CUBE);
+        }
         ImGui::SameLine();
         if (rename && selected == (void *)gameObject) {
             ShowRename(gameObject->GetName());
