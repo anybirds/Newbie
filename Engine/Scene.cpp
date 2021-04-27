@@ -35,12 +35,22 @@ void Scene::FromBackup() {
 void Scene::LoadBackup() {
     Scene &scene = GetInstance();
     Scene &backup = GetBackup();
+    
+    json js;
+    backup.ToJson(js);
+    scene.FromJson(js);
+
     scene.name = backup.name;
     scene.path = backup.path;
     scene.loaded = true;
-    json js;
-    GameObject::ToJson(js, backup.roots, false);
-    GameObject::FromJson(js, scene.roots, true);
+}
+
+void Scene::ToJson(json &js, bool nullify) {
+    GameObject::ToJson(js, roots, nullify);
+}
+
+void Scene::FromJson(const json &js, bool nullify) {
+    GameObject::FromJson(js, roots, nullify);
 }
 
 void Scene::Load(const string &path) {
@@ -56,7 +66,7 @@ void Scene::Close() {
     flags |= CLOSE;
 }
 
-bool Scene::LoadImmediate(const string &path, bool restore) {
+bool Scene::LoadImmediate(const string &path) {
     try {
         // open json file
         ifstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -75,18 +85,14 @@ bool Scene::LoadImmediate(const string &path, bool restore) {
         // read json object
         json js;
         fs >> js;
-        
-        // read roots
-        GameObject::FromJson(js, roots, true);
+        FromJson(js);
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
         FromBackup();
         return false;
     }
     
-    if (!restore) {
-        GetBackup().CloseImmediate();
-    }
+    GetBackup().CloseImmediate();
 
     loaded = true;
     cerr << '[' << __FUNCTION__ << ']' << " read scene: " << path << " done.\n";
@@ -95,10 +101,9 @@ bool Scene::LoadImmediate(const string &path, bool restore) {
 
 bool Scene::SaveImmediate() {
     try {
+        // write json object
         json js;
-
-        // write roots
-        GameObject::ToJson(js, roots, false);
+        ToJson(js);
         
         // open json file
         ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
@@ -117,19 +122,8 @@ bool Scene::SaveImmediate() {
 }
 
 void Scene::CloseImmediate() {
-    function<void(GameObject *)> recurse = [this, &recurse](GameObject *gameObject) {
-        Transform *transform = gameObject->GetTransform();
-        for (Transform *t : transform->GetChildren()) {
-            recurse(t->GetGameObject());
-        }
-
-        auto components = gameObject->components;
-        for (Component *component : components) {
-            delete component;
-        }
-    };
     for (GameObject *root : roots) {
-        recurse(root);
+        DestroyGameObject(root);
     }
 
     for (auto &order : batches) {
@@ -160,12 +154,12 @@ GameObject *Scene::AddGameObject(GameObject *gameObject) {
 }
 
 void Scene::RemoveGameObject(GameObject *gameObject) {
-    gameObject->GetTransform()->flags |= Component::REMOVED;
+    gameObject->GetTransform()->removed = true;
     gameObject->GetTransform()->SetLocalEnabled(false);
 }
 
 void Scene::RemoveComponent(Component *component) {
-    component->flags |= Component::REMOVED;
+    component->removed = true;
     component->SetLocalEnabled(false);
 }
 
@@ -176,6 +170,18 @@ GameObject *Scene::FindGameObject(const string &name) {
         }
     }
     return nullptr;
+}
+
+void Scene::DestroyGameObject(GameObject *gameObject) {
+    Transform *transform = gameObject->GetTransform();
+    for (Transform *t : transform->GetChildren()) {
+        DestroyGameObject(t->GetGameObject());
+    }
+
+    auto components = gameObject->components;
+    for (Component *component : components) {
+        delete component;
+    }
 }
 
 void Scene::Flags() {

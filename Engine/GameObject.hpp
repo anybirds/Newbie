@@ -22,8 +22,8 @@ NAMESPACE(Engine) {
         PROPERTY_GET(std::shared_ptr<Prefab>, prefab, Prefab);
 
     public:
-        static void ToJson(nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify);
-        static void FromJson(nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify);
+        static void ToJson(nlohmann::json &js, const std::vector<GameObject *> &roots, bool nullify = false);
+        static void FromJson(const nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify = true);
         GameObject *GetCopy();
 
     public:

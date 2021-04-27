@@ -76,17 +76,22 @@ void Generator::Deserialize() {
             cout << "}\n";
         }
         for (Class *cs : ns->classes) {
-            cout << "void " << cs->name << "::Deserialize(json &js, Engine::Entity *entity) {\n";
+            cout << "size_t " << cs->name << "::Deserialize(const json &js, Engine::Entity *entity) {\n";
 
+            cout << "  size_t i = ";
+            if (cs->base.empty()) {
+                cout << "0;\n";
+            } else {
+                cout << cs->base << "::StaticType()->Deserialize(js, entity);\n";
+            }
+        
             cout << "  " << cs->name << " *e = (" << cs->name << " *)entity;\n";
-            for (auto it = cs->properties.rbegin(); it != cs->properties.rend(); it++) {
-                Property *p = *it;
-                cout << "  e->" << p->name << " = js.back().get<" << p->type << ">(); js.erase(--js.end());\n";
+            for (size_t i = 0; i < cs->properties.size(); i++) {
+                Property *p = cs->properties[i];
+                cout << "  e->" << p->name << " = js[i++].get<" << p->type << ">();\n";
             }
 
-            if (!cs->base.empty()) {
-                cout << "  " << cs->base << "::StaticType()->Deserialize(js, entity);\n";
-            }
+            cout << "  return i;\n";
 
             cout << "}\n";
         }
@@ -104,11 +109,10 @@ void Generator::TypeInit() {
             cout << "}\n";
         }
         for (Class *cs : ns->classes) {
-            cout << "  " << cs->name << "::SetType(new Engine::Type(\""
-                << cs->name << "\", "
-                << "Engine::instantiate<" << cs->name << ", true>, "
-                << cs->name << "::Serialize, "
-                << cs->name << "::Deserialize));\n";
+            cout << "  " << cs->name << "::SetType(new Engine::Type(\"" << cs->name << "\"));\n";
+            cout << "  " << cs->name << "::StaticType()->SetInstantiate(" << "Engine::instantiate<" << cs->name << ", true>);\n";
+            cout << "  " << cs->name << "::StaticType()->SetSerialize(" << cs->name << "::Serialize);\n";
+            cout << "  " << cs->name << "::StaticType()->SetDeserialize(" << cs->name << "::Deserialize);\n";
         }
     };
 

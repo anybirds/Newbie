@@ -68,14 +68,18 @@ NAMESPACE(Engine) {
     public:
         Scene(const Scene &) = delete;
 
+        void ToJson(nlohmann::json &js, bool nullify = false);
+        void FromJson(const nlohmann::json &js, bool nullify = true);
+
         void Load(const std::string &path);
         void Save();
         void Close();
-        bool LoadImmediate(const std::string &path, bool restore = false);
+        bool LoadImmediate(const std::string &path);
         bool SaveImmediate();
         void CloseImmediate();
 
         bool IsLoaded() const { return loaded; }
+        void SetLoaded(bool loaded) { this->loaded = loaded; }
         const std::string &GetName() const { return name; }
         const std::string &GetPath() const { return path; }
         void SetPath(const std::string &path) { this->path = path; }
@@ -87,6 +91,7 @@ NAMESPACE(Engine) {
         void RemoveGameObject(GameObject *gameObject);
         void RemoveComponent(Component *component);
         GameObject *FindGameObject(const std::string &name);
+        void DestroyGameObject(GameObject *gameObject);
 
         void Loop();
         void PauseLoop();

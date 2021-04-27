@@ -40,14 +40,14 @@ NAMESPACE(Engine) {
     !std::is_base_of_v<Asset, T>, bool> = true>
     void to_json(nlohmann::json &js, const T *t) {
         if (Entity::GetNullify()) {
-            auto it = Entity::GetMap().find((uint64_t)t);
+            auto it = Entity::GetMap().find((uintptr_t)t);
             if (it == Entity::GetMap().end()) {
                 js = 0U;
             } else {
                 js = it->second;
             }
         } else {
-            js = reinterpret_cast<uint64_t>(t);
+            js = reinterpret_cast<uintptr_t>(t);
         }
     }
 

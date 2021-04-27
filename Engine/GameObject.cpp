@@ -8,12 +8,12 @@ using namespace std;
 using namespace Engine;
 using json = nlohmann::json;
 
-void GameObject::ToJson(json &js, vector<GameObject *> &roots, bool nullify) {
+void GameObject::ToJson(json &js, const vector<GameObject *> &roots, bool nullify) {
     GetMap().clear();
     SetNullify(nullify);
 
     if (nullify) {
-        uint64_t id = 1;
+        uintptr_t id = 1;
         function<void(GameObject *)> recurse = [&recurse, &id](GameObject *gameObject) {
             Transform *transform = gameObject->GetTransform();
             for (Transform *t : transform->children) {
@@ -21,9 +21,9 @@ void GameObject::ToJson(json &js, vector<GameObject *> &roots, bool nullify) {
             }
 
             for (Component *component : gameObject->components) {
-                GetMap().insert(make_pair((uint64_t)component, id++));
+                GetMap().insert(make_pair((uintptr_t)component, id++));
             }
-            GetMap().insert(make_pair((uint64_t)gameObject, id++));
+            GetMap().insert(make_pair((uintptr_t)gameObject, id++));
         };
         for (GameObject *root : roots) {
             recurse(root);
@@ -41,14 +41,14 @@ void GameObject::ToJson(json &js, vector<GameObject *> &roots, bool nullify) {
         }
 
         for (Component *component : gameObject->components) {
-            uint64_t id = GetNullify() ? GetMap()[(uint64_t)component] : (uint64_t)component;
+            uintptr_t id = GetNullify() ? GetMap()[(uintptr_t)component] : (uintptr_t)component;
             Type *type = component->GetType();
                 type->Serialize(
                     entities[type->GetName()][to_string(id)],
                     component); 
         }
 
-        uint64_t id = GetNullify() ? GetMap()[(uint64_t)gameObject] : (uint64_t)gameObject;
+        uintptr_t id = GetNullify() ? GetMap()[(uintptr_t)gameObject] : (uintptr_t)gameObject;
         GameObject::StaticType()->Serialize(
             entities[GameObject::StaticType()->GetName()][to_string(id)], 
             gameObject);
@@ -58,23 +58,23 @@ void GameObject::ToJson(json &js, vector<GameObject *> &roots, bool nullify) {
     }
 }
 
-void GameObject::FromJson(json &js, vector<GameObject *> &roots, bool nullify) {
+void GameObject::FromJson(const json &js, vector<GameObject *> &roots, bool nullify) {
     GetMap().clear();
     SetNullify(nullify);
 
     // read entities
-    json &entities = js["entities"];
-    for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+    const json &entities = js["entities"];
+    for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
         const Type *type = Type::GetType(i.key());
-        for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+        for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
             Entity *entity = type->Instantiate();
-            GetMap().insert({stoll(j.key()), (uint64_t)entity});
+            GetMap().insert({stoll(j.key()), (uintptr_t)entity});
         }
     }
 
-    for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+    for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
         const Type *type = Type::GetType(i.key());
-        for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+        for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
             type->Deserialize(j.value(), (Entity *)GetMap().at(stoll(j.key())));
         }
     }

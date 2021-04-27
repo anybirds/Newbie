@@ -13,7 +13,7 @@ void Widget::ShowRename(string &str) {
     ImGui::SetKeyboardFocusHere();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-    ImGui::InputText((string("##") + to_string((uint64_t)selected)).c_str(), &str, ImGuiInputTextFlags_AutoSelectAll);
+    ImGui::InputText((string("##") + to_string((uintptr_t)selected)).c_str(), &str, ImGuiInputTextFlags_AutoSelectAll);
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     renameClicked = ImGui::IsItemClicked();

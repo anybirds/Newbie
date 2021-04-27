@@ -36,7 +36,7 @@ void HierarchyPanel::ShowContents() {
         if (rename && selected == (void *)gameObject) {
             ShowRename(gameObject->GetName());
         } else {
-            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uint64_t)gameObject)).c_str(), (void *)gameObject == selected);
+            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == selected);
             if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
                 selected = (void *)gameObject;
             }

@@ -46,7 +46,7 @@
     virtual Engine::Type *GetType() const { return T::StaticType(); } \
     private: \
     static void Serialize(nlohmann::json &, const Engine::Entity *); \
-    static void Deserialize(nlohmann::json &, Engine::Entity *); \
+    static size_t Deserialize(const nlohmann::json &, Engine::Entity *); \
     friend void ::type_init() 
     
 
@@ -83,7 +83,7 @@ namespace Engine {
     public:
         typedef Entity *(*FInstantiate)();
         typedef void (*FSerialize)(nlohmann::json &, const Entity *);
-        typedef void (*FDeserialize)(nlohmann::json &, Entity *);
+        typedef size_t (*FDeserialize)(const nlohmann::json &, Entity *);
 
     private:
         static std::unordered_map<std::string, const Type *> &GetAllTypes() {
@@ -108,12 +108,17 @@ namespace Engine {
         FDeserialize deserialize;
 
     public:
-        Type(const std::string &name, FInstantiate instantiate, FSerialize serialize, FDeserialize deserialize);
+        Type(const std::string &name);
         ~Type();
 
         const std::string &GetName() const { return name; }
+
+        void SetInstantiate(FInstantiate instantiate) { this->instantiate = instantiate; }
+        void SetSerialize(FSerialize serialize) { this->serialize = serialize; }
+        void SetDeserialize(FDeserialize deserialize) { this->deserialize = deserialize; }
+
         Entity *Instantiate() const { return instantiate(); }
         void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
-        void Deserialize(nlohmann::json &js, Entity *entity) const { deserialize(js, entity); }
+        size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
     };
 }

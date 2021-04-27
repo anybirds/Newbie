@@ -11,6 +11,7 @@
 #include <AssetPanel.hpp>
 #include <HierarchyPanel.hpp>
 
+#include <Project.hpp>
 #include <Graphics/Window.hpp>
 #include <Time.hpp>
 #include <Input.hpp>
@@ -94,6 +95,7 @@ int main(int argc, char **argv) {
         window.SwapBuffers();
     }
 
+    Project::GetInstance().Close();
     gamePanel.Close();
     scenePanel.Close();
     window.Close();

@@ -10,18 +10,22 @@ NAMESPACE(Engine) {
     CLASS_FINAL_ATTR(APrefab, Asset, ENGINE_EXPORT) {
         TYPE(APrefab);
 
-        PROPERTY(std::string, path, Path);
+        PROPERTY(nlohmann::json, js, Json);
     
     public:
         virtual std::shared_ptr<Resource> GetResource() override;
+        nlohmann::json &GetJson() { return js; }
         void SetPrefab(GameObject *gameObject);
     };
 
     class ENGINE_EXPORT Prefab : public Resource {
-        PROPERTY_GET(std::string, path, Path);
+        PROPERTY(bool, dirty, Dirty);
+        PROPERTY(nlohmann::json, js, Json);
+        PROPERTY_GET(GameObject *, gameObject, GameObject);
 
     public:
         Prefab(APrefab *aprefab);
+        virtual ~Prefab();
         virtual void Apply() override;
     };
 }

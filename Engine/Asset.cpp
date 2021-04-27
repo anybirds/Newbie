@@ -13,11 +13,11 @@ void Asset::Apply() {
 }
 
 void Engine::from_json(const json &js, Entity *&entity) {
-    uint64_t key = js.get<uint64_t>();
+    uintptr_t key = js.get<uintptr_t>();
     if (key) {
         auto it = Entity::GetMap().find(key);
         if (it == Entity::GetMap().end()) {
-            entity = reinterpret_cast<Entity *>(key * (uint64_t)!Entity::GetNullify());
+            entity = reinterpret_cast<Entity *>(key * (uintptr_t)!Entity::GetNullify());
         } else {
             entity = reinterpret_cast<Entity *>(it->second);
         }

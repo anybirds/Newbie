@@ -65,8 +65,7 @@ namespace glm {
     }
 }
 
-Type::Type(const string &name, FInstantiate instantiate, FSerialize serialize, FDeserialize deserialize)
-    : name(name), instantiate(instantiate), serialize(serialize), deserialize(deserialize) {
+Type::Type(const string &name) : name(name) {
     GetAllTypes().insert({name, this});
 }
 

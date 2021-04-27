@@ -2,16 +2,16 @@
 
 #include <Panel.hpp>
 #include <Asset.hpp>
-#include <GameObject.hpp>
+#include <Prefab.hpp>
 
 class AssetPanel : public Panel {
 public:
     static AssetPanel &GetInstance() { static AssetPanel assetPanel; return assetPanel; }
 
 private:
-    AssetPanel() : Panel("Asset"), gameObject(nullptr) {}
+    AssetPanel() : Panel("Asset"), aprefab(nullptr) {}
     
-    Engine::GameObject *gameObject;
+    Engine::APrefab *aprefab;
     bool preview;
 
 public:
