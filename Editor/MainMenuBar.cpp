@@ -32,7 +32,7 @@ void MainMenuBar::Show() {
             if (ImGui::MenuItem("Open")) {
                 project_open = true;
             }
-            if (ImGui::MenuItem("Save", "Ctrl+S", nullptr, project.IsLoaded() && !gamePanel.IsGameRunning())) {
+            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded() && !gamePanel.IsGameRunning())) {
                 project.Save();
             }
             ImGui::EndMenu();

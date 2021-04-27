@@ -14,6 +14,8 @@ private:
     Engine::APrefab *aprefab;
     bool preview;
 
+    void ShowIcon(Engine::Asset *asset);
+
 public:
     AssetPanel(const AssetPanel &) = delete;
     AssetPanel &operator=(const AssetPanel &) = delete;

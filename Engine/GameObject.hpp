@@ -36,7 +36,8 @@ NAMESPACE(Engine) {
         void SetLocalEnabled(bool localEnabled) { transform->SetLocalEnabled(localEnabled); }
         bool IsRemoved() const { return transform->IsRemoved(); }
         GameObject *GetParent() const { Transform *p = transform->GetParent(); if (p) { return p->GetGameObject(); } else { return nullptr; } }
-
+        void SetParent(GameObject *parent) { transform->SetParent(parent->GetTransform()); }
+        
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
         T *GetComponent() const {
             for (Component *component : components) {
@@ -67,6 +68,7 @@ NAMESPACE(Engine) {
 
         GameObject *AddGameObject();
         GameObject *AddGameObject(GameObject *gameObject);
+        GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
         GameObject *FindGameObject(const std::string &name) const;
 
         friend class Scene;

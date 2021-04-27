@@ -96,6 +96,7 @@ int main(int argc, char **argv) {
     }
 
     Project::GetInstance().Close();
+    hierarchyPanel.Close();
     gamePanel.Close();
     scenePanel.Close();
     window.Close();

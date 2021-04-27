@@ -2,7 +2,7 @@
 
 #include <GameObject.hpp>
 #include <Component.hpp>
-#include <Asset.hpp>
+#include <Prefab.hpp>
 
 using namespace std;
 using namespace Engine;
@@ -103,6 +103,18 @@ GameObject *GameObject::AddGameObject() {
 
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
     GameObject *child = gameObject->GetCopy();
+    Transform *t = child->GetTransform();
+    t->parent = transform;
+    t->Propagate();
+    transform->children.push_back(t);
+    return child;
+}
+
+GameObject *GameObject::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
+    vector<GameObject *> roots;
+    FromJson(prefab->GetJson(), roots);
+    assert(roots.size() == 1);
+    GameObject *child = roots[0];
     Transform *t = child->GetTransform();
     t->parent = transform;
     t->Propagate();

@@ -19,6 +19,7 @@ NAMESPACE(Engine) {
     class Renderer;
     class Material;
     class Mesh;
+    class Prefab;
 
     class ENGINE_EXPORT Scene final {
     public:
@@ -88,6 +89,7 @@ NAMESPACE(Engine) {
         const std::vector<GameObject *> &GetRootGameObjects() const { return roots; }
         GameObject *AddGameObject();
         GameObject *AddGameObject(GameObject *gameObject);
+        GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
         void RemoveGameObject(GameObject *gameObject);
         void RemoveComponent(Component *component);
         GameObject *FindGameObject(const std::string &name);

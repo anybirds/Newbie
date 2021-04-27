@@ -9,6 +9,7 @@
 #include <Transform.hpp>
 #include <Scene.hpp>
 #include <Script.hpp>
+#include <Prefab.hpp>
 #include <Graphics/Drawer.hpp>
 #include <Graphics/Renderer.hpp>
 
@@ -150,6 +151,18 @@ GameObject *Scene::AddGameObject(GameObject *gameObject) {
     t->parent = nullptr;
     t->Propagate();
     roots.push_back(root);
+    return root;
+}
+
+GameObject *Scene::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
+    vector<GameObject *> roots;
+    GameObject::FromJson(prefab->GetJson(), roots);
+    assert(roots.size() == 1);
+    GameObject *root = roots[0];
+    Transform *t = root->GetTransform();
+    t->parent = nullptr;
+    t->Propagate();
+    this->roots.push_back(root);
     return root;
 }
 

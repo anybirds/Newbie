@@ -9,6 +9,36 @@ using namespace std;
 using json = nlohmann::json;
 using namespace Engine;
 
+void AssetPanel::ShowIcon(Asset *asset) {
+    Type *type = asset->GetType();
+    if (type == AMaterial::StaticType()) {
+        ImGui::Text(ICON_FA_TINT);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
+    } else if (type == AMesh::StaticType()) {
+        ImGui::Text(ICON_FA_DRAW_POLYGON);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mesh");
+    } else if (type == ATexture::StaticType()) {
+        ImGui::Text(ICON_FA_IMAGE);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Texture");
+    } else if (type == AShader::StaticType()) {
+        ImGui::Text(ICON_FA_FILE_CODE);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shader");
+    } else if (type == AModel::StaticType()) {
+        ImGui::Text(ICON_FA_SHAPES);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Model");
+    } else if (type == AFramebuffer::StaticType()) {
+        ImGui::Text(ICON_FA_DESKTOP);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
+    } else if (type == APrefab::StaticType()) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+        ImGui::Text(ICON_FA_CUBE);
+        ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
+    } else {
+        ImGui::Text(ICON_FA_FILE);
+    }
+}
+
 void AssetPanel::ShowContents() {
     Project &project = Project::GetInstance();
     if (!project.IsLoaded()) {
@@ -19,40 +49,14 @@ void AssetPanel::ShowContents() {
     ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     for (auto &p : project.GetAllAssets()) {
         Asset *asset = p.second;
-        Type *type = asset->GetType();
-        if (type == AMaterial::StaticType()) {
-            ImGui::Text(ICON_FA_TINT);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
-        } else if (type == AMesh::StaticType()) {
-            ImGui::Text(ICON_FA_DRAW_POLYGON);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mesh");
-        } else if (type == ATexture::StaticType()) {
-            ImGui::Text(ICON_FA_IMAGE);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Texture");
-        } else if (type == AShader::StaticType()) {
-            ImGui::Text(ICON_FA_FILE_CODE);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shader");
-        } else if (type == AModel::StaticType()) {
-            ImGui::Text(ICON_FA_SHAPES);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Model");
-        } else if (type == AFramebuffer::StaticType()) {
-            ImGui::Text(ICON_FA_DESKTOP);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
-        } else if (type == APrefab::StaticType()) {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-            ImGui::Text(ICON_FA_CUBE);
-            ImGui::PopStyleColor();
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
-        } else {
-            ImGui::Text(ICON_FA_FILE);
-        }
+        ShowIcon(asset);
         ImGui::SameLine();
         if (rename && selected == (void *)asset) {
             ShowRename(asset->GetName()); 
         } else {
             if (ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), (void *)asset == selected, ImGuiSelectableFlags_AllowDoubleClick)) {
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    if (type == APrefab::StaticType() && !GamePanel::GetInstance().IsGameRunning()) {
+                    if (asset->GetType() == APrefab::StaticType() && !GamePanel::GetInstance().IsGameRunning()) {
                         if (preview) {
                             Scene::FromBackup();
                         }
@@ -68,13 +72,18 @@ void AssetPanel::ShowContents() {
             if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
                 selected = (void *)asset;
             }
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+                ImGui::SetDragDropPayload("Asset", &selected, sizeof(Asset *));
+                ShowIcon((Asset *)selected);
+                ImGui::SameLine();
+                ImGui::Text(((Asset *)selected)->GetName().c_str());
+                ImGui::EndDragDropSource();
+            }
         }
     }
     ImGui::EndChild();
-    if (ImGui::BeginDragDropTarget())
-    {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
-        {
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject")) {
             IM_ASSERT(payload->DataSize == sizeof(GameObject *));
             GameObject *gameObject = *(GameObject **)payload->Data;
             if (!gameObject->GetPrefab()) {
