@@ -16,14 +16,14 @@ NAMESPACE(Engine) {
     CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
         TYPE(GameObject);
 
+        PROPERTY_NONE(std::vector<Component *>, components);
         PROPERTY(std::string, name, Name);
         PROPERTY_GET(Transform *, transform, Transform);
-        PROPERTY_NONE(std::vector<Component *>, components);
-        PROPERTY_GET(std::shared_ptr<Prefab>, prefab, Prefab);
+        PROPERTY(std::shared_ptr<Prefab>, prefab, Prefab);
 
     public:
-        static void ToJson(nlohmann::json &js, const std::vector<GameObject *> &roots, bool nullify = false);
-        static void FromJson(const nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify = true);
+        static void ToJson(nlohmann::json &js, const std::vector<GameObject *> &roots, bool nullify = false, const std::shared_ptr<Prefab> &base = nullptr, uintptr_t start = 0U);
+        static uintptr_t FromJson(const nlohmann::json &js, std::vector<GameObject *> &roots, bool nullify = true);
         GameObject *GetCopy();
 
     public:
@@ -37,7 +37,9 @@ NAMESPACE(Engine) {
         bool IsRemoved() const { return transform->IsRemoved(); }
         GameObject *GetParent() const { Transform *p = transform->GetParent(); if (p) { return p->GetGameObject(); } else { return nullptr; } }
         void SetParent(GameObject *parent) { transform->SetParent(parent->GetTransform()); }
-        
+
+        bool HasPrefabCycle() const;
+
         template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
         T *GetComponent() const {
             for (Component *component : components) {

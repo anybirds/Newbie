@@ -46,8 +46,8 @@ void Scene::LoadBackup() {
     scene.loaded = true;
 }
 
-void Scene::ToJson(json &js, bool nullify) {
-    GameObject::ToJson(js, roots, nullify);
+void Scene::ToJson(json &js, bool nullify, const shared_ptr<Prefab> &base, uintptr_t start) {
+    GameObject::ToJson(js, roots, nullify, base, start);
 }
 
 void Scene::FromJson(const json &js, bool nullify) {
@@ -134,8 +134,6 @@ void Scene::CloseImmediate() {
     }
 
     *this = Scene();
-
-    cerr << '[' << __FUNCTION__ << ']' << " close scene done.\n";
 }
 
 GameObject *Scene::AddGameObject() {
@@ -167,12 +165,12 @@ GameObject *Scene::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
 }
 
 void Scene::RemoveGameObject(GameObject *gameObject) {
-    gameObject->GetTransform()->removed = true;
+    gameObject->GetTransform()->state |= Component::REMOVED;
     gameObject->GetTransform()->SetLocalEnabled(false);
 }
 
 void Scene::RemoveComponent(Component *component) {
-    component->removed = true;
+    component->state |= Component::REMOVED;
     component->SetLocalEnabled(false);
 }
 
@@ -197,6 +195,29 @@ void Scene::DestroyGameObject(GameObject *gameObject) {
     }
 }
 
+void Scene::OrganizeGameObject(GameObject *gameObject) {
+    vector<Component *> removeComps;
+    vector<Transform *> removeTrans;
+    function<void(GameObject *, bool)> remove = [&remove, &removeComps, &removeTrans](GameObject *gameObject, bool removed) {
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->GetChildren()) {
+            remove(t->GetGameObject(), removed || t->IsRemoved());
+        }
+        if (removed || transform->IsRemoved()) {
+            removeTrans.push_back(transform);
+        }
+        for (Component *component : gameObject->components) {
+            if (removed || component->IsRemoved()) {
+                removeComps.push_back(component);
+            }
+        }
+    };
+    remove(gameObject, gameObject->GetTransform()->IsRemoved());
+
+    Remove(removeComps, removeTrans);
+    Destroy(removeComps);
+}
+
 void Scene::Flags() {
     if (flags & CLOSE) {
         CloseImmediate();
@@ -214,7 +235,104 @@ void Scene::Flags() {
     enables.clear();
     disables.clear();
 
-    function<void(GameObject *, bool, bool)> recurse = [this, &recurse](GameObject *gameObject, bool enabled, bool removed) {
+    set<APrefab *> dirtyAPrefabs;
+    
+    function<void(GameObject *, bool, bool)> recurse = [this, &recurse, &dirtyAPrefabs](GameObject *gameObject, bool enabled, bool removed) {
+        shared_ptr<Prefab> prefab = gameObject->GetPrefab();
+        if (prefab && prefab->GetDirty()) {
+            APrefab *aprefab = (APrefab *)prefab->GetAsset();
+            dirtyAPrefabs.insert(aprefab);
+
+            json &baseEntities = prefab->GetJson()["entities"];
+            json &assetEntities = aprefab->GetJson()["entities"];
+
+            uintptr_t entityCount = 1U;
+            for (auto ia = assetEntities.begin(); ia != assetEntities.end(); ia++) {
+                entityCount += ia.value().size();
+            }
+
+            json js;
+            GameObject::ToJson(js, vector<GameObject *>{gameObject}, true, prefab, entityCount);
+            json &entities = js["entities"];
+
+            for (json::iterator i = entities.begin(); i != entities.end(); i++) {
+                auto ib = baseEntities.find(i.key());
+                auto ia = assetEntities.find(i.key());
+                if (ib != baseEntities.end()) {
+                    assert(ia != assetEntities.end());
+                    for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
+                        auto jb = ib.value().find(stoull(j.key()));
+                        auto ja = ia.value().find(stoull(j.key()));
+                        if (jb != ib.value().end()) {
+                            assert(ja != ia.value().end());
+                            for (size_t k = 0; k < j.value().size(); k++) {
+                                if (j.value()[k] == jb.value()[k]) {
+                                    // get value from asset
+                                    j.value()[k] = ja.value()[k];
+                                }
+                            }   
+                        }
+                    }   
+                }
+            }
+
+            for (json::iterator ia = assetEntities.begin(); ia != assetEntities.end(); ia++) {
+                auto i = entities.find(ia.key());
+                if (i == entities.end()) {
+                    entities.insert(entities.end(), *ia);
+                } else {
+                    for (json::iterator ja = ia.value().begin(); ja != ia.value().end(); ja++) {
+                        auto j = i.value().find(stoull(ja.key()));
+                        if (j == i.value().end()) {
+                            i.value().insert(i.value().end(), *ja);
+                        }
+                    }
+                }
+            } 
+            json &gameObjects = entities["GameObject"];
+            json &assetGameObjects = assetEntities["GameObject"];
+            for (auto ia = assetGameObjects.begin(); ia != assetGameObjects.end(); ia++) {
+                auto i = gameObjects.find(ia.key());
+                json js = ia.value();
+                size_t j = 0;
+                while (j < ia.value()[0].size() && ia.value()[0][j] == i.value()[0][j]) {
+                    j++;
+                }
+                for (; j < i.value()[0].size(); j++) {
+                    js.push_back(i.value()[0][j]);
+                }
+                i.value() = js;
+            }
+            json &transforms = entities["Transform"];
+            json &assetTransforms = assetEntities["Transform"];
+            for (auto ia = assetTransforms.begin(); ia != assetTransforms.end(); ia++) {
+                auto i = transforms.find(ia.key());
+                json js = ia.value();
+                size_t j = 0;
+                while (j < ia.value()[2].size() && ia.value()[2][j] == i.value()[2][j]) {
+                    j++;
+                }
+                for (; j < i.value()[2].size(); j++) {
+                    js.push_back(i.value()[2][j]);
+                }
+                i.value() = js;
+            }
+
+            vector<GameObject *> roots;
+            GameObject::FromJson(js, roots);
+
+            Transform *parent = roots[0]->GetTransform()->GetParent();
+            if (parent) {
+                auto it = find(parent->children.begin(), parent->children.end(), gameObject);
+                *it = roots[0]->GetTransform();
+            } else {
+                Scene &scene = Scene::GetInstance();
+                auto it = find(scene.roots.begin(), scene.roots.end(), gameObject);
+                *it = roots[0];
+            }
+            DestroyGameObject(gameObject);
+        }
+        
         Transform *transform = gameObject->GetTransform();
         for (Transform *t : transform->GetChildren()) {
             recurse(t->GetGameObject(), 
@@ -231,7 +349,7 @@ void Scene::Flags() {
                 component->flags |= Component::ENABLED;
             } else if ((component->flags & Component::ENABLED) && !(enabled && component->IsLocalEnabled())) {
                 disables.push_back(component);
-                component->flags |= ~Component::ENABLED;
+                component->flags &= ~Component::ENABLED;
             }
             if (removed || component->IsRemoved()) {
                 removeComps.push_back(component);
@@ -241,6 +359,15 @@ void Scene::Flags() {
 
     for (GameObject *root : roots) {
         recurse(root, root->IsLocalEnabled(), root->IsRemoved());
+    }
+
+    for (APrefab *aprefab : dirtyAPrefabs) {
+        vector<GameObject *> roots;
+        GameObject::FromJson(aprefab->GetJson(), roots);
+        OrganizeGameObject(roots[0]);
+        GameObject::ToJson(aprefab->GetJson(), roots, true);
+        aprefab->Apply();
+        DestroyGameObject(roots[0]);
     }
 }
 
@@ -272,7 +399,7 @@ void Scene::Disable() {
     }
 }
 
-void Scene::Remove() {
+void Scene::Remove(const vector<Component *> &removeComps, const vector<Transform *> &removeTrans) {
     for (Component *component : removeComps) {
         try {
             component->OnDestroy();
@@ -333,7 +460,7 @@ void Scene::Remove() {
     }
 }
 
-void Scene::Destroy() {
+void Scene::Destroy(const vector<Component *> &removeComps) {
     for (Component *component : removeComps) {
         delete component;
     }
@@ -367,8 +494,8 @@ void Scene::Loop() {
 
     Untrack();
     Disable();
-    Remove();
-    Destroy();
+    Remove(removeComps, removeTrans);
+    Destroy(removeComps);
     Track();
     Enable();
     Update();
@@ -379,7 +506,15 @@ void Scene::PauseLoop() {
     Flags();
 
     Untrack();
-    Remove();
+    Remove(removeComps, removeTrans);
+    Track();
+    Render();
+}
+
+void Scene::RetainLoop() {
+    Flags();
+
+    Untrack();
     Track();
     Render();
 }

@@ -21,8 +21,9 @@ namespace Engine {
         
         virtual void Apply();
 
-        const std::string &GetName() const { return name; }
         const uint64_t GetSerial() const { return serial; }
+        const std::string &GetName() const { return name; }
+        Asset *GetAsset() const { return asset; }
 
         friend class Asset;
     };

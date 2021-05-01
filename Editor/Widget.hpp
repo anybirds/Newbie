@@ -12,6 +12,10 @@ protected:
     static bool rename;
     static bool renameClicked;
 
+    static bool running;
+    static bool paused;
+    static bool preview;
+
 public:
     static void UpdateRename();
     static void ShowRename(std::string &str);

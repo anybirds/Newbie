@@ -9,6 +9,7 @@
 #include <ProjectDialog.hpp>
 #include <FileDialog.hpp>
 #include <NewDialog.hpp>
+#include <HierarchyPanel.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -58,11 +59,17 @@ void ProjectDialog::RemoveProject(const string &dir) {
 }
 
 void ProjectDialog::LoadProject(const string &dir) {
+    // clear temporary copies
+    HierarchyPanel::GetInstance().Clear();
+
     Project &project = Project::GetInstance();
     if (project.Load(GetProjectFile(dir))) {
         Window &window = Window::GetInstance();
         window.SetTitle(string("Newbie - ") + project.GetName());
     }
+    running = false;
+    paused = false;
+    preview = false;
     ImGui::CloseCurrentPopup();
 }
 

@@ -16,6 +16,19 @@ const string &SceneDialog::GetEmptyScenePath() {
     return emptyScenePath;
 }
 
+void SceneDialog::LoadScene(const std::string &path) {
+    Scene &scene = Scene::GetInstance();
+    if (scene.LoadImmediate(path)) {
+        Window &window = Window::GetInstance();
+        window.SetTitle(window.GetTitle() + " - " + scene.GetName());
+    }
+    running = false;
+    paused = false;
+    preview = false;
+    selected = nullptr;
+    ImGui::CloseCurrentPopup();
+}
+
 void SceneDialog::ShowContents() {
     FileDialog &fileDialog = FileDialog::GetInstance();
     if (ImGui::BeginMenuBar()) {
@@ -48,13 +61,7 @@ void SceneDialog::ShowContents() {
         ImGui::SameLine();
         if (ImGui::Selectable(path.c_str(), selected == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {
-                Scene &scene = Scene::GetInstance();
-                if (scene.LoadImmediate(path)) {
-                    Window &window = Window::GetInstance();
-                    window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
-                }
-                selected = nullptr;
-                ImGui::CloseCurrentPopup();
+                LoadScene(path);
             } else {
                 selected = (void *)&path;
             }
@@ -71,13 +78,7 @@ void SceneDialog::ShowContents() {
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
         if (selected) {
-            Scene &scene = Scene::GetInstance();
-            if (scene.LoadImmediate(*(string *)selected)) {
-                Window &window = Window::GetInstance();
-                window.SetTitle(string("Newbie - ") + project.GetName() + " - " + scene.GetName());
-            }
-            selected = nullptr;
-            ImGui::CloseCurrentPopup();
+            LoadScene(*(string *)selected);
         }
     }
 

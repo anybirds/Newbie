@@ -12,24 +12,25 @@ NAMESPACE(Engine) {
     CLASS_ATTR(Component, Entity, ENGINE_EXPORT) {
         TYPE(Component);
 
-        PROPERTY_NONE(bool, localEnabled);
-        PROPERTY_NONE(bool, removed);
+        PROPERTY_NONE(uint8_t, state);
         PROPERTY_GET(GameObject *, gameObject, GameObject);
         
     private:
         enum : uint8_t {
+            LOCAL_ENABLED = 1,
+            REMOVED = 1 << 2,
             ENABLED = 1,
             DESTROYED = 1 << 2
         };
         uint8_t flags;
 
     public:
-        Component() : flags(0U), localEnabled(true), removed(false), gameObject(nullptr) {}
+        Component() : flags(0U), state(0U), gameObject(nullptr) {}
 
         bool IsEnabled() const;
-        bool IsLocalEnabled() const { return localEnabled; }
-        void SetLocalEnabled(bool localEnabled) { this->localEnabled = localEnabled; }
-        bool IsRemoved() const { return removed; } 
+        bool IsLocalEnabled() const { return state & LOCAL_ENABLED; }
+        void SetLocalEnabled(bool localEnabled) { state = (state & ~LOCAL_ENABLED) + localEnabled; }
+        bool IsRemoved() const { return state & REMOVED; } 
         
         Transform *GetTransform() const;
         

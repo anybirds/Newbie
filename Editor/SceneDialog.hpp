@@ -16,6 +16,8 @@ private:
     std::string name;
     std::string location;
     
+    void LoadScene(const std::string &dir);
+
 public:
     SceneDialog(const SceneDialog &) = delete;
     SceneDialog &operator=(const SceneDialog &) = delete;

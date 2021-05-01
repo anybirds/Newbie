@@ -94,9 +94,10 @@ int main(int argc, char **argv) {
 
         window.SwapBuffers();
     }
-
+    
+    hierarchyPanel.Clear();
     Project::GetInstance().Close();
-    hierarchyPanel.Close();
+    
     gamePanel.Close();
     scenePanel.Close();
     window.Close();

@@ -9,10 +9,7 @@ public:
     static AssetPanel &GetInstance() { static AssetPanel assetPanel; return assetPanel; }
 
 private:
-    AssetPanel() : Panel("Asset"), aprefab(nullptr) {}
-    
-    Engine::APrefab *aprefab;
-    bool preview;
+    AssetPanel() : Panel("Asset") {}
 
     void ShowIcon(Engine::Asset *asset);
 
@@ -21,6 +18,5 @@ public:
     AssetPanel &operator=(const AssetPanel &) = delete;
     
     virtual void ShowContents() override;
-    bool IsPreview() const { return preview; }
     void ShowPreviewOff();
 };

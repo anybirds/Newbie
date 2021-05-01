@@ -32,16 +32,16 @@ void MainMenuBar::Show() {
             if (ImGui::MenuItem("Open")) {
                 project_open = true;
             }
-            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded() && !gamePanel.IsGameRunning())) {
+            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded() && !running)) {
                 project.Save();
             }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Scene", project.IsLoaded())) {
-            if (ImGui::MenuItem("New", nullptr, nullptr, !gamePanel.IsGameRunning())) {
+            if (ImGui::MenuItem("New")) {
                 scene_new = true;
             }
-            if (ImGui::MenuItem("Open", nullptr, nullptr, !gamePanel.IsGameRunning())) {
+            if (ImGui::MenuItem("Open")) {
                 scene_open = true;
             }
             ImGui::EndMenu();
@@ -67,7 +67,7 @@ void MainMenuBar::Show() {
         }
         gamePanel.ShowPlayPause();
         AssetPanel &assetPanel = AssetPanel::GetInstance();
-        if (assetPanel.IsPreview()) {
+        if (preview) {
             assetPanel.ShowPreviewOff();
         }
 

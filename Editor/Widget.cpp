@@ -9,6 +9,10 @@ void *Widget::selected;
 bool Widget::rename;
 bool Widget::renameClicked;
 
+bool Widget::running;
+bool Widget::paused;
+bool Widget::preview;
+
 void Widget::ShowRename(string &str) {
     ImGui::SetKeyboardFocusHere();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));

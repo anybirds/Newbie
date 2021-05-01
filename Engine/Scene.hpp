@@ -60,8 +60,8 @@ NAMESPACE(Engine) {
         void Untrack();
         void Enable();
         void Disable();
-        void Remove();
-        void Destroy();
+        void Remove(const std::vector<Component *> &removeComps, const std::vector<Transform *> &removeTrans);
+        void Destroy(const std::vector<Component *> &removeComps);
 
         void Render();
         void Update();
@@ -69,7 +69,7 @@ NAMESPACE(Engine) {
     public:
         Scene(const Scene &) = delete;
 
-        void ToJson(nlohmann::json &js, bool nullify = false);
+        void ToJson(nlohmann::json &js, bool nullify = false, const std::shared_ptr<Prefab> &base = nullptr, uintptr_t start = 0U);
         void FromJson(const nlohmann::json &js, bool nullify = true);
 
         void Load(const std::string &path);
@@ -94,9 +94,11 @@ NAMESPACE(Engine) {
         void RemoveComponent(Component *component);
         GameObject *FindGameObject(const std::string &name);
         void DestroyGameObject(GameObject *gameObject);
+        void OrganizeGameObject(GameObject *gameObject);
 
         void Loop();
         void PauseLoop();
+        void RetainLoop();
 
         friend class Transform;
         friend class Script;

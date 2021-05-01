@@ -83,7 +83,7 @@ void GamePanel::ShowPlayPause() {
     Scene &scene = Scene::GetInstance();
     ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
     ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
-    if (!scene.IsLoaded() || AssetPanel::GetInstance().IsPreview()) {
+    if (!scene.IsLoaded() || preview) {
         flags = ImGuiSelectableFlags_Disabled;
     }
     if (ImGui::Selectable(ICON_FA_PLAY, running, flags, ImVec2(16.0f, 0.0f))) {

@@ -9,7 +9,7 @@ public:
 
 private:
     HierarchyPanel() : Panel("Hierarchy"), menu(false), hovered(nullptr), copyed(nullptr) {}
-    
+
     bool menu;
     Engine::GameObject *hovered;
     Engine::GameObject *copyed;
@@ -21,5 +21,5 @@ public:
     HierarchyPanel &operator=(const HierarchyPanel &) = delete;
 
     virtual void ShowContents();
-    void Close();
+    void Clear();
 };

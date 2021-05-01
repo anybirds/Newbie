@@ -1,5 +1,7 @@
+#include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <functional>
 
 #include <AssetPanel.hpp>
 #include <GamePanel.hpp>
@@ -56,16 +58,18 @@ void AssetPanel::ShowContents() {
         } else {
             if (ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), (void *)asset == selected, ImGuiSelectableFlags_AllowDoubleClick)) {
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    if (asset->GetType() == APrefab::StaticType() && !GamePanel::GetInstance().IsGameRunning()) {
+                    if (asset->GetType() == APrefab::StaticType() && !running) {
                         if (preview) {
                             Scene::FromBackup();
                         }
-                        aprefab = (APrefab *)asset;
+                        APrefab *aprefab = (APrefab *)asset;
                         Scene &scene = Scene::GetInstance();
                         Scene::ToBackup();
                         scene.FromJson(aprefab->GetJson());
                         scene.SetLoaded(true);
                         preview = true;
+
+                        cerr << '[' << __FUNCTION__ << ']' << " preview Prefab: " << aprefab->GetName() << '\n';
                     }
                 }
             }
@@ -89,9 +93,11 @@ void AssetPanel::ShowContents() {
             if (!gameObject->GetPrefab()) {
                 APrefab *aprefab = project.AddAsset<APrefab>();
                 aprefab->SetName(gameObject->GetName());
-                aprefab->SetPrefab(gameObject);
+                gameObject->SetPrefab(dynamic_pointer_cast<Prefab>(aprefab->GetResource()));
                 GameObject::ToJson(aprefab->GetJson(), vector<GameObject *>{gameObject}, true);
                 aprefab->Apply();
+
+                cerr << '[' << __FUNCTION__ << ']' << " created Prefab: " << aprefab->GetName() << '\n';
             }
         }
         ImGui::EndDragDropTarget();
@@ -100,14 +106,20 @@ void AssetPanel::ShowContents() {
 
 void AssetPanel::ShowPreviewOff() {
     ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-    if (ImGui::Selectable(ICON_FA_ANGLE_DOUBLE_LEFT, false, 0, ImVec2(16.0f, 0.0f))) {
-        preview = false;
-        Scene &scene = Scene::GetInstance();
-        scene.ToJson(aprefab->GetJson());
+    ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
+    Scene &scene = Scene::GetInstance();
+    assert(scene.GetRootGameObjects().size() == 1);
+    if (scene.GetRootGameObjects()[0]->HasPrefabCycle()) {
+        flags = ImGuiSelectableFlags_Disabled;
+    }
+    if (ImGui::Selectable(ICON_FA_ANGLE_DOUBLE_LEFT, false, flags, ImVec2(16.0f, 0.0f))) {
+        shared_ptr<Prefab> prefab = scene.GetRootGameObjects()[0]->GetPrefab();
+        APrefab *aprefab = (APrefab *)prefab->GetAsset();
+        scene.ToJson(aprefab->GetJson(), true, prefab, prefab->GetEntityCount() + 1);
         Scene::FromBackup();
-        shared_ptr<Prefab> prefab = dynamic_pointer_cast<Prefab>(aprefab->GetResource());
         prefab->SetDirty(true);
         aprefab = nullptr;
+        preview = false;
     }
     ImGui::PopStyleColor();
 }

@@ -22,10 +22,6 @@ shared_ptr<Resource> APrefab::GetResource() {
     return sp;
 }
 
-void APrefab::SetPrefab(GameObject *gameObject) { 
-    gameObject->prefab = dynamic_pointer_cast<Prefab>(GetResource()); 
-}
-
 Prefab::Prefab(APrefab *aprefab) : Resource(aprefab), gameObject(nullptr) {
     Apply();
 }
@@ -48,6 +44,6 @@ void Prefab::Apply() {
         return;
     }
     vector<GameObject *> roots;
-    GameObject::FromJson(js, roots);
+    entityCount = GameObject::FromJson(js, roots);
     gameObject = roots[0];
 }

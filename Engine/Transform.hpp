@@ -11,12 +11,12 @@ NAMESPACE(Engine) {
     CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
         TYPE(Transform);
 
+        PROPERTY_GET(std::vector<Transform *>, children, Children);
         PROPERTY_GET(glm::vec3, localPosition, LocalPosition);
         PROPERTY_GET(glm::quat, localRotation, LocalRotation);
         PROPERTY_GET(glm::vec3, localScale, LocalScale);
         PROPERTY_GET(glm::vec3, localEulerAngles, LocalEulerAngles);
         PROPERTY_GET(Transform *, parent, Parent);
-        PROPERTY_GET(std::vector<Transform *>, children, Children);
         PROPERTY_NONE_ATTR(bool, dirty, mutable);
         PROPERTY_NONE_ATTR(glm::mat4, localToWorldMatrix, mutable);
 
