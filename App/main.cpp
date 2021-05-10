@@ -6,7 +6,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 int main(int argc, char **argv) { 
     // type init

@@ -6,7 +6,6 @@
 #include <AssetPanel.hpp>
 
 using namespace std;
-using namespace Engine;
 
 GamePanel::GamePanel() : Panel("Game") {
     Window &window = Window::GetInstance();

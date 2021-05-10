@@ -9,7 +9,6 @@
 #include <NewDialog.hpp>
 
 using namespace std;
-using namespace Engine;
 
 const string &SceneDialog::GetEmptyScenePath() {
     static std::string emptyScenePath(string(NEWBIE_PATH) + "/Samples/Empty/Main.json");

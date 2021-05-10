@@ -3,7 +3,7 @@
 #include <Engine.hpp>
 #include <UserExport.hpp>
 
-CLASS_ATTR(SampleScript, Engine::Script, USER_EXPORT) {
+CLASS_ATTR(SampleScript, Script, USER_EXPORT) {
     TYPE(SampleScript);
 
     PROPERTY(float, rate, Rate);

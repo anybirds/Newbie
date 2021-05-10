@@ -3,8 +3,6 @@
 
 #include <Time.hpp>
 
-using namespace Engine;
-
 void Time::Init() {
     dt = 0.0;
     prev = glfwGetTime();

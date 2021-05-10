@@ -9,7 +9,6 @@
 
 using namespace std;
 using json = nlohmann::json;
-using namespace Engine;
 
 shared_ptr<Resource> APrefab::GetResource() {
     shared_ptr<Resource> sp;
@@ -22,28 +21,12 @@ shared_ptr<Resource> APrefab::GetResource() {
     return sp;
 }
 
-Prefab::Prefab(APrefab *aprefab) : Resource(aprefab), gameObject(nullptr) {
+Prefab::Prefab(APrefab *aprefab) : Resource(aprefab) {
     Apply();
-}
-
-Prefab::~Prefab() {
-    Scene::GetInstance().DestroyGameObject(gameObject);
 }
 
 void Prefab::Apply() {
     Resource::Apply();
     APrefab *aprefab = (APrefab *)asset;
     js = aprefab->GetJson();
-
-    Scene &scene = Scene::GetInstance();
-    if (gameObject) {
-        scene.DestroyGameObject(gameObject);
-    }
-
-    if (js.empty()) {
-        return;
-    }
-    vector<GameObject *> roots;
-    entityCount = GameObject::FromJson(js, roots);
-    gameObject = roots[0];
 }

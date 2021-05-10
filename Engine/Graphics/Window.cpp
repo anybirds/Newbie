@@ -3,7 +3,6 @@
 #include <Graphics/Window.hpp>
 
 using namespace std;
-using namespace Engine;
 
 void Window::ErrorCallback(int error, const char *description) {
     cerr << "glfw error " << error << ": " << description << '\n';

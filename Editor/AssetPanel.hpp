@@ -11,7 +11,7 @@ public:
 private:
     AssetPanel() : Panel("Asset") {}
 
-    void ShowIcon(Engine::Asset *asset);
+    void ShowIcon(Asset *asset);
 
 public:
     AssetPanel(const AssetPanel &) = delete;

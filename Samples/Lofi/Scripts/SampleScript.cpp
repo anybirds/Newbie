@@ -2,7 +2,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 void SampleScript::Start() {
 

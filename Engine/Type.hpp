@@ -41,12 +41,12 @@
 
 #define TYPE(T) \
     public: \
-    static Engine::Type *&StaticType() { static Engine::Type *type; return type; } \
-    static void SetType(Engine::Type *type) { StaticType() = type; } \
-    virtual Engine::Type *GetType() const { return T::StaticType(); } \
+    static Type *&StaticType() { static Type *type; return type; } \
+    static void SetType(Type *type) { StaticType() = type; } \
+    virtual Type *GetType() const { return T::StaticType(); } \
     private: \
-    static void Serialize(nlohmann::json &, const Engine::Entity *); \
-    static size_t Deserialize(const nlohmann::json &, Engine::Entity *); \
+    static void Serialize(nlohmann::json &, const Entity *); \
+    static size_t Deserialize(const nlohmann::json &, Entity *); \
     friend void ::type_init() 
     
 
@@ -64,61 +64,58 @@ namespace glm {
     void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::quat &q);
 }
 
-namespace Engine {
-    
-    class Entity;
-    
-    template <typename T,
-    std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
-    Entity *instantiate() {
-        return (Entity *)new T();
-    }
-    template <typename T,
-    std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
-    Entity *instantiate() {
-        return nullptr;
-    }
+class Entity;
 
-    class ENGINE_EXPORT Type final {
-    public:
-        typedef Entity *(*FInstantiate)();
-        typedef void (*FSerialize)(nlohmann::json &, const Entity *);
-        typedef size_t (*FDeserialize)(const nlohmann::json &, Entity *);
-
-    private:
-        static std::unordered_map<std::string, const Type *> &GetAllTypes() {
-            static std::unordered_map<std::string, const Type *> types;
-            return types;
-        }
-
-    public:
-        static const Type *GetType(const std::string &name) {
-            auto &types = GetAllTypes();
-            auto it = types.find(name);
-            if (it == types.end()) {
-                return nullptr;
-            }
-            return it->second;
-        }
-
-    private:
-        std::string name;
-        FInstantiate instantiate;
-        FSerialize serialize;
-        FDeserialize deserialize;
-
-    public:
-        Type(const std::string &name);
-        ~Type();
-
-        const std::string &GetName() const { return name; }
-
-        void SetInstantiate(FInstantiate instantiate) { this->instantiate = instantiate; }
-        void SetSerialize(FSerialize serialize) { this->serialize = serialize; }
-        void SetDeserialize(FDeserialize deserialize) { this->deserialize = deserialize; }
-
-        Entity *Instantiate() const { return instantiate(); }
-        void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
-        size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
-    };
+template <typename T,
+std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
+Entity *instantiate() {
+    return (Entity *)new T();
 }
+template <typename T,
+std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
+Entity *instantiate() {
+    return nullptr;
+}
+
+class ENGINE_EXPORT Type final {
+public:
+    typedef Entity *(*FInstantiate)();
+    typedef void (*FSerialize)(nlohmann::json &, const Entity *);
+    typedef size_t (*FDeserialize)(const nlohmann::json &, Entity *);
+
+private:
+    static std::unordered_map<std::string, const Type *> &GetAllTypes() {
+        static std::unordered_map<std::string, const Type *> types;
+        return types;
+    }
+
+public:
+    static const Type *GetType(const std::string &name) {
+        auto &types = GetAllTypes();
+        auto it = types.find(name);
+        if (it == types.end()) {
+            return nullptr;
+        }
+        return it->second;
+    }
+
+private:
+    std::string name;
+    FInstantiate instantiate;
+    FSerialize serialize;
+    FDeserialize deserialize;
+
+public:
+    Type(const std::string &name);
+    ~Type();
+
+    const std::string &GetName() const { return name; }
+
+    void SetInstantiate(FInstantiate instantiate) { this->instantiate = instantiate; }
+    void SetSerialize(FSerialize serialize) { this->serialize = serialize; }
+    void SetDeserialize(FDeserialize deserialize) { this->deserialize = deserialize; }
+
+    Entity *Instantiate() const { return instantiate(); }
+    void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
+    size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
+};

@@ -11,10 +11,10 @@ private:
     HierarchyPanel() : Panel("Hierarchy"), menu(false), hovered(nullptr), copyed(nullptr) {}
 
     bool menu;
-    Engine::GameObject *hovered;
-    Engine::GameObject *copyed;
+    GameObject *hovered;
+    GameObject *copyed;
 
-    void ShowIcon(Engine::GameObject *gameObject);
+    void ShowIcon(GameObject *gameObject);
 
 public:
     HierarchyPanel(const HierarchyPanel &) = delete;

@@ -13,7 +13,6 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace Engine;
 
 const string &ProjectDialog::GetProjectsPath() {
     static std::string projectsPath(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 

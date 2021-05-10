@@ -14,7 +14,6 @@
 
 using namespace glm;
 using namespace std;
-using namespace Engine;
 
 void Camera::Render() {
     int width, height;

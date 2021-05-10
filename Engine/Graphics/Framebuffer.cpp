@@ -5,7 +5,6 @@
 #include <Graphics/Framebuffer.hpp>
 
 using namespace std;
-using namespace Engine;
 
 AFramebuffer::AFramebuffer() : colorTexture(nullptr), depthTexture(nullptr), useDepthRenderTexture(false) {}
 

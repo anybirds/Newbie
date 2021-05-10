@@ -13,9 +13,9 @@ public:
 private:
     GamePanel();
 
-    Engine::ATexture *gameTexture;
-    Engine::AFramebuffer *gameFramebuffer;
-    std::shared_ptr<Engine::Framebuffer> gameFramebufferResource;
+    ATexture *gameTexture;
+    AFramebuffer *gameFramebuffer;
+    std::shared_ptr<Framebuffer> gameFramebufferResource;
 
 public:
     GamePanel(const GamePanel &) = delete;

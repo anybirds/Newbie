@@ -9,7 +9,6 @@
 #include <Project.hpp>
 
 using namespace std;
-using namespace Engine;
 
 ATexture::ATexture() : 
     width(1024), height(1024), format(Texture::RGBA), 

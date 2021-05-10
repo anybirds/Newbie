@@ -4,7 +4,6 @@
 #include <Graphics/Model.hpp>
 
 using namespace std;
-using namespace Engine;
 
 AMesh::AMesh() : amodel(nullptr), index(0U) {}
 

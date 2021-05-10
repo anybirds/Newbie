@@ -9,7 +9,6 @@
 
 using namespace std;
 using json = nlohmann::json;
-using namespace Engine;
 
 void AssetPanel::ShowIcon(Asset *asset) {
     Type *type = asset->GetType();

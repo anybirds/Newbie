@@ -3,7 +3,6 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace Engine;
 
 namespace glm {
     void to_json(json &js, const glm::vec3 &v) {

@@ -21,21 +21,21 @@ public:
 private:
     ScenePanel();
 
-    Engine::GameObject *sceneCamera;
-    Engine::Camera *camera;
+    GameObject *sceneCamera;
+    Camera *camera;
 
-    Engine::ATexture *sceneTexture;
-    Engine::AFramebuffer *sceneFramebuffer;
+    ATexture *sceneTexture;
+    AFramebuffer *sceneFramebuffer;
     
-    Engine::ATexture *selectTexture;
-    Engine::AFramebuffer *selectFramebuffer;
-    Engine::AShader *selectVertexShader;
-    Engine::AShader *selectFragmentShader;
-    Engine::AMaterial *selectMaterial;
+    ATexture *selectTexture;
+    AFramebuffer *selectFramebuffer;
+    AShader *selectVertexShader;
+    AShader *selectFragmentShader;
+    AMaterial *selectMaterial;
 
-    std::shared_ptr<Engine::Material> selectMaterialResource;
-    std::shared_ptr<Engine::Framebuffer> sceneFramebufferResource;
-    std::shared_ptr<Engine::Framebuffer> selectFramebufferResource;
+    std::shared_ptr<Material> selectMaterialResource;
+    std::shared_ptr<Framebuffer> sceneFramebufferResource;
+    std::shared_ptr<Framebuffer> selectFramebufferResource;
 
     bool control;
     float moveSpeed;

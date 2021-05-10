@@ -12,7 +12,6 @@
 #include <HierarchyPanel.hpp>
 
 using namespace std;
-using namespace Engine;
 
 void MainMenuBar::Show() {
     if (ImGui::BeginMainMenuBar())

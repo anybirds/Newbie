@@ -8,7 +8,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 Transform::Transform() :
     localPosition(0.0f), localRotation(1.0f, 0.0f, 0.0f, 0.0f), localScale(1.0f),
@@ -138,4 +137,31 @@ void Transform::RotateAround(const glm::vec3 &axis, float angle) {
 
 void Transform::Translate(const glm::vec3 &translation) {
     SetLocalPosition(localPosition + vec3(GetLocalToWorldMatrix() * vec4(translation, 0.0f)));
+}
+
+GameObject *Transform::AddGameObject() {
+    GameObject *child = new GameObject();
+    Transform *t = child->AddComponent<Transform>();
+    t->parent = this;
+    children.push_back(t);
+    return child;
+}
+
+GameObject *Transform::AddGameObject(GameObject *gameObject) {
+
+}
+
+GameObject *Transform::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
+
+}
+
+GameObject *Transform::FindGameObject(const string &name) const {
+    for (Transform *t : GetChildren()) {
+        GameObject *child = t->GetGameObject();
+        if (child->GetName() == name) {
+            return child;
+        }
+        t->FindGameObject(name);
+    }
+    return nullptr;
 }

@@ -11,7 +11,6 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace Engine;
 
 bool Project::Load(const string &path) {
     // close project

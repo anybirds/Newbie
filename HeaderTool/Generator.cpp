@@ -49,7 +49,7 @@ void Generator::Serialize() {
             cout << "}\n";
         }
         for (Class *cs : ns->classes) {
-            cout << "void " << cs->name << "::Serialize(json &js, const Engine::Entity *entity) {\n";
+            cout << "void " << cs->name << "::Serialize(json &js, const Entity *entity) {\n";
             
             if (!cs->base.empty()) {
                 cout << "  " << cs->base << "::StaticType()->Serialize(js, entity);\n";
@@ -76,7 +76,7 @@ void Generator::Deserialize() {
             cout << "}\n";
         }
         for (Class *cs : ns->classes) {
-            cout << "size_t " << cs->name << "::Deserialize(const json &js, Engine::Entity *entity) {\n";
+            cout << "size_t " << cs->name << "::Deserialize(const json &js, Entity *entity) {\n";
 
             cout << "  size_t i = ";
             if (cs->base.empty()) {
@@ -102,17 +102,24 @@ void Generator::Deserialize() {
 }
 
 void Generator::TypeInit() {
-    function<void(Namespace *ns)> write = [&write](Namespace *ns) {
+    vector<Namespace *> stack;
+    function<void(Namespace *ns)> write = [&write, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
-            cout << "{\n  using namespace " << n->name << ";\n";
+            stack.push_back(n);
             write(n);
-            cout << "}\n";
+            stack.pop_back();
         }
         for (Class *cs : ns->classes) {
-            cout << "  " << cs->name << "::SetType(new Engine::Type(\"" << cs->name << "\"));\n";
-            cout << "  " << cs->name << "::StaticType()->SetInstantiate(" << "Engine::instantiate<" << cs->name << ", true>);\n";
-            cout << "  " << cs->name << "::StaticType()->SetSerialize(" << cs->name << "::Serialize);\n";
-            cout << "  " << cs->name << "::StaticType()->SetDeserialize(" << cs->name << "::Deserialize);\n";
+            string name;
+            for (Namespace *n : stack) {
+                name += n->name;
+                name += "::";
+            }
+            name += cs->name;
+            cout << "  " << name << "::SetType(new Type(\"" << name << "\"));\n";
+            cout << "  " << name << "::StaticType()->SetInstantiate(" << "instantiate<" << name << ", true>);\n";
+            cout << "  " << name << "::StaticType()->SetSerialize(" << name << "::Serialize);\n";
+            cout << "  " << name << "::StaticType()->SetDeserialize(" << name << "::Deserialize);\n";
         }
     };
 
@@ -124,14 +131,21 @@ void Generator::TypeInit() {
 }
 
 void Generator::TypeClear() {
-    function<void(Namespace *ns)> write = [&write](Namespace *ns) {
+    vector<Namespace *> stack;
+    function<void(Namespace *ns)> write = [&write, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
-            cout << "{\n  using namespace " << n->name << ";\n";
+            stack.push_back(n);
             write(n);
-            cout << "}\n";
+            stack.pop_back();
         }
         for (Class *cs : ns->classes) {
-            cout << "  delete " << cs->name << "::StaticType();\n";
+            string name;
+            for (Namespace *n : stack) {
+                name += n->name;
+                name += "::";
+            }
+            name += cs->name;
+            cout << "  delete " << name << "::StaticType();\n";
         }
     };
 

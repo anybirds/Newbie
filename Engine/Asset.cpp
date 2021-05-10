@@ -4,7 +4,6 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace Engine;
 
 void Asset::Apply() {
     if (shared_ptr<Resource> sp = resource.lock()) {
@@ -12,12 +11,12 @@ void Asset::Apply() {
     }
 }
 
-void Engine::from_json(const json &js, Entity *&entity) {
+void from_json(const json &js, Entity *&entity) {
     uintptr_t key = js.get<uintptr_t>();
     if (key) {
         auto it = Entity::GetMap().find(key);
         if (it == Entity::GetMap().end()) {
-            entity = reinterpret_cast<Entity *>(key * (uintptr_t)!Entity::GetNullify());
+            entity = nullptr;
         } else {
             entity = reinterpret_cast<Entity *>(it->second);
         }
@@ -26,7 +25,7 @@ void Engine::from_json(const json &js, Entity *&entity) {
     }
 }
 
-void Engine::from_json(const json &js, Asset *&asset) {
+void from_json(const json &js, Asset *&asset) {
     uint64_t key = js.get<uint64_t>();
     if (key) {
         Project &project = Project::GetInstance();

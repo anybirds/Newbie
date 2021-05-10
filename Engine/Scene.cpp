@@ -15,7 +15,6 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace Engine;
 
 void Scene::ToBackup() {
     Scene &scene = GetInstance();

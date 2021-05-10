@@ -7,7 +7,6 @@
 #include <Prefab.hpp>
 
 using namespace std;
-using namespace Engine;
 
 void HierarchyPanel::ShowIcon(GameObject *gameObject) {
     if (gameObject->GetPrefab()) {

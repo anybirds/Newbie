@@ -1,8 +1,6 @@
 #include <Input.hpp>
 #include <Graphics/Window.hpp>
 
-using namespace Engine;
-
 void Input::Init() {
     glfwGetCursorPos(Window::GetInstance().GetGlfwWindow(), &mouseCursorX, &mouseCursorY);
 }

@@ -3,7 +3,6 @@
 #include <Transform.hpp>
 
 using namespace std;
-using namespace Engine;
 
 Transform *Component::GetTransform() const {
     return gameObject->GetTransform();

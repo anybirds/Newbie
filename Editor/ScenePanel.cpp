@@ -3,7 +3,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 const std::string &ScenePanel::GetSelectVertexShader() {
     static std::string selectVertexShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/select_vert.glsl"); 

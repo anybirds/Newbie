@@ -7,7 +7,6 @@
 #include <Project.hpp>
 
 using namespace std;
-using namespace Engine;
 
 AShader::AShader() : shaderType(Shader::VERTEX) {}
 

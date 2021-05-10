@@ -8,7 +8,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 AMaterial::AMaterial() : vertexShader(nullptr), fragmentShader(nullptr), mainTexture(nullptr) {}
 

@@ -7,7 +7,6 @@
 
 using namespace std;
 using namespace Assimp;
-using namespace Engine;
 
 shared_ptr<Resource> AModel::GetResource() {
     shared_ptr<Resource> sp;

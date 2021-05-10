@@ -13,7 +13,6 @@
 
 using namespace std;
 using namespace glm;
-using namespace Engine;
 
 void Drawer::Draw(Renderer *renderer) {
     if (!mesh) {

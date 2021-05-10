@@ -4,7 +4,6 @@
 #include <Graphics/Renderer.hpp>
 
 using namespace glm;
-using namespace Engine;
 
 Renderer::Renderer() : 
     order(0U), dirty(true), orthographic(false), 

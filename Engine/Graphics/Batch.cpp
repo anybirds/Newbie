@@ -3,7 +3,6 @@
 #include <Graphics/Renderer.hpp>
 
 using namespace std;
-using namespace Engine;
 
 Batch::~Batch() {
 
