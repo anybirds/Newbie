@@ -4,7 +4,6 @@
 
 #include <Transform.hpp>
 #include <GameObject.hpp>
-#include <Scene.hpp>
 
 using namespace std;
 using namespace glm;
@@ -112,16 +111,11 @@ void Transform::SetParent(Transform *parent) {
         p = p->parent;
     }
     
-    Scene &scene = Scene::GetInstance();
     if (this->parent) {
         this->parent->children.erase(find(this->parent->children.begin(), this->parent->children.end(), this));
-    } else {
-        scene.roots.erase(find(scene.roots.begin(), scene.roots.end(), GetGameObject()));
     }
     if (parent) {
         parent->children.push_back(this);
-    } else {
-        scene.roots.push_back(GetGameObject());
     }
     this->parent = parent;
     Propagate();
@@ -137,31 +131,4 @@ void Transform::RotateAround(const glm::vec3 &axis, float angle) {
 
 void Transform::Translate(const glm::vec3 &translation) {
     SetLocalPosition(localPosition + vec3(GetLocalToWorldMatrix() * vec4(translation, 0.0f)));
-}
-
-GameObject *Transform::AddGameObject() {
-    GameObject *child = new GameObject();
-    Transform *t = child->AddComponent<Transform>();
-    t->parent = this;
-    children.push_back(t);
-    return child;
-}
-
-GameObject *Transform::AddGameObject(GameObject *gameObject) {
-
-}
-
-GameObject *Transform::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
-
-}
-
-GameObject *Transform::FindGameObject(const string &name) const {
-    for (Transform *t : GetChildren()) {
-        GameObject *child = t->GetGameObject();
-        if (child->GetName() == name) {
-            return child;
-        }
-        t->FindGameObject(name);
-    }
-    return nullptr;
 }

@@ -17,7 +17,6 @@ class Script;
 class Renderer;
 class Material;
 class Mesh;
-class Prefab;
 
 class ENGINE_EXPORT Scene final {
 public:
@@ -25,7 +24,6 @@ public:
     static Scene &GetBackup() { static Scene backup; return backup; }
     static void ToBackup();
     static void FromBackup();
-    static void LoadBackup();
 
 private:
     Scene() : flags(0U), loaded(false) {}
@@ -33,8 +31,7 @@ private:
 
     enum {
         LOAD = 1,
-        SAVE = 1 << 1,
-        CLOSE = 1 << 2,
+        LOAD_ASYNC = 1 << 1,
     };
     uint8_t flags;
     std::string loadPath;
@@ -42,7 +39,7 @@ private:
     bool loaded;
     std::string name;
     std::string path;
-    std::vector<GameObject *> roots;
+    GameObject *root;
     std::unordered_set<Script *> scripts;
     std::map<int, std::unordered_set<Renderer *>> renderers;
     std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> batches;
@@ -58,8 +55,8 @@ private:
     void Untrack();
     void Enable();
     void Disable();
-    void Remove(const std::vector<Component *> &removeComps, const std::vector<Transform *> &removeTrans);
-    void Destroy(const std::vector<Component *> &removeComps);
+    void Remove();
+    void Destroy();
 
     void Render();
     void Update();
@@ -67,15 +64,12 @@ private:
 public:
     Scene(const Scene &) = delete;
 
-    void ToJson(nlohmann::json &js, bool nullify = false, const std::shared_ptr<Prefab> &base = nullptr, uintptr_t start = 0U);
-    void FromJson(const nlohmann::json &js, bool nullify = true);
-
     void Load(const std::string &path);
-    void Save();
-    void Close();
     bool LoadImmediate(const std::string &path);
-    bool SaveImmediate();
-    void CloseImmediate();
+    bool LoadImmediate(const std::string &path, nlohmann::json &js);
+    bool LoadImmediate(const nlohmann::json &js);
+    bool Save(const nlohmann::json &js);
+    void Close();
 
     bool IsLoaded() const { return loaded; }
     void SetLoaded(bool loaded) { this->loaded = loaded; }
@@ -84,19 +78,10 @@ public:
     void SetPath(const std::string &path) { this->path = path; }
     
     const std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> &GetAllBatches() const { return batches; }
-    const std::vector<GameObject *> &GetRootGameObjects() const { return roots; }
-    GameObject *AddGameObject();
-    GameObject *AddGameObject(GameObject *gameObject);
-    GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
-    void RemoveGameObject(GameObject *gameObject);
-    void RemoveComponent(Component *component);
-    GameObject *FindGameObject(const std::string &name);
-    void DestroyGameObject(GameObject *gameObject);
-    void OrganizeGameObject(GameObject *gameObject);
+    GameObject *GetRoot() { return root; }
 
     void Loop();
     void PauseLoop();
-    void RetainLoop();
 
     friend class Transform;
     friend class Script;

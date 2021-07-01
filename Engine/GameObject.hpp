@@ -18,6 +18,9 @@ CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
     PROPERTY(std::string, name, Name);
 
 public:
+    static GameObject *Instantiate(const nlohmann::json &js);
+
+public:
     GameObject() : transform(nullptr) {}
     
     std::string &GetName() { return name; }
@@ -56,6 +59,14 @@ public:
         transform = t;
         return t;
     }
+
+    GameObject *AddGameObject();
+    GameObject *AddGameObject(GameObject *gameObject);
+    GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
+    GameObject *FindGameObject(const std::string &name) const;
+
+    void Remove() { transform->flags |= Component::REMOVED; transform->localEnabled = false; }
+    void Destroy();
 
     friend class Scene;
     friend class Component;

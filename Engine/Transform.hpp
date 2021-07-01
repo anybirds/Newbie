@@ -50,11 +50,6 @@ public:
     void Rotate(const glm::vec3 &eulerAngles);
     void RotateAround(const glm::vec3 &axis, float angle);
     void Translate(const glm::vec3 &translation);
-    
-    GameObject *AddGameObject();
-    GameObject *AddGameObject(GameObject *gameObject);
-    GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
-    GameObject *FindGameObject(const std::string &name) const;
 
     friend class Scene;
     friend class GameObject;

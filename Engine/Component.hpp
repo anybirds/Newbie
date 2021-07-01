@@ -27,6 +27,7 @@ public:
     bool IsEnabled() const;
     bool IsLocalEnabled() const { return localEnabled; }
     bool IsRemoved() const { return flags & REMOVED; } 
+    void Remove() { flags |= REMOVED; localEnabled = false; }
     
     Transform *GetTransform() const;
     
