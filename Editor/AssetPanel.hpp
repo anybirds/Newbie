@@ -18,5 +18,4 @@ public:
     AssetPanel &operator=(const AssetPanel &) = delete;
     
     virtual void ShowContents() override;
-    void ShowPreviewOff();
 };

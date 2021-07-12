@@ -18,19 +18,21 @@ CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
     PROPERTY(std::string, name, Name);
 
 public:
-    static GameObject *Instantiate(const nlohmann::json &js);
+    static void ToJson(nlohmann::json &js, const GameObject *gameObject);
+    static void FromJson(const nlohmann::json &js, GameObject *&gameObject, bool nullify = true);
 
 public:
     GameObject() : transform(nullptr) {}
     
     std::string &GetName() { return name; }
-    const std::vector<Component *> &GetAllComponents() { return components; }
+    const std::vector<Component *> &GetAllComponents() const { return components; }
     bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
     bool IsEnabled() const { return transform->IsEnabled(); }
     void SetLocalEnabled(bool localEnabled) { transform->SetLocalEnabled(localEnabled); }
     bool IsRemoved() const { return transform->IsRemoved(); }
     GameObject *GetParent() const { Transform *p = transform->GetParent(); if (p) { return p->GetGameObject(); } else { return nullptr; } }
     void SetParent(GameObject *parent) { transform->SetParent(parent->GetTransform()); }
+    void SetSibling(GameObject *sibling) { transform->SetSibling(sibling->GetTransform()); }
 
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
     T *GetComponent() const {
@@ -63,10 +65,10 @@ public:
     GameObject *AddGameObject();
     GameObject *AddGameObject(GameObject *gameObject);
     GameObject *AddGameObject(const std::shared_ptr<Prefab> &prefab);
+    GameObject *AddGameObject(const nlohmann::json &js);
     GameObject *FindGameObject(const std::string &name) const;
 
     void Remove() { transform->flags |= Component::REMOVED; transform->localEnabled = false; }
-    void Destroy();
 
     friend class Scene;
     friend class Component;

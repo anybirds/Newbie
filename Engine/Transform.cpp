@@ -101,12 +101,12 @@ void Transform::SetScale(const glm::vec3 &scale) {
     Propagate();
 }
 
-void Transform::SetParent(Transform *parent) {
+bool Transform::SetParent(Transform *parent) {
     // prevent cycles in hierarchy
     Transform *p = parent;
     while (p) {
         if (this == p) {
-            return;
+            return false;
         }
         p = p->parent;
     }
@@ -119,6 +119,22 @@ void Transform::SetParent(Transform *parent) {
     }
     this->parent = parent;
     Propagate();
+    return true;
+}
+
+bool Transform::SetSibling(Transform *sibling) {
+    Transform *parent = sibling->GetParent();
+    if (!parent) {
+        return false;
+    }
+    if (!SetParent(parent)) {
+        return false;
+    }
+
+    auto it = find(parent->children.begin(), parent->children.end(), sibling);
+    parent->children.emplace(it, this);
+    parent->children.pop_back();
+    return true;
 }
 
 void Transform::Rotate(const glm::vec3 &eulerAngles) {

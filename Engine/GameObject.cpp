@@ -1,13 +1,66 @@
 #include <cstdint>
+#include <functional>
 
 #include <GameObject.hpp>
 #include <Component.hpp>
+#include <Prefab.hpp>
 
 using namespace std;
 using json = nlohmann::json;
 
-GameObject *GameObject::Instantiate(const json &js) { 
-    
+void GameObject::ToJson(json &js, const GameObject *gameObject) {
+    js.clear();
+
+    // write root
+    js["root"] = gameObject;
+
+    // write entities
+    json &entities = js["entities"];
+    function<void(const GameObject *)> recurse = [&recurse, &entities](const GameObject *gameObject) {
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->children) {
+            recurse(t->GetGameObject());
+        }
+
+        for (Component *component : gameObject->components) {
+            Type *type = component->GetType();
+                type->Serialize(
+                    entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
+                    component); 
+        }
+
+        GameObject::StaticType()->Serialize(
+            entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+            gameObject);
+    };
+    recurse(gameObject);
+}
+
+void GameObject::FromJson(const json &js, GameObject *&gameObject, bool nullify) {
+    GetMap().clear();
+    SetNullify(nullify);
+
+    // read entities
+    const json &entities = js["entities"];
+    for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
+        const Type *type = Type::GetType(i.key());
+        for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
+            Entity *entity = type->Instantiate();
+            GetMap().insert({stoull(j.key()), (uintptr_t)entity});
+        }
+    }
+
+    for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
+        const Type *type = Type::GetType(i.key());
+        for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
+            type->Deserialize(j.value(), (Entity *)GetMap().at(stoull(j.key())));
+        }
+    }
+
+    // read root
+    gameObject = js["root"].get<GameObject *>();
+
+    GetMap().clear();
 }
 
 GameObject *GameObject::AddGameObject() {
@@ -19,11 +72,23 @@ GameObject *GameObject::AddGameObject() {
 }
 
 GameObject *GameObject::AddGameObject(GameObject *gameObject) {
-
+    json js;
+    GameObject *child;
+    ToJson(js, gameObject);
+    FromJson(js, child, false);
+    child->SetParent(this);
+    return child;
 }
 
 GameObject *GameObject::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
+    return AddGameObject(prefab->GetJson());
+}
 
+GameObject *GameObject::AddGameObject(const json &js) {
+    GameObject *child;
+    FromJson(js, child);
+    child->SetParent(this);
+    return child;
 }
 
 GameObject *GameObject::FindGameObject(const string &name) const {
@@ -35,20 +100,4 @@ GameObject *GameObject::FindGameObject(const string &name) const {
         child->FindGameObject(name);
     }
     return nullptr;
-}
-
-void GameObject::Destroy() {
-    Transform *parent = transform->GetParent();
-    if (parent) {
-        parent->children.erase(find(parent->children.begin(), parent->children.end(), this));
-    }
-
-    for (Transform *t : transform->GetChildren()) {
-        t->GetGameObject()->Destroy();
-    }
-
-    auto temp = components;
-    for (Component *component : temp) {
-        delete component;
-    }
 }

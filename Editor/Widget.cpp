@@ -11,7 +11,6 @@ bool Widget::renameClicked;
 
 bool Widget::running;
 bool Widget::paused;
-bool Widget::preview;
 
 void Widget::ShowRename(string &str) {
     ImGui::SetKeyboardFocusHere();

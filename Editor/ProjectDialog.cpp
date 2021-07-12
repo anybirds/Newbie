@@ -68,7 +68,6 @@ void ProjectDialog::LoadProject(const string &dir) {
     }
     running = false;
     paused = false;
-    preview = false;
     ImGui::CloseCurrentPopup();
 }
 

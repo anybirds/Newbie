@@ -45,7 +45,8 @@ public:
     void SetPosition(const glm::vec3 &position);
     // void SetRotation(const glm::quat &rotation);
     void SetScale(const glm::vec3 &scale);
-    void SetParent(Transform *parent);
+    bool SetParent(Transform *parent);
+    bool SetSibling(Transform *sibling);
 
     void Rotate(const glm::vec3 &eulerAngles);
     void RotateAround(const glm::vec3 &axis, float angle);

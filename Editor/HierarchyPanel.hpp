@@ -1,5 +1,8 @@
 #pragma once
 
+#include <utility>
+#include <nlohmann/json.hpp>
+
 #include <Panel.hpp>
 #include <GameObject.hpp>
 
@@ -8,13 +11,10 @@ public:
     static HierarchyPanel &GetInstance() { static HierarchyPanel hierarchyPanel; return hierarchyPanel; }
 
 private:
-    HierarchyPanel() : Panel("Hierarchy"), menu(false), hovered(nullptr), copyed(nullptr) {}
+    HierarchyPanel() : Panel("Hierarchy"), menu(false) {}
 
     bool menu;
-    GameObject *hovered;
-    GameObject *copyed;
-
-    void ShowIcon(GameObject *gameObject);
+    nlohmann::json copyed;
 
 public:
     HierarchyPanel(const HierarchyPanel &) = delete;

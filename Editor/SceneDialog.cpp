@@ -23,7 +23,6 @@ void SceneDialog::LoadScene(const std::string &path) {
     }
     running = false;
     paused = false;
-    preview = false;
     selected = nullptr;
     ImGui::CloseCurrentPopup();
 }

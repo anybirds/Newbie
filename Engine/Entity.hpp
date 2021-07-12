@@ -12,6 +12,8 @@ public:
         static std::unordered_map<uintptr_t, uintptr_t> map;
         return map;
     }
+    static bool &GetNullify() { static bool nullify; return nullify; }
+    static void SetNullify(bool nullify) { GetNullify() = nullify; }
 
 public:
     virtual ~Entity() {}

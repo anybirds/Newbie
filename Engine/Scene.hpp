@@ -24,9 +24,10 @@ public:
     static Scene &GetBackup() { static Scene backup; return backup; }
     static void ToBackup();
     static void FromBackup();
+    static void LoadBackup();
 
 private:
-    Scene() : flags(0U), loaded(false) {}
+    Scene() : flags(0U), loaded(false), root(nullptr) {}
     Scene &operator=(const Scene &) = default;
 
     enum {
@@ -66,19 +67,16 @@ public:
 
     void Load(const std::string &path);
     bool LoadImmediate(const std::string &path);
-    bool LoadImmediate(const std::string &path, nlohmann::json &js);
-    bool LoadImmediate(const nlohmann::json &js);
-    bool Save(const nlohmann::json &js);
+    bool Save();
     void Close();
 
     bool IsLoaded() const { return loaded; }
-    void SetLoaded(bool loaded) { this->loaded = loaded; }
     const std::string &GetName() const { return name; }
     const std::string &GetPath() const { return path; }
     void SetPath(const std::string &path) { this->path = path; }
     
+    GameObject *GetRoot() const { return root; }
     const std::map<int, std::map<std::pair<Mesh *, Material *>, Batch *>> &GetAllBatches() const { return batches; }
-    GameObject *GetRoot() { return root; }
 
     void Loop();
     void PauseLoop();

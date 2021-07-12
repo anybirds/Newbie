@@ -65,10 +65,6 @@ void MainMenuBar::Show() {
             ImGui::EndMenu();
         }
         gamePanel.ShowPlayPause();
-        AssetPanel &assetPanel = AssetPanel::GetInstance();
-        if (preview) {
-            assetPanel.ShowPreviewOff();
-        }
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {
