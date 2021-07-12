@@ -32,6 +32,19 @@ void Scene::FromBackup() {
     backup = Scene();
 }
 
+void Scene::LoadBackup() {
+    Scene &scene = GetInstance();
+    Scene &backup = GetBackup();
+    
+    json js;
+    GameObject::ToJson(js, backup.root);
+    GameObject::FromJson(js, scene.root);
+
+    scene.name = backup.name;
+    scene.path = backup.path;
+    scene.loaded = true;
+}
+
 void Scene::Load(const string &path) {
     flags |= LOAD;
     this->loadPath = path;
@@ -56,7 +69,7 @@ bool Scene::LoadImmediate(const string &path) {
         // read json object
         json js;
         fs >> js;
-        FromJson(js);
+        GameObject::FromJson(js, root);
     } catch(...) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot read scene: " << path << '\n';
         FromBackup();
@@ -70,21 +83,44 @@ bool Scene::LoadImmediate(const string &path) {
     return true;
 }
 
-bool Scene::Save(const json &js) {
-    // write to scene file
-    ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
-    if (fs.fail()) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << path << '\n';
+bool Scene::Save() {
+    try {
+        // write json object
+        json js;
+        GameObject::ToJson(js, root);
+        
+        // open json file
+        ofstream fs(filesystem::u8path(Project::GetInstance().GetDirectoy() + "/" + path));
+        if (fs.fail()) {
+            cerr << '[' << __FUNCTION__ << ']' << " cannot open scene: " << path << '\n';
+            return false;
+        }
+        fs << js;
+    } catch(...) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot save scene: " << path << '\n';
         return false;
     }
-    fs << js;
 
     cerr << '[' << __FUNCTION__ << ']' << " save scene: " << path << " done.\n";
     return true;
 }
 
 void Scene::Close() {
-    root->Destroy();
+    function<void(GameObject *)> recurse = [&recurse](GameObject *gameObject) {
+        Transform *transform = gameObject->GetTransform();
+        for (Transform *t : transform->GetChildren()) {
+            recurse(t->GetGameObject());
+        }
+
+        // Transform component is guaranteed to be at index 0
+        for (size_t i = 1; i < gameObject->GetAllComponents().size(); i++) {
+            delete gameObject->GetAllComponents()[i];
+        }
+        delete transform;
+    };
+    if (root) {
+        recurse(root);
+    }
 
     for (auto &order : batches) {
         for (auto &batch : order.second) {
@@ -131,7 +167,9 @@ void Scene::Flags() {
         }
     };
 
-    recurse(root, root->IsLocalEnabled(), false); // root should not be removed
+    root->GetTransform()->flags &= ~Component::REMOVED; // root should not be removed
+    root->SetLocalEnabled(true); // root should be enabled
+    recurse(root, root->IsLocalEnabled(), root->IsRemoved()); 
 }
 
 void Scene::Track() {

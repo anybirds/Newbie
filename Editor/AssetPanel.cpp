@@ -5,6 +5,7 @@
 
 #include <AssetPanel.hpp>
 #include <GamePanel.hpp>
+#include <NewDialog.hpp>
 #include <Engine.hpp>
 
 using namespace std;
@@ -31,9 +32,7 @@ void AssetPanel::ShowIcon(Asset *asset) {
         ImGui::Text(ICON_FA_DESKTOP);
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
     } else if (type == APrefab::StaticType()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
         ImGui::Text(ICON_FA_CUBE);
-        ImGui::PopStyleColor();
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
     } else {
         ImGui::Text(ICON_FA_FILE);
@@ -55,23 +54,7 @@ void AssetPanel::ShowContents() {
         if (rename && selected == (void *)asset) {
             ShowRename(asset->GetName()); 
         } else {
-            if (ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), (void *)asset == selected, ImGuiSelectableFlags_AllowDoubleClick)) {
-                if (ImGui::IsMouseDoubleClicked(0)) {
-                    if (asset->GetType() == APrefab::StaticType() && !running) {
-                        if (preview) {
-                            Scene::FromBackup();
-                        }
-                        APrefab *aprefab = (APrefab *)asset;
-                        Scene &scene = Scene::GetInstance();
-                        Scene::ToBackup();
-                        scene.FromJson(aprefab->GetJson());
-                        scene.SetLoaded(true);
-                        preview = true;
-
-                        cerr << '[' << __FUNCTION__ << ']' << " preview Prefab: " << aprefab->GetName() << '\n';
-                    }
-                }
-            }
+            ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), (void *)asset == selected);
             if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
                 selected = (void *)asset;
             }
@@ -85,40 +68,35 @@ void AssetPanel::ShowContents() {
         }
     }
     ImGui::EndChild();
+    
+    NewDialog &newDialog = NewDialog::GetInstance();
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject")) {
             IM_ASSERT(payload->DataSize == sizeof(GameObject *));
             GameObject *gameObject = *(GameObject **)payload->Data;
-            if (!gameObject->GetPrefab()) {
-                APrefab *aprefab = project.AddAsset<APrefab>();
-                aprefab->SetName(gameObject->GetName());
-                gameObject->SetPrefab(dynamic_pointer_cast<Prefab>(aprefab->GetResource()));
-                GameObject::ToJson(aprefab->GetJson(), vector<GameObject *>{gameObject}, true);
-                aprefab->Apply();
+            newDialog.SetCallback([gameObject](const string &path)->bool {
+                auto fspath(filesystem::u8path(path));
+                try {
+                    // write to prefab file
+                    json js;
+                    GameObject::ToJson(js, gameObject);
+                    ofstream fs(fspath);
+                    if (fs.fail()) {
+                        return false;
+                    } 
+                    fs << js;
 
-                cerr << '[' << __FUNCTION__ << ']' << " created Prefab: " << aprefab->GetName() << '\n';
-            }
+                    // add prefab
+                    Project &project = Project::GetInstance();
+                    APrefab *aprefab = project.AddAsset<APrefab>();
+                    aprefab->SetName(gameObject->GetName());
+                    aprefab->SetPath(filesystem::relative(fspath, filesystem::u8path(project.GetDirectoy())).u8string());
+                } catch (...) { return false; }
+                return true;
+            });
+            newDialog.Open();
         }
         ImGui::EndDragDropTarget();
     }
-}
-
-void AssetPanel::ShowPreviewOff() {
-    ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-    ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
-    Scene &scene = Scene::GetInstance();
-    assert(scene.GetRootGameObjects().size() == 1);
-    if (scene.GetRootGameObjects()[0]->HasPrefabCycle()) {
-        flags = ImGuiSelectableFlags_Disabled;
-    }
-    if (ImGui::Selectable(ICON_FA_ANGLE_DOUBLE_LEFT, false, flags, ImVec2(16.0f, 0.0f))) {
-        shared_ptr<Prefab> prefab = scene.GetRootGameObjects()[0]->GetPrefab();
-        APrefab *aprefab = (APrefab *)prefab->GetAsset();
-        scene.ToJson(aprefab->GetJson(), true, prefab, prefab->GetEntityCount() + 1);
-        Scene::FromBackup();
-        prefab->SetDirty(true);
-        aprefab = nullptr;
-        preview = false;
-    }
-    ImGui::PopStyleColor();
+    newDialog.Show();
 }

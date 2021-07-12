@@ -28,5 +28,21 @@ Prefab::Prefab(APrefab *aprefab) : Resource(aprefab) {
 void Prefab::Apply() {
     Resource::Apply();
     APrefab *aprefab = (APrefab *)asset;
-    js = aprefab->GetJson();
+    path = aprefab->GetPath();
+
+    ifstream file;
+    string absolute;
+    Project &project = Project::GetInstance();
+    if (project.IsLoaded()) {
+        absolute = Project::GetInstance().GetDirectoy() + "/" + GetPath();
+    } else {
+        absolute = GetPath();
+    }
+    file.open(filesystem::u8path(absolute));
+    if (!file.is_open()) {
+        cerr << '[' << __FUNCTION__ << ']' << " failed to find a prefab: " << GetPath() << '\n';
+        throw exception();
+    }
+
+    file >> js;
 }

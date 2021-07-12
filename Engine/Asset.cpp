@@ -16,7 +16,7 @@ void from_json(const json &js, Entity *&entity) {
     if (key) {
         auto it = Entity::GetMap().find(key);
         if (it == Entity::GetMap().end()) {
-            entity = nullptr;
+            entity = reinterpret_cast<Entity *>(key * (uintptr_t)!Entity::GetNullify());
         } else {
             entity = reinterpret_cast<Entity *>(it->second);
         }

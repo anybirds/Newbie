@@ -14,7 +14,6 @@ protected:
 
     static bool running;
     static bool paused;
-    static bool preview;
 
 public:
     static void UpdateRename();

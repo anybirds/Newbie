@@ -133,7 +133,7 @@ bool Project::Load(const string &path) {
 bool Project::Save() {
     // save scene
     Scene &scene = Scene::GetInstance();
-    if (scene.IsLoaded() && !scene.SaveImmediate()) {
+    if (scene.IsLoaded() && !scene.Save()) {
         return false;
     }
 
@@ -173,9 +173,9 @@ bool Project::Save() {
 void Project::Close() {
     // close scene
     Scene &scene = Scene::GetInstance();
-    scene.CloseImmediate();
+    scene.Close();  
     Scene &backup = Scene::GetBackup();
-    backup.CloseImmediate();
+    backup.Close();
 
     // clear out members
     if (setting) {

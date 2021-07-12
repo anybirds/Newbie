@@ -11,8 +11,6 @@ CLASS_ATTR(Renderer, Component, ENGINE_EXPORT) {
     TYPE(Renderer);
 
     PROPERTY_GET(unsigned, order, Order);
-    PROPERTY_NONE(bool, dirty);
-    PROPERTY_NONE(glm::mat4, normalization);
     PROPERTY_NONE(bool, orthographic);
     PROPERTY_GET(float, fovy, Fovy);
     PROPERTY_GET(float, aspectRatio, AspectRatio);
@@ -20,6 +18,10 @@ CLASS_ATTR(Renderer, Component, ENGINE_EXPORT) {
     PROPERTY_GET(float, fr, Far);
     PROPERTY_GET(float, size, Size);
     PROPERTY(std::shared_ptr<Framebuffer>, framebuffer, Framebuffer);
+
+private:
+    mutable bool dirty;
+    mutable glm::mat4 normalization;
 
 public:
     Renderer();

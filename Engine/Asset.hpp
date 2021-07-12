@@ -37,12 +37,7 @@ void to_json(nlohmann::json &js, const T *t) {
 template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T> &&
 !std::is_base_of_v<Asset, T>, bool> = true>
 void to_json(nlohmann::json &js, const T *t) {
-    auto it = Entity::GetMap().find((uintptr_t)t);
-    if (it == Entity::GetMap().end()) {
-        js = 0U;
-    } else {
-        js = it->second;
-    }
+    js = reinterpret_cast<uint64_t>(t);
 }
 
 template <typename T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>

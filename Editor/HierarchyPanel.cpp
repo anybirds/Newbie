@@ -8,16 +8,6 @@
 
 using namespace std;
 
-void HierarchyPanel::ShowIcon(GameObject *gameObject) {
-    if (gameObject->GetPrefab()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-        ImGui::Text(ICON_FA_CUBE);
-        ImGui::PopStyleColor();
-    } else {
-        ImGui::Text(ICON_FA_CUBE);
-    }
-}
-
 void HierarchyPanel::ShowContents() {
     Scene &scene = Scene::GetInstance();
     if (!scene.IsLoaded()) {
@@ -34,7 +24,7 @@ void HierarchyPanel::ShowContents() {
         }
         bool open = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, "");
         ImGui::SameLine();
-        ShowIcon(gameObject);
+        ImGui::Text(ICON_FA_CUBE);
         ImGui::SameLine();
         if (rename && selected == (void *)gameObject) {
             ShowRename(gameObject->GetName());
@@ -48,7 +38,7 @@ void HierarchyPanel::ShowContents() {
             }
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                 ImGui::SetDragDropPayload("GameObject", &selected, sizeof(GameObject *));
-                ShowIcon((GameObject *)selected);
+                ImGui::Text(ICON_FA_CUBE);
                 ImGui::SameLine();
                 ImGui::Text(((GameObject *)selected)->GetName().c_str());
                 ImGui::EndDragDropSource();
@@ -82,9 +72,9 @@ void HierarchyPanel::ShowContents() {
     
     ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     hovered = nullptr;
-    for (GameObject *root : scene.GetRootGameObjects()) {
-        recurse(root);
-    }
+    GameObject *root = scene.GetRoot();
+    recurse(root);
+
     if (ImGui::BeginPopupContextWindow())
     {
         if (!menu) {
@@ -93,41 +83,33 @@ void HierarchyPanel::ShowContents() {
         Scene &scene = Scene::GetInstance();
         if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)selected)) {
             GameObject *gameObject = (GameObject *)selected;
-            if (copyed) {
-                scene.DestroyGameObject(copyed);
-            }
-            copyed = gameObject->GetCopy();
-            scene.RemoveGameObject(gameObject);
+            GameObject::ToJson(copyed, gameObject);
+            gameObject->Remove();
         }
         if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)selected)) {
             GameObject *gameObject = (GameObject *)selected;
-            if (copyed) {
-                scene.DestroyGameObject(copyed);
-            }
-            copyed = gameObject->GetCopy();
+            GameObject::ToJson(copyed, gameObject);
         }
-        if (ImGui::MenuItem("Paste", nullptr, nullptr, (bool)copyed && (selected || !preview))) {
+        if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
             if (selected) {
                 GameObject *gameObject = (GameObject *)selected;
-                GameObject *child = gameObject->AddGameObject(copyed);
+                gameObject->AddGameObject(copyed);
             } else {
-                scene.AddGameObject(copyed);
+                root->AddGameObject(copyed);
             }
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Add GameObject", nullptr, nullptr, selected || !preview)) {
+        if (ImGui::MenuItem("Add GameObject", nullptr, nullptr)) {
             if (selected) {
                 GameObject *gameObject = (GameObject *)selected;
-                GameObject *child = gameObject->AddGameObject();
-                child->SetName("GameObject");
+                gameObject->AddGameObject();
             } else {
-                GameObject *root = scene.AddGameObject();
-                root->SetName("GameObject");
+                root->AddGameObject();
             }
         }
         if (ImGui::MenuItem("Remove", nullptr, nullptr, (bool)selected)) {
             GameObject *gameObject = (GameObject *)selected;
-            scene.RemoveGameObject(gameObject);
+            gameObject->Remove();
         }
         
         menu = true;
@@ -136,12 +118,12 @@ void HierarchyPanel::ShowContents() {
         menu = false;
     }
     ImGui::EndChild();
-    if (ImGui::BeginDragDropTarget() && !hovered && !preview) {
+    if (ImGui::BeginDragDropTarget() && !hovered) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset")) {
             IM_ASSERT(payload->DataSize == sizeof(Asset *));
             Asset *asset = *(Asset **)payload->Data;
             if (asset->GetType() == APrefab::StaticType()) {
-                scene.AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
+                root->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
             }
         }
         ImGui::EndDragDropTarget();
@@ -149,8 +131,5 @@ void HierarchyPanel::ShowContents() {
 }
 
 void HierarchyPanel::Clear() {
-    if (copyed) {
-        Scene::GetInstance().DestroyGameObject(copyed);
-    }
-    copyed = nullptr;
+    copyed.clear();
 }
