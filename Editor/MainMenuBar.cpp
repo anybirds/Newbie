@@ -100,7 +100,7 @@ void MainMenuBar::ShowPlayPause() {
     GamePanel &gamePanel = GamePanel::GetInstance();
     if (ImGui::Selectable(ICON_FA_PLAY, gamePlaying, flags, ImVec2(16.0f, 0.0f))) {
         if (gamePlaying) {
-            gamePanel.SetOpen(true);
+            gamePanel.SetOpen(false);
             Scene::FromBackup();
         } else {
             gamePanel.SetOpen(true);
@@ -109,6 +109,9 @@ void MainMenuBar::ShowPlayPause() {
         }
         gamePlaying ^= true;
         gamePaused = false;
+
+        GetLocalSelected() = nullptr;
+        GetSelected() = nullptr; // nothing should be selected after the play mode changes
     }
     if (ImGui::Selectable(ICON_FA_PAUSE, gamePaused, flags, ImVec2(16.0f, 0.0f))) {
         gamePaused ^= true;

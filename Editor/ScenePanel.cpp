@@ -143,7 +143,7 @@ void ScenePanel::ShowContents() {
     }
 
     // gizmo
-    if (ImGui::IsWindowFocused() && !ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
+    if (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
         if (ImGui::IsKeyPressed(GLFW_KEY_T)) {
             gizmoOperation = ImGuizmo::TRANSLATE;
         } else if (ImGui::IsKeyPressed(GLFW_KEY_R)) {
@@ -170,7 +170,7 @@ void ScenePanel::ShowContents() {
         ImGuizmo::Manipulate(value_ptr(view), value_ptr(normalization), gizmoOperation, gizmoOperation == ImGuizmo::SCALE ? ImGuizmo::LOCAL : gizmoMode, value_ptr(object));
         if (ImGuizmo::IsUsing()) {
             vec3 translation, rotation, scale;
-            mat4 local = transform->GetParent() ? transform->GetParent()->GetWorldToLocalMatrix() * object : mat4(1.0f);
+            mat4 local = transform->GetParent() ? transform->GetParent()->GetWorldToLocalMatrix() * object : object;
             ImGuizmo::DecomposeMatrixToComponents(value_ptr(local), value_ptr(translation), value_ptr(rotation), value_ptr(scale));
             transform->SetLocalPosition(translation);
             transform->SetLocalEulerAngles(rotation);
