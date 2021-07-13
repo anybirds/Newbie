@@ -10,6 +10,8 @@
 #include <Graphics/Material.hpp>
 #include <GameObject.hpp>
 
+#include "imgui/ImGuizmo.h"
+
 class ScenePanel : public Panel {
 private:
     static const std::string &GetSelectVertexShader();
@@ -40,6 +42,9 @@ private:
     bool control;
     float moveSpeed;
     float rotateSpeed;
+
+    ImGuizmo::OPERATION gizmoOperation;
+    ImGuizmo::MODE gizmoMode;
 
     bool clicked;
     int clickX;

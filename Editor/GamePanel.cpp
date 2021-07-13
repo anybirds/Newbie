@@ -4,6 +4,7 @@
 #include <Engine.hpp>
 #include <GamePanel.hpp>
 #include <AssetPanel.hpp>
+#include <MainMenuBar.hpp>
 
 using namespace std;
 
@@ -39,13 +40,13 @@ void GamePanel::Update() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     Scene &scene = Scene::GetInstance();
+    MainMenuBar &mainMenuBar = MainMenuBar::GetInstance();
     if (!scene.IsLoaded()) {
-        running = false;
-        paused = false;
+        mainMenuBar.StopGamePlay();
         return;
     }
 
-    if (running && !paused) {
+    if (mainMenuBar.IsGamePlaying() && !mainMenuBar.IsGamePaused()) {
         scene.Loop();
     } else {
         scene.PauseLoop();
@@ -76,29 +77,4 @@ void GamePanel::ShowContents() {
         imgSize,
         ImVec2(0.0f, imgSize.y / gameFramebufferResource->GetMaxHeight()),
         ImVec2(imgSize.x / gameFramebufferResource->GetMaxWidth(), 0.0f));
-}
-
-void GamePanel::ShowPlayPause() {
-    Scene &scene = Scene::GetInstance();
-    ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-    ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
-    if (!scene.IsLoaded()) {
-        flags = ImGuiSelectableFlags_Disabled;
-    }
-    if (ImGui::Selectable(ICON_FA_PLAY, running, flags, ImVec2(16.0f, 0.0f))) {
-        if (running) {
-            open = false;
-            Scene::FromBackup();
-        } else {
-            open = true;
-            Scene::ToBackup();
-            Scene::LoadBackup();
-        }
-        running ^= true;
-        paused = false;
-    }
-    if (ImGui::Selectable(ICON_FA_PAUSE, paused, flags, ImVec2(16.0f, 0.0f))) {
-        paused ^= true;
-    }
-    ImGui::PopStyleColor();
 }

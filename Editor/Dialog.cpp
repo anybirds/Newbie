@@ -14,5 +14,5 @@ void Dialog::Show() {
 
 void Dialog::Open() {
     ImGui::OpenPopup(title.c_str());
-    selected = nullptr;
+    GetLocalSelected() = nullptr;
 }

@@ -22,7 +22,6 @@ public:
     GamePanel &operator=(const GamePanel &) = delete;
 
     virtual void ShowContents() override;
-    void ShowPlayPause();
     virtual void Update() override;
     void Close();
 };

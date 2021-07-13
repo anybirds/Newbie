@@ -31,7 +31,7 @@ void MainMenuBar::Show() {
             if (ImGui::MenuItem("Open")) {
                 project_open = true;
             }
-            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded() && !running)) {
+            if (ImGui::MenuItem("Save", nullptr, nullptr, project.IsLoaded() && !gamePlaying)) {
                 project.Save();
             }
             ImGui::EndMenu();
@@ -64,7 +64,7 @@ void MainMenuBar::Show() {
             } 
             ImGui::EndMenu();
         }
-        gamePanel.ShowPlayPause();
+        ShowPlayPause();
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
         if (project_new) {
@@ -88,4 +88,30 @@ void MainMenuBar::Show() {
 
         ImGui::EndMainMenuBar();
     }
+}
+
+void MainMenuBar::ShowPlayPause() {
+    Scene &scene = Scene::GetInstance();
+    ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+    ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
+    if (!scene.IsLoaded()) {
+        flags = ImGuiSelectableFlags_Disabled;
+    }
+    GamePanel &gamePanel = GamePanel::GetInstance();
+    if (ImGui::Selectable(ICON_FA_PLAY, gamePlaying, flags, ImVec2(16.0f, 0.0f))) {
+        if (gamePlaying) {
+            gamePanel.SetOpen(true);
+            Scene::FromBackup();
+        } else {
+            gamePanel.SetOpen(true);
+            Scene::ToBackup();
+            Scene::LoadBackup();
+        }
+        gamePlaying ^= true;
+        gamePaused = false;
+    }
+    if (ImGui::Selectable(ICON_FA_PAUSE, gamePaused, flags, ImVec2(16.0f, 0.0f))) {
+        gamePaused ^= true;
+    }
+    ImGui::PopStyleColor();
 }

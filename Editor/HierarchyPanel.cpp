@@ -48,21 +48,21 @@ void HierarchyPanel::ShowContents() {
         ImGui::SameLine();
         ImGui::Text(ICON_FA_CUBE);
         ImGui::SameLine();
-        if (rename && selected == (void *)gameObject) {
-            ShowRename(gameObject->GetName());
+        if (IsRenaming() && !GetLocalSelected() && GetSelected() == (void *)gameObject) {
+            ShowRenamingItem(gameObject->GetName());
         } else {
-            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == selected);
+            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == GetSelected());
             if (ImGui::IsItemHovered()) {
                 hovered = gameObject;
                 if (ImGui::IsMouseDown(0)) {
-                    selected = (void *)gameObject;
+                    GetSelected() = (Entity *)gameObject;
                 }
             }
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                ImGui::SetDragDropPayload("GameObject", &selected, sizeof(GameObject *));
+                ImGui::SetDragDropPayload("GameObject", &GetSelected(), sizeof(GameObject *));
                 ImGui::Text(ICON_FA_CUBE);
                 ImGui::SameLine();
-                ImGui::Text(((GameObject *)selected)->GetName().c_str());
+                ImGui::Text(((GameObject *)GetSelected())->GetName().c_str());
                 ImGui::EndDragDropSource();
             }
             if (ImGui::BeginDragDropTarget()) {
@@ -97,22 +97,24 @@ void HierarchyPanel::ShowContents() {
     recurse(root);
     ImGui::PopStyleVar();
     
+    Asset *asset;
+    GameObject *gameObject;
     if (parent) {
         if (source->GetType() == APrefab::StaticType()) {
-            Asset *asset = (Asset *)source;
+            asset = (Asset *)source;
             parent->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
         } else {
-            GameObject *gameObject = (GameObject *)source;
+            gameObject = (GameObject *)source;
             gameObject->SetParent(parent);
         }
     }
     if (sibling) {
         if (source->GetType() == APrefab::StaticType()) {
-            Asset *asset = (Asset *)source;
-            GameObject *gameObject = root->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
+            asset = (Asset *)source;
+            gameObject = root->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
             gameObject->SetSibling(sibling);
         } else {
-            GameObject *gameObject = (GameObject *)source;
+            gameObject = (GameObject *)source;
             gameObject->SetSibling(sibling);
         }
     }
@@ -120,21 +122,19 @@ void HierarchyPanel::ShowContents() {
     if (ImGui::BeginPopupContextWindow())
     {
         if (!menu) {
-            selected = (void *)hovered;
+            GetSelected() = (Entity *)hovered;
         }
+        gameObject = (GameObject *)GetSelected();
         Scene &scene = Scene::GetInstance();
-        if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)selected)) {
-            GameObject *gameObject = (GameObject *)selected;
+        if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)gameObject)) {
             GameObject::ToJson(copyed, gameObject);
             gameObject->Remove();
         }
-        if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)selected)) {
-            GameObject *gameObject = (GameObject *)selected;
+        if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)gameObject)) {
             GameObject::ToJson(copyed, gameObject);
         }
         if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
-            if (selected) {
-                GameObject *gameObject = (GameObject *)selected;
+            if (gameObject) {
                 gameObject->AddGameObject(copyed);
             } else {
                 root->AddGameObject(copyed);
@@ -142,15 +142,13 @@ void HierarchyPanel::ShowContents() {
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Add GameObject", nullptr, nullptr)) {
-            if (selected) {
-                GameObject *gameObject = (GameObject *)selected;
+            if (gameObject) {
                 gameObject->AddGameObject();
             } else {
                 root->AddGameObject();
             }
         }
-        if (ImGui::MenuItem("Remove", nullptr, nullptr, (bool)selected)) {
-            GameObject *gameObject = (GameObject *)selected;
+        if (ImGui::MenuItem("Remove", nullptr, nullptr, (bool)gameObject)) {
             gameObject->Remove();
         }
         

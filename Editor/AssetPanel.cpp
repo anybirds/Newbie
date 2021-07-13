@@ -51,18 +51,18 @@ void AssetPanel::ShowContents() {
         Asset *asset = p.second;
         ShowIcon(asset);
         ImGui::SameLine();
-        if (rename && selected == (void *)asset) {
-            ShowRename(asset->GetName()); 
+        if (IsRenaming() && !GetLocalSelected() && GetSelected() == (Entity *)asset) {
+            ShowRenamingItem(asset->GetName());
         } else {
-            ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), (void *)asset == selected);
+            ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), GetSelected() == (void *)asset);
             if (ImGui::IsItemHovered() && ImGui::IsMouseDown(0)) {
-                selected = (void *)asset;
+                GetSelected() = (Entity *)asset;
             }
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                ImGui::SetDragDropPayload("Asset", &selected, sizeof(Asset *));
-                ShowIcon((Asset *)selected);
+                ImGui::SetDragDropPayload("Asset", &GetSelected(), sizeof(Asset *));
+                ShowIcon((Asset *)GetSelected());
                 ImGui::SameLine();
-                ImGui::Text(((Asset *)selected)->GetName().c_str());
+                ImGui::Text(((Asset *)GetSelected())->GetName().c_str());
                 ImGui::EndDragDropSource();
             }
         }

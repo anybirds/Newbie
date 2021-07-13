@@ -6,20 +6,22 @@
 #include <imgui/imgui_stdlib.h>
 #include <Icons/IconsFontAwesome5.h>
 
+class Entity;
+
 class Widget {
 protected:
-    static void *selected;
-    static bool rename;
-    static bool renameClicked;
-
-    static bool running;
-    static bool paused;
+    static Entity *&GetSelected() { static Entity *selected; return selected; }
+    static void *&GetLocalSelected() { static void *localSelected; return localSelected; }
+    static bool IsSelected() { return GetLocalSelected() || GetSelected(); } 
+    static bool &IsRenaming() { static bool renaming; return renaming; }
+    static bool &IsClickedRenamingItem() { static bool clicked; return clicked; }
 
 public:
-    static void UpdateRename();
-    static void ShowRename(std::string &str);
+    static void ShowRenamingItem(std::string &str);
+    static void Update();
 
 public:
     virtual ~Widget() {}
+
     virtual void Show() = 0;
 };

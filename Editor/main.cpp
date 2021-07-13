@@ -34,6 +34,7 @@ int main(int argc, char **argv) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
+    io.ConfigWindowsMoveFromTitleBarOnly = true; // https://github.com/ocornut/imgui/issues/899
     io.Fonts->AddFontFromFileTTF(
         (string(NEWBIE_PATH) + "/Editor/Fonts/NotoSansCJKkr-hinted/NotoSansCJKkr-Regular.otf").c_str(), 
         20.0f, NULL, io.Fonts->GetGlyphRangesKorean());
@@ -75,7 +76,7 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        Widget::UpdateRename();
+        Widget::Update();
         mainMenuBar.Show();
         gamePanel.Show();
         scenePanel.Show();

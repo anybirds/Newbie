@@ -43,11 +43,11 @@ void FileDialog::ShowContents() {
                 if (filesystem::is_directory(p.path())) {
                     ImGui::Text(ICON_FA_FOLDER);
                     ImGui::SameLine();
-                    if (ImGui::Selectable((name + "##" + to_string(index)).c_str(), selected == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
+                    if (ImGui::Selectable((name + "##" + to_string(index)).c_str(), GetLocalSelected() == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
                         if (ImGui::IsMouseDoubleClicked(0)) {
                             temp = p.path().u8string();
                         }
-                        selected = (void *)index;
+                        GetLocalSelected() = (void *)index;
                         arg = p.path().u8string();
                     }
                 }
@@ -58,17 +58,17 @@ void FileDialog::ShowContents() {
                     ImGui::Text(ICON_FA_FILE);
                 }
                 ImGui::SameLine();
-                if (ImGui::Selectable(name.c_str(), selected == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
+                if (ImGui::Selectable(name.c_str(), GetLocalSelected() == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
                     if (ImGui::IsMouseDoubleClicked(0)) {
                         if (filesystem::is_directory(p.path())) {
                             temp = p.path().u8string();
                         } else {
                             callback(p.path().u8string());
-                            selected = nullptr;
+                            GetLocalSelected() = nullptr;
                             ImGui::CloseCurrentPopup();
                         }
                     }
-                    selected = (void *)index;
+                    GetLocalSelected() = (void *)index;
                     arg = p.path().u8string();
                 }
             }
@@ -80,20 +80,20 @@ void FileDialog::ShowContents() {
     ImGui::Separator();
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-        if (selected && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
+        if (GetLocalSelected() && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
             callback(arg);
-            selected = nullptr;
+            GetLocalSelected() = nullptr;
             ImGui::CloseCurrentPopup();
         } else if (folder) {
             callback(dir);
-            selected = nullptr;
+            GetLocalSelected() = nullptr;
             ImGui::CloseCurrentPopup();
         }
     }
 
     if (dir != temp) {
         dir = temp;
-        selected = nullptr;
+        GetLocalSelected() = nullptr;
         arg.clear();
     }
 }

@@ -92,12 +92,24 @@ void Transform::SetLocalEulerAngles(const glm::vec3 &localEulerAngles) {
 }
 
 void Transform::SetPosition(const glm::vec3 &position) {
-    this->localPosition = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * position;
+    localPosition = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * position;
+    Propagate();
+}
+
+void Transform::SetRotation(const glm::quat &rotation) {
+    localRotation = toQuat((parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * toMat4(rotation));
+    localEulerAngles = degrees(eulerAngles(localRotation));
     Propagate();
 }
 
 void Transform::SetScale(const glm::vec3 &scale) {
-    this->localScale = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * scale;
+    localScale = mat3(parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * scale;
+    Propagate();
+}
+
+void Transform::SetEulerAngles(const glm::vec3 &eulerAngles) {
+    localRotation = toQuat((parent? parent->GetWorldToLocalMatrix() : mat4(1.0f)) * toMat4(quat(radians(eulerAngles))));
+    localEulerAngles = degrees(glm::eulerAngles(localRotation));
     Propagate();
 }
 

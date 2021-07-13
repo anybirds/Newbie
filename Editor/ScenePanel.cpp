@@ -1,5 +1,9 @@
+#include <glm/gtc/type_ptr.hpp>
+
 #include <Engine.hpp>
 #include <ScenePanel.hpp>
+
+#include <iostream>
 
 using namespace std;
 using namespace glm;
@@ -14,7 +18,9 @@ const std::string &ScenePanel::GetSelectFragmentShader() {
     return selectFragmentShader;
 }
 
-ScenePanel::ScenePanel() : Panel("Scene"), moveSpeed(10.0f), rotateSpeed(1.0f) {
+ScenePanel::ScenePanel() : Panel("Scene"), 
+    control(false), moveSpeed(10.0f), rotateSpeed(1.0f), 
+    gizmoOperation(ImGuizmo::TRANSLATE), gizmoMode(ImGuizmo::WORLD), clicked(false) {
     Window &window = Window::GetInstance();
 
     sceneTexture = new ATexture();
@@ -110,10 +116,10 @@ void ScenePanel::ShowContents() {
         }
         sceneFramebufferResource->SetWidth((int)imgSize.x);
         sceneFramebufferResource->SetHeight((int)imgSize.y);
-        camera->SetFramebuffer(sceneFramebufferResource);
+
         camera->Render();
     } catch(...) {}
-
+  
     ImGui::Image((void *)(intptr_t)camera->GetFramebuffer()->GetColorTexture()->GetId(), 
         imgSize,
         ImVec2(0.0f, imgSize.y / camera->GetFramebuffer()->GetMaxHeight()),
@@ -122,6 +128,7 @@ void ScenePanel::ShowContents() {
     Input &input = Input::GetInstance();
     if (ImGui::IsItemClicked(1)) {
         control = true;
+        ImGui::SetWindowFocus();
         input.SetMouseCursorMode(Input::MOUSE_CURSOR_DISABLED);
     }
     if (control && !ImGui::IsMouseDown(1)) {
@@ -133,5 +140,41 @@ void ScenePanel::ShowContents() {
     if (clicked) {
         clickX = (int)(ImGui::GetMousePos().x - ImGui::GetItemRectMin().x);
         clickY = (int)(ImGui::GetMousePos().y - ImGui::GetItemRectMin().y);
+    }
+
+    // gizmo
+    if (ImGui::IsWindowFocused() && !ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
+        if (ImGui::IsKeyPressed(GLFW_KEY_T)) {
+            gizmoOperation = ImGuizmo::TRANSLATE;
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_R)) {
+            gizmoOperation = ImGuizmo::ROTATE;
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_S)) {
+            gizmoOperation = ImGuizmo::SCALE;
+        }
+        
+        if (ImGui::IsKeyPressed(GLFW_KEY_W)) {
+            gizmoMode = ImGuizmo::WORLD;
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_L)) {
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+    }
+    
+    if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+        ImGuizmo::SetDrawlist();
+        GameObject *gameObject = (GameObject *)GetSelected();
+        Transform *transform = gameObject->GetTransform();
+        mat4 view = sceneCamera->GetTransform()->GetWorldToLocalMatrix();
+        mat4 normalization = camera->GetNormalization();
+        mat4 object = transform->GetLocalToWorldMatrix();
+        ImGuizmo::SetRect(ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y, ImGui::GetItemRectSize().x, ImGui::GetItemRectSize().y);
+        ImGuizmo::Manipulate(value_ptr(view), value_ptr(normalization), gizmoOperation, gizmoOperation == ImGuizmo::SCALE ? ImGuizmo::LOCAL : gizmoMode, value_ptr(object));
+        if (ImGuizmo::IsUsing()) {
+            vec3 translation, rotation, scale;
+            mat4 local = transform->GetParent() ? transform->GetParent()->GetWorldToLocalMatrix() * object : mat4(1.0f);
+            ImGuizmo::DecomposeMatrixToComponents(value_ptr(local), value_ptr(translation), value_ptr(rotation), value_ptr(scale));
+            transform->SetLocalPosition(translation);
+            transform->SetLocalEulerAngles(rotation);
+            transform->SetLocalScale(scale);
+        }
     }
 }

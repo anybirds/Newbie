@@ -7,6 +7,7 @@
 #include <SceneDialog.hpp>
 #include <FileDialog.hpp>
 #include <NewDialog.hpp>
+#include <MainMenuBar.hpp>
 
 using namespace std;
 
@@ -21,9 +22,9 @@ void SceneDialog::LoadScene(const std::string &path) {
         Window &window = Window::GetInstance();
         window.SetTitle(window.GetTitle() + " - " + scene.GetName());
     }
-    running = false;
-    paused = false;
-    selected = nullptr;
+    GetLocalSelected() = nullptr;
+    GetSelected() = nullptr; // nothing should be selected after the scece loads
+    MainMenuBar::GetInstance().StopGamePlay();
     ImGui::CloseCurrentPopup();
 }
 
@@ -57,26 +58,26 @@ void SceneDialog::ShowContents() {
             deleted = &path;
         }
         ImGui::SameLine();
-        if (ImGui::Selectable(path.c_str(), selected == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
+        if (ImGui::Selectable(path.c_str(), GetLocalSelected() == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {
                 LoadScene(path);
             } else {
-                selected = (void *)&path;
+                GetLocalSelected() = (void *)&path;
             }
         }
     }
     ImGui::PopStyleColor();
     if (deleted) {
         project.RemoveScene(*deleted);
-        selected = nullptr;
+        GetLocalSelected() = nullptr;
     }
     ImGui::EndChild();
 
     ImGui::Separator();
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-        if (selected) {
-            LoadScene(*(string *)selected);
+        if (GetLocalSelected()) {
+            LoadScene(*(string *)GetLocalSelected());
         }
     }
 
@@ -96,7 +97,6 @@ void SceneDialog::ShowContents() {
             return true;
         });
         newDialog.Open();
-        selected = nullptr;
         newScene = false;
     }
     newDialog.Show();

@@ -10,6 +10,7 @@
 #include <FileDialog.hpp>
 #include <NewDialog.hpp>
 #include <HierarchyPanel.hpp>
+#include <MainMenuBar.hpp>
 
 using json = nlohmann::json;
 using namespace std;
@@ -66,8 +67,9 @@ void ProjectDialog::LoadProject(const string &dir) {
         Window &window = Window::GetInstance();
         window.SetTitle(string("Newbie - ") + project.GetName());
     }
-    running = false;
-    paused = false;
+    GetLocalSelected() = nullptr;
+    GetSelected() = nullptr; // nothing should be selected after the project loads
+    MainMenuBar::GetInstance().StopGamePlay();
     ImGui::CloseCurrentPopup();
 }
 
@@ -112,18 +114,17 @@ void ProjectDialog::ShowContents() {
             deleted = &path;
         }
         ImGui::SameLine();
-        if (ImGui::Selectable(path.c_str(), selected == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
+        if (ImGui::Selectable(path.c_str(), GetLocalSelected() == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {
-                selected = nullptr;
                 LoadProject(path);
             } else {
-                selected = (void *)&path;
+                GetLocalSelected() = (void *)&path;
             }
         }
     }
     ImGui::PopStyleColor();
     if (deleted) {
-        selected = nullptr;
+        GetLocalSelected() = nullptr;
         RemoveProject(*deleted);
     }
     ImGui::EndChild();
@@ -131,9 +132,8 @@ void ProjectDialog::ShowContents() {
     ImGui::Separator();
     ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
-        if (selected) {
-            LoadProject(*(string *)selected);
-            selected = nullptr;
+        if (GetLocalSelected()) {
+            LoadProject(*(string *)GetLocalSelected());
         }
     }
 
@@ -164,7 +164,6 @@ void ProjectDialog::ShowContents() {
             return true;
         });
         newDialog.Open();
-        selected = nullptr;
         newProject = false;
     }
     newDialog.Show();

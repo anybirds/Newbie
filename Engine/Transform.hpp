@@ -43,8 +43,9 @@ public:
     void SetLocalScale(const glm::vec3 &localScale);
     void SetLocalEulerAngles(const glm::vec3 &localEulerAngles);
     void SetPosition(const glm::vec3 &position);
-    // void SetRotation(const glm::quat &rotation);
+    void SetRotation(const glm::quat &rotation);
     void SetScale(const glm::vec3 &scale);
+    void SetEulerAngles(const glm::vec3 &eulerAngles);
     bool SetParent(Transform *parent);
     bool SetSibling(Transform *sibling);
 
