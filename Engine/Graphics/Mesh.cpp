@@ -33,6 +33,8 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Apply() {
+    Mesh backup(*this);
+
     Resource::Apply();
     AMesh *amesh = (AMesh *)asset;
     index = amesh->GetIndex();
@@ -41,16 +43,9 @@ void Mesh::Apply() {
     }
     if (!model) {
         cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh: " << GetName() << '\n';
+        *this = backup;
         throw exception();
     }
-
-    if (icnt > 0) {
-        // indexed wireframe
-        glDeleteBuffers(1, &ebo);
-    }
-    // delete
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
 
     const aiScene *scene = GetModel()->importer->GetScene();
     aiMesh *aimesh = scene->mMeshes[GetIndex()];
@@ -146,7 +141,15 @@ void Mesh::Apply() {
 
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Mesh: " << GetName() << '\n';
+        glDeleteBuffers(1, &ebo);
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        *this = backup;
         throw exception();
     }
+
+    glDeleteBuffers(1, &backup.ebo);
+    glDeleteVertexArrays(1, &backup.vao);
+    glDeleteBuffers(1, &backup.vbo);
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }

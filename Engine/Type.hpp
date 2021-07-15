@@ -8,27 +8,37 @@
 
 #include <EngineExport.hpp>
 
-#define GET(Type, Member, Property) Type const &Get##Property() const { return Member; }
-#define SET(Type, Member, Property) void Set##Property(Type const &Member) { this->Member = Member; }
+#define IS(Type, Member, Property) template <typename T = Type> T const &Is##Property() const { return Member; }
+#define GET(Type, Member, Property) template <typename T = Type> T const &Get##Property() const { return Member; }
+#define SET(Type, Member, Property) template <typename T = Type> void Set##Property(T const &Member) { this->Member = Member; }
 
 #define PROPERTY_NONE_ACCESS_ATTR(Type, Member, MemberAccess, Attr) MemberAccess: Attr Type Member
 #define PROPERTY_NONE_ACCESS(Type, Member, MemberAccess) PROPERTY_NONE_ACCESS_ATTR(Type, Member, MemberAccess, )
 #define PROPERTY_NONE_ATTR(Type, Member, Attr) PROPERTY_NONE_ACCESS_ATTR(Type, Member, private, Attr)
 #define PROPERTY_NONE(Type, Member) PROPERTY_NONE_ACCESS(Type, Member, private)
+
 #define PROPERTY_GET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, Attr) GetAccess: GET(Type, Member, Property) MemberAccess: Attr Type Member
 #define PROPERTY_GET_ACCESS(Type, Member, Property, MemberAccess, GetAccess) PROPERTY_GET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, )
 #define PROPERTY_GET_ATTR(Type, Member, Property, Attr) PROPERTY_GET_ACCESS_ATTR(Type, Member, Property, private, public, Attr)
 #define PROPERTY_GET(Type, Member, Property) PROPERTY_GET_ACCESS(Type, Member, Property, private, public)
+#define PROPERTY_IS_ACCESS_ATTR(Type, Member, Property, MemberAccess, IsAccess, Attr) IsAccess: IS(Type, Member, Property) MemberAccess: Attr Type Member
+#define PROPERTY_IS_ACCESS(Type, Member, Property, MemberAccess, IsAccess) PROPERTY_IS_ACCESS_ATTR(Type, Member, Property, MemberAccess, IsAccess, )
+#define PROPERTY_IS_ATTR(Type, Member, Property, Attr) PROPERTY_IS_ACCESS_ATTR(Type, Member, Property, private, public, Attr)
+#define PROPERTY_IS(Type, Member, Property) PROPERTY_IS_ACCESS(Type, Member, Property, private, public)
+
 #define PROPERTY_SET_ACCESS_ATTR(Type, Member, Property, MemberAccess, SetAccess, Attr) SetAccess: SET(Type, Member, Property) MemberAccess: Attr Type Member
 #define PROPERTY_SET_ACCESS(Type, Member, Property, MemberAccess, SetAccess) PROPERTY_SET_ACCESS_ATTR(Type, Member, Property, MemberAccess, SetAccess, )
 #define PROPERTY_SET_ATTR(Type, Member, Property, Attr) PROPERTY_SET_ACCESS_ATTR(Type, Member, Property, private, public, Attr)
 #define PROPERTY_SET(Type, Member, Property) PROPERTY_SET_ACCESS(Type, Member, Property, private, public)
-#define PROPERTY_GET_SET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, SetAccess, Attr) GetAccess: GET(Type, Member, Property) SetAccess: SET(Type, Member, Property) MemberAccess: Attr Type Member
-#define PROPERTY_GET_SET_ACCESS(Type, Member, Property, MemberAccess, GetAccess, SetAccess) PROPERTY_GET_SET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, SetAccess, )
-#define PROPERTY_GET_SET_ATTR(Type, Member, Property, Attr) PROPERTY_GET_SET_ACCESS_ATTR(Type, Member, Property, private, public, public, Attr)
-#define PROPERTY_GET_SET(Type, Member, Property) PROPERTY_GET_SET_ACCESS(Type, Member, Property, private, public, public)
-#define PROPERTY_ATTR(Type, Member, Property, Attr) PROPERTY_GET_SET_ATTR(Type, Member, Property, Attr)
-#define PROPERTY(Type, Member, Property) PROPERTY_GET_SET(Type, Member, Property)
+
+#define PROPERTY_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, SetAccess, Attr) GetAccess: GET(Type, Member, Property) SetAccess: SET(Type, Member, Property) MemberAccess: Attr Type Member
+#define PROPERTY_ACCESS(Type, Member, Property, MemberAccess, GetAccess, SetAccess) PROPERTY_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, SetAccess, )
+#define PROPERTY_ATTR(Type, Member, Property, Attr) PROPERTY_ACCESS_ATTR(Type, Member, Property, private, public, public, Attr)
+#define PROPERTY(Type, Member, Property) PROPERTY_ACCESS(Type, Member, Property, private, public, public)
+#define PROPERTY_BOOL_ACCESS_ATTR(Type, Member, Property, MemberAccess, IsAccess, SetAccess, Attr) IsAccess: IS(Type, Member, Property) SetAccess: SET(Type, Member, Property) MemberAccess: Attr Type Member
+#define PROPERTY_BOOL_ACCESS(Type, Member, Property, MemberAccess, IsAccess, SetAccess) PROPERTY_BOOL_ACCESS_ATTR(Type, Member, Property, MemberAccess, IsAccess, SetAccess, )
+#define PROPERTY_BOOL_ATTR(Type, Member, Property, Attr) PROPERTY_BOOL_ACCESS_ATTR(Type, Member, Property, private, public, public, Attr)
+#define PROPERTY_BOOL(Type, Member, Property) PROPERTY_BOOL_ACCESS(Type, Member, Property, private, public, public)
 
 #define CLASS_ENTITY(Entity, Empty, Attr) class Attr Entity 
 #define CLASS_FINAL_ATTR(Derived, Base, Attr) class Attr Derived final : public Base

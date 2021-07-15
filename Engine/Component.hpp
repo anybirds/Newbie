@@ -10,8 +10,8 @@ class Transform;
 CLASS_ATTR(Component, Entity, ENGINE_EXPORT) {
     TYPE(Component);
 
-    PROPERTY_SET(bool, localEnabled, LocalEnabled);
-    PROPERTY_GET(GameObject *, gameObject, GameObject);
+    PROPERTY_BOOL(bool, localEnabled, LocalEnabled);
+    PROPERTY_NONE(GameObject *, gameObject);
     
 private:
     enum : uint8_t {
@@ -25,10 +25,10 @@ public:
     Component() : localEnabled(true), flags(0U), gameObject(nullptr) {}
 
     bool IsEnabled() const;
-    bool IsLocalEnabled() const { return localEnabled; }
     bool IsRemoved() const { return flags & REMOVED; } 
     void Remove() { flags |= REMOVED; localEnabled = false; }
     
+    GameObject *GetGameObject() const { return gameObject; }
     Transform *GetTransform() const;
     
     virtual void OnTrack() {}

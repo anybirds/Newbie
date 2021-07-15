@@ -1,9 +1,8 @@
 #pragma once
 
 #include <Engine.hpp>
-#include <UserExport.hpp>
 
-CLASS_ATTR(SampleScript, Script, USER_EXPORT) {
+CLASS(SampleScript, Script) {
     TYPE(SampleScript);
 
     PROPERTY(float, rate, Rate);

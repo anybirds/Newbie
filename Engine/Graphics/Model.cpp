@@ -28,14 +28,12 @@ Model::~Model() {
 }
 
 void Model::Apply() {
+    Model backup(*this);
+
     Resource::Apply();
     AModel *amodel = (AModel *)asset;
     path = amodel->GetPath();
     
-    if (importer) {
-        delete importer;
-    }
-
     string absolute;
     Project &project = Project::GetInstance();
     if (project.IsLoaded()) {
@@ -48,10 +46,14 @@ void Model::Apply() {
         absolute,
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        if (scene) { delete scene; }
         cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << GetPath() << '\n';
+        if (scene) { delete scene; }
+        *this = backup;
         throw exception();
     }
 
+    if (backup.importer) {
+        delete backup.importer;
+    }
     cerr << '[' << __FUNCTION__ << ']' << " created Model: " << GetName() << '\n';
 }

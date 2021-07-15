@@ -30,15 +30,17 @@ Shader::~Shader() {
 }
 
 void Shader::Apply() {
+    Shader backup(*this);
+
     Resource::Apply();
     AShader *ashader = (AShader *)asset;
     path = ashader->GetPath();
     shaderType = ashader->GetShaderType();
 
-    glDeleteShader(id);
     id = glCreateShader(GetShaderType());
     if (!id) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << '\n';
+        *this = backup;
         throw exception();
     }
 
@@ -54,6 +56,7 @@ void Shader::Apply() {
     if (!file.is_open()) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << '\n';
         glDeleteShader(id);
+        *this = backup;
         throw exception();
     }
 
@@ -69,13 +72,17 @@ void Shader::Apply() {
     if (status == GL_FALSE) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << GetPath() << '\n';
         glDeleteShader(id);
+        *this = backup;
         throw exception();
     }
 
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Shader: " << GetName() << '\n';
         glDeleteShader(id);
+        *this = backup;
         throw exception();
     }
+
+    glDeleteShader(backup.id);
     cerr << '[' << __FUNCTION__ << ']' << " created Shader: " << GetName() << '\n';
 }

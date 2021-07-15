@@ -13,12 +13,12 @@ class Prefab;
 CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
     TYPE(Transform);
 
-    PROPERTY_GET(std::vector<Transform *>, children, Children);
-    PROPERTY_GET(Transform *, parent, Parent);
-    PROPERTY_GET(glm::vec3, localPosition, LocalPosition);
-    PROPERTY_GET(glm::quat, localRotation, LocalRotation);
-    PROPERTY_GET(glm::vec3, localScale, LocalScale);
-    PROPERTY_GET(glm::vec3, localEulerAngles, LocalEulerAngles);
+    PROPERTY_NONE(std::vector<Transform *>, children);
+    PROPERTY_NONE(Transform *, parent);
+    PROPERTY(glm::vec3, localPosition, LocalPosition);
+    PROPERTY(glm::quat, localRotation, LocalRotation);
+    PROPERTY(glm::vec3, localScale, LocalScale);
+    PROPERTY(glm::vec3, localEulerAngles, LocalEulerAngles);
 
 private:
     mutable bool dirty;
@@ -29,6 +29,8 @@ public:
     Transform();
     virtual ~Transform();
 
+    const std::vector<Transform *> &GetChildren() const { return children; }
+    Transform *GetParent() const { return parent; }
     glm::mat4 GetLocalToWorldMatrix() const;
     glm::mat4 GetWorldToLocalMatrix() const;
     glm::vec3 GetPosition() const;

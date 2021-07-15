@@ -35,6 +35,8 @@ Texture::~Texture() {
 }
 
 void Texture::Apply() {
+    Texture backup(*this);
+
     Resource::Apply();
     ATexture *atexture = (ATexture *)asset;
     path = atexture->GetPath();
@@ -45,8 +47,6 @@ void Texture::Apply() {
     verticalWrap = atexture->GetVerticalWrap();
     minFilter = atexture->GetMinFilter();
     magFilter = atexture->GetMagFilter();
-    
-    glDeleteTextures(1, &id);
 
     unsigned char *image = nullptr;
     if (!GetPath().empty()) {
@@ -64,6 +64,7 @@ void Texture::Apply() {
         image = stbi_load(absolute.c_str(), &width, &height, &channel, 0);
         if (!image) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << atexture->GetPath() << '\n';
+            *this = backup;
             throw exception();
         }
 
@@ -101,7 +102,10 @@ void Texture::Apply() {
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Texture: " << GetName() << '\n';
         glDeleteTextures(1, &id);
+        *this = backup;
         throw exception();
     }
+
+    glDeleteTextures(1, &backup.id);
     cerr << '[' << __FUNCTION__ << ']' << " created Texture: " << GetName() << '\n';
 }

@@ -11,8 +11,8 @@ class Renderer;
 CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
 	TYPE(Drawer);
 
-	PROPERTY_GET(std::shared_ptr<Mesh>, mesh, Mesh);
-	PROPERTY_GET(std::shared_ptr<Material>, material, Material);
+	PROPERTY(std::shared_ptr<Mesh>, mesh, Mesh);
+	PROPERTY(std::shared_ptr<Material>, material, Material);
 
 public:
 	virtual void OnTrack() override;

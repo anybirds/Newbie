@@ -32,6 +32,8 @@ Material::~Material() {
 }
 
 void Material::Apply() {
+    Material backup(*this);
+
     Resource::Apply();
     AMaterial *amaterial = (AMaterial *)asset;
     if (amaterial->GetVertexShader()) {
@@ -42,41 +44,24 @@ void Material::Apply() {
     }
     if (!vertexShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
+        *this = backup;
         throw exception();
     }
     if (!fragmentShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material: " << GetName() << '\n';
+        *this = backup;
         throw exception();
     }
     if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
         fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
         cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch in Material: " << GetName() << '\n';
+        *this = backup;
         throw exception();
     }
 
     if (order != amaterial->GetOrder()) {
-        // batch reordering
-        Scene &scene = Scene::GetInstance();
-        auto it = scene.batches.find(order);
-        if (it != scene.batches.end()) {
-            vector<Batch *> batches;
-            for (auto &p : it->second) {
-                if (this == p.first.second) {
-                    batches.push_back(p.second);
-                }
-            }
-            for (Batch *batch : batches) {
-                it->second.erase(make_pair(batch->GetMesh(), batch->GetMaterial()));
-            }
-            if (it->second.empty()) {
-                scene.batches.erase(it);
-            }
-            for (Batch *batch : batches) {
-                scene.batches[amaterial->GetOrder()].insert(make_pair(make_pair(batch->GetMesh(), batch->GetMaterial()), batch));
-            }
-        }
+        SetOrder(amaterial->GetOrder());
     } 
-    order = amaterial->GetOrder();
 
     intMap = amaterial->GetIntMap();
     intArrayMap = amaterial->GetIntArrayMap();
@@ -90,8 +75,6 @@ void Material::Apply() {
         samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
     }
 
-    glDeleteProgram(program);
-
     // attach shaders and link
     program = glCreateProgram();
     glAttachShader(program, vertexShader->GetId());
@@ -101,8 +84,11 @@ void Material::Apply() {
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Material: " << GetName() << '\n';
         glDeleteProgram(program);
+        *this = backup;
         throw exception();
     }
+
+    glDeleteProgram(backup.program);
     cerr << '[' << __FUNCTION__ << ']' << " created Material: " << GetName() << '\n';
 }
 
@@ -229,3 +215,27 @@ void Material::SetMatrixArray(const string &name, const vector<mat4> &value) {
 void Material::SetSampler(const string &name, const shared_ptr<Texture> &value) {
     samplerMap[name] = value;
 }
+
+void Material::SetOrder(unsigned order) {
+    // batch reordering
+    Scene &scene = Scene::GetInstance();
+    auto it = scene.batches.find(this->order);
+    if (it != scene.batches.end()) {
+        vector<Batch *> batches;
+        for (auto &p : it->second) {
+            if (this == p.first.second) {
+                batches.push_back(p.second);
+            }
+        }
+        for (Batch *batch : batches) {
+            it->second.erase(make_pair(batch->GetMesh(), batch->GetMaterial()));
+        }
+        if (it->second.empty()) {
+            scene.batches.erase(it);
+        }
+        for (Batch *batch : batches) {
+            scene.batches[order].insert(make_pair(make_pair(batch->GetMesh(), batch->GetMaterial()), batch));
+        }
+    }
+    this->order = order;
+} 

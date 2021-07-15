@@ -47,9 +47,8 @@ public:
 };
 
 class ENGINE_EXPORT Material : public Resource {
-    PROPERTY_GET(unsigned, order, Order);
-
 private:
+    unsigned order;
     std::shared_ptr<Shader> vertexShader;
     std::shared_ptr<Shader> fragmentShader;
     
@@ -70,7 +69,7 @@ public:
     virtual ~Material();
     
     virtual void Apply() override;
-
+    
     int GetInt(const std::string &name) const;
     std::vector<int> GetIntArray(const std::string &name) const;
     float GetFloat(const std::string &name) const;
@@ -92,6 +91,9 @@ public:
     void SetSampler(const std::string &name, const std::shared_ptr<Texture> &value);
 
     void UpdateUniforms();
+
+    unsigned GetOrder() const { return order; }
+    void SetOrder(unsigned order);
 
     std::shared_ptr<Shader> GetVertexShader() const { return vertexShader; }
     std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }

@@ -29,6 +29,8 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::Apply() {
+    Framebuffer backup(*this);
+
     Resource::Apply();
     AFramebuffer *aframebuffer = (AFramebuffer *)asset;
     useDepthRenderTexture = aframebuffer->GetUseDepthRenderTexture();
@@ -38,9 +40,6 @@ void Framebuffer::Apply() {
     if (aframebuffer->GetDepthTexture()) {
         depthTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetDepthTexture()->GetResource());
     }
-
-    glDeleteFramebuffers(1, &fbo);
-    glDeleteRenderbuffers(1, &rbo);
 
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -68,6 +67,8 @@ void Framebuffer::Apply() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         cerr << '[' << __FUNCTION__ << ']' << " incomplete Framebuffer: " << GetName() << '\n';
         glDeleteFramebuffers(1, &fbo);
+        glDeleteRenderbuffers(1, &rbo);
+        *this = backup;
         throw exception();
     }
 
@@ -76,8 +77,13 @@ void Framebuffer::Apply() {
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Framebuffer: " << GetName() << '\n';
         glDeleteFramebuffers(1, &fbo);
+        glDeleteRenderbuffers(1, &rbo);
+        *this = backup;
         throw exception();
     }
+
+    glDeleteFramebuffers(1, &backup.fbo);
+    glDeleteRenderbuffers(1, &backup.rbo);
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }
 

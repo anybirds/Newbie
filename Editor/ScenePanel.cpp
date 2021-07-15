@@ -20,7 +20,7 @@ const std::string &ScenePanel::GetSelectFragmentShader() {
 
 ScenePanel::ScenePanel() : Panel("Scene"), 
     control(false), moveSpeed(10.0f), rotateSpeed(1.0f), 
-    gizmoOperation(ImGuizmo::TRANSLATE), gizmoMode(ImGuizmo::WORLD), clicked(false) {
+    gizmoOperation(ImGuizmo::TRANSLATE), gizmoMode(ImGuizmo::WORLD) {
     Window &window = Window::GetInstance();
 
     sceneTexture = new ATexture();
@@ -106,18 +106,26 @@ void ScenePanel::ShowContents() {
 
     ImVec2 imgSize = ImGui::GetContentRegionAvail();
     try {
-        if (clicked) {
-            /*
-            selectFramebufferResource->SetWidth((int)imgSize.x);
-            selectFramebufferResource->SetHeight((int)imgSize.y);
-            camera->SetFramebuffer(selectFramebufferResource);
-            selectFramebufferResource->ReadPixels(clickX, clickY);
-            */
-        }
         sceneFramebufferResource->SetWidth((int)imgSize.x);
         sceneFramebufferResource->SetHeight((int)imgSize.y);
 
         camera->Render();
+
+        // render selected outline
+        GameObject *gameObject = (GameObject *)GetSelected();
+        if (gameObject) {
+            /*
+            Drawer *drawer = gameObject->GetComponent<Drawer>();
+            Batch batch(drawer->GetMesh().get(), drawer->GetMaterial().get());
+            batch.AddDrawer(drawer);
+            camera->Render(batch);
+            Transform *transform = gameObject->GetTransform();
+            vec3 originalScale = transform->GetScale();
+            transform->SetScale(originalScale * 1.125f);
+            camera->Render(batch);
+            transform->SetScale(originalScale);
+            */
+        }
     } catch(...) {}
   
     ImGui::Image((void *)(intptr_t)camera->GetFramebuffer()->GetColorTexture()->GetId(), 
@@ -125,6 +133,7 @@ void ScenePanel::ShowContents() {
         ImVec2(0.0f, imgSize.y / camera->GetFramebuffer()->GetMaxHeight()),
         ImVec2(imgSize.x / camera->GetFramebuffer()->GetMaxWidth(), 0.0f));
     
+    // viewport control
     Input &input = Input::GetInstance();
     if (ImGui::IsItemClicked(1)) {
         control = true;
@@ -136,13 +145,12 @@ void ScenePanel::ShowContents() {
         input.SetMouseCursorMode(Input::MOUSE_CURSOR_NORMAL);
     }
 
-    clicked = ImGui::IsItemClicked(0);
-    if (clicked) {
-        clickX = (int)(ImGui::GetMousePos().x - ImGui::GetItemRectMin().x);
-        clickY = (int)(ImGui::GetMousePos().y - ImGui::GetItemRectMin().y);
+    if (ImGui::IsItemClicked(0)) {
+        int x = (int)(ImGui::GetMousePos().x - ImGui::GetItemRectMin().x);
+        int y = (int)(ImGui::GetMousePos().y - ImGui::GetItemRectMin().y);
+        // selectFramebufferResource->ReadPixels(x, y);
     }
 
-    // gizmo
     if (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
         if (ImGui::IsKeyPressed(GLFW_KEY_T)) {
             gizmoOperation = ImGuizmo::TRANSLATE;
@@ -159,6 +167,7 @@ void ScenePanel::ShowContents() {
         }
     }
     
+    // draw gizmo
     if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
         ImGuizmo::SetDrawlist();
         GameObject *gameObject = (GameObject *)GetSelected();

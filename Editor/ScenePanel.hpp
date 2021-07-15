@@ -45,10 +45,6 @@ private:
 
     ImGuizmo::OPERATION gizmoOperation;
     ImGuizmo::MODE gizmoMode;
-
-    bool clicked;
-    int clickX;
-    int clickY;
     
 public:
     ScenePanel(const ScenePanel &) = delete;

@@ -10,13 +10,13 @@ class Framebuffer;
 CLASS_ATTR(Renderer, Component, ENGINE_EXPORT) {
     TYPE(Renderer);
 
-    PROPERTY_GET(unsigned, order, Order);
-    PROPERTY_NONE(bool, orthographic);
-    PROPERTY_GET(float, fovy, Fovy);
-    PROPERTY_GET(float, aspectRatio, AspectRatio);
-    PROPERTY_GET(float, nr, Near);
-    PROPERTY_GET(float, fr, Far);
-    PROPERTY_GET(float, size, Size);
+    PROPERTY(unsigned, order, Order);
+    PROPERTY_BOOL(bool, orthographic, Orthographic);
+    PROPERTY(float, fovy, Fovy);
+    PROPERTY(float, aspectRatio, AspectRatio);
+    PROPERTY(float, nr, Near);
+    PROPERTY(float, fr, Far);
+    PROPERTY(float, size, Size);
     PROPERTY(std::shared_ptr<Framebuffer>, framebuffer, Framebuffer);
 
 private:
@@ -27,8 +27,6 @@ public:
     Renderer();
     virtual void Render() = 0;
 
-    bool IsOrthographic() const { return orthographic; }
-    bool IsPerspective() const { return !orthographic; }
     const glm::mat4 &GetNormalization();
 
     void SetOrder(unsigned order);
