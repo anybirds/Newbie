@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <Scene.hpp>
 #include <Graphics/Batch.hpp>
@@ -9,7 +10,7 @@
 using namespace std;
 using namespace glm;
 
-AMaterial::AMaterial() : vertexShader(nullptr), fragmentShader(nullptr), mainTexture(nullptr) {}
+AMaterial::AMaterial() : vertexShader(nullptr), fragmentShader(nullptr) {}
 
 shared_ptr<Resource> AMaterial::GetResource() {
     shared_ptr<Resource> sp;
@@ -33,6 +34,26 @@ Material::~Material() {
 void Material::Apply() {
     Resource::Apply();
     AMaterial *amaterial = (AMaterial *)asset;
+    if (amaterial->GetVertexShader()) {
+        vertexShader = dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
+    }
+    if (amaterial->GetFragmentShader()) {
+        fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
+    }
+    if (!vertexShader) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
+        throw exception();
+    }
+    if (!fragmentShader) {
+        cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material: " << GetName() << '\n';
+        throw exception();
+    }
+    if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
+        fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
+        cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch in Material: " << GetName() << '\n';
+        throw exception();
+    }
+
     if (order != amaterial->GetOrder()) {
         // batch reordering
         Scene &scene = Scene::GetInstance();
@@ -56,42 +77,26 @@ void Material::Apply() {
         }
     } 
     order = amaterial->GetOrder();
-    if (amaterial->GetVertexShader()) {
-        vertexShader =  dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
-    }
-    if (amaterial->GetFragmentShader()) {
-        fragmentShader = dynamic_pointer_cast<Shader>(amaterial->GetFragmentShader()->GetResource());
-    }
-    if (amaterial->GetMainTexture()) {
-        mainTexture = dynamic_pointer_cast<Texture>(amaterial->GetMainTexture()->GetResource());
-    }
-    if (!vertexShader) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
-        throw exception();
-    }
-    if (!fragmentShader) {
-        cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material: " << GetName() << '\n';
-        throw exception();
+
+    intMap = amaterial->GetIntMap();
+    intArrayMap = amaterial->GetIntArrayMap();
+    floatMap = amaterial->GetFloatMap();
+    floatArrayMap = amaterial->GetFloatArrayMap();
+    vectorMap = amaterial->GetVectorMap();
+    vectorArrayMap = amaterial->GetVectorArrayMap();
+    matrixMap = amaterial->GetMatrixMap();
+    matrixArrayMap = amaterial->GetMatrixArrayMap();
+    for (auto &p : amaterial->GetSamplerMap()) {
+        samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
     }
 
     glDeleteProgram(program);
-
-    if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
-        fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
-        cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch in Material: " << GetName() << '\n';
-        throw exception();
-    }
 
     // attach shaders and link
     program = glCreateProgram();
     glAttachShader(program, vertexShader->GetId());
     glAttachShader(program, fragmentShader->GetId());
     glLinkProgram(program);
-
-    // sampler uniform values
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, "_MAIN_TEX");
-    glUniform1i(location, 0);
 
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Material: " << GetName() << '\n';
@@ -101,163 +106,126 @@ void Material::Apply() {
     cerr << '[' << __FUNCTION__ << ']' << " created Material: " << GetName() << '\n';
 }
 
-int Material::GetInteger(const char *name) const {
+void Material::UpdateUniforms() {
     glUseProgram(program);
-    int ret = 0;
-    GLint location = glGetUniformLocation(program, name);
-    if (location != -1) {
-        glGetUniformiv(program, location, &ret);
-    }
-    return ret;
-}
-
-vector<int> Material::GetIntegerArray(const char *name) const {
-    glUseProgram(program);
-    vector<int> ret;
     GLint location;
-    string str(name);
-    for (int i=0; ; i++) {
-        string elem = str + '[' + to_string(i) + ']';
-        location = glGetUniformLocation(program, elem.c_str());
-        if (location == -1) {
-            break;
-        }
-        int value;
-        glGetUniformiv(program, location, &value);
-        ret.push_back(value);
+    for (auto &p : intMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1i(location, p.second);
     }
-    return ret;
-}
-float Material::GetFloat(const char *name) const {
-    glUseProgram(program);
-    float ret = 0.0f;
-    GLint location = glGetUniformLocation(program, name);
-    if (location != -1) {
-        glGetUniformfv(program, location, &ret);
+    for (auto &p : intArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1iv(location, (GLsizei)p.second.size(), p.second.data());
     }
-    return ret;
-}
-vector<float> Material::GetFloatArray(const char *name) const {
-    glUseProgram(program);
-    vector<float> ret;
-    GLint location;
-    string str(name);
-    for (int i=0; ; i++) {
-        string elem = str + '[' + to_string(i) + ']';
-        location = glGetUniformLocation(program, elem.c_str());
-        if (location == -1) {
-            break;
-        }
-        float value;
-        glGetUniformfv(program, location, &value);
-        ret.push_back(value);
+    for (auto &p : floatMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1f(location, p.second);
     }
-    return ret;
-}
-vec4 Material::GetVector(const char *name) const {
-    glUseProgram(program);
-    vec4 ret;
-    GLint location = glGetUniformLocation(program, name);
-    if (location != -1) {
-        glGetUniformfv(program, location, (GLfloat *)&ret);
+    for (auto &p : floatArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1fv(location, (GLsizei)p.second.size(), p.second.data());
     }
-    return ret;
-}
-vector<vec4> Material::GetVectorArray(const char *name) const {
-    glUseProgram(program);
-    vector<vec4> ret;
-    GLint location;
-    string str(name);
-    for (int i=0; ; i++) {
-        string elem = str + '[' + to_string(i) + ']';
-        location = glGetUniformLocation(program, elem.c_str());
-        if (location == -1) {
-            break;
-        }
-        vec4 value;
-        glGetUniformfv(program, location, (GLfloat *)&value);
-        ret.push_back(value);
+    for (auto &p : vectorMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform4fv(location, 1, value_ptr(p.second));
     }
-    return ret;
-}
-mat4 Material::GetMatrix(const char *name) const {
-    glUseProgram(program);
-    mat4 ret;
-    GLint location = glGetUniformLocation(program, name);
-    if (location != -1) {
-        glGetUniformfv(program, location, (GLfloat *)&ret);
+    for (auto &p : vectorArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform4fv(location, (GLsizei)p.second.size(), value_ptr(*p.second.data()));
     }
-    return ret;
-}
-
-vector<mat4> Material::GetMatrixArray(const char *name) const {
-    glUseProgram(program);
-    vector<mat4> ret;
-    GLint location;
-    string str(name);
-    for (int i=0; ; i++) {
-        string elem = str + '[' + to_string(i) + ']';
-        location = glGetUniformLocation(program, elem.c_str());
-        if (location == -1) {
-            break;
-        }
-        mat4 value;
-        glGetUniformfv(program, location, (GLfloat *)&value);
-        ret.push_back(value);
+    for (auto &p : matrixMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(p.second));
     }
-    return ret;
+    for (auto &p : matrixArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix4fv(location, (GLsizei)p.second.size(), GL_FALSE, value_ptr(*p.second.data()));
+    }
+    GLint i = 0;
+    for (auto &p : samplerMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1i(location, i);
+        glActiveTexture(GL_TEXTURE0 + i++);
+        glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+    }
 }
 
-void Material::SetInteger(const char *name, int value) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform1i(location, value);
+int Material::GetInt(const string &name) const {
+    auto it = intMap.find(name);
+    return it == intMap.end() ? 0 : it->second;
 }
 
-void Material::SetIntegerArray(const char *name, const int *value, int length) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform1iv(location, length, value);
+vector<int> Material::GetIntArray(const string &name) const {
+    auto it = intArrayMap.find(name);
+    return it == intArrayMap.end() ? vector<int>{} : it->second;
 }
 
-void Material::SetFloat(const char *name, float value) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform1f(location, value);
+float Material::GetFloat(const string &name) const {
+    auto it = floatMap.find(name);
+    return it == floatMap.end() ? 0.0f : it->second;
 }
 
-void Material::SetFloatArray(const char *name, const float *value, int length) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform1fv(location, length, value);
+vector<float> Material::GetFloatArray(const string &name) const {
+    auto it = floatArrayMap.find(name);
+    return it == floatArrayMap.end() ? vector<float>{} : it->second;
 }
 
-void Material::SetVector(const char *name, const vec4 &value) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform4fv(location, 1, (const GLfloat *)&value);
+vec4 Material::GetVector(const string &name) const {
+    auto it = vectorMap.find(name);
+    return it == vectorMap.end() ? vec4{0.0f} : it->second;
 }
 
-void Material::SetVectorArray(const char *name, const vec4 *value, int length) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniform4fv(location, length, (const GLfloat *)value);
+vector<vec4> Material::GetVectorArray(const string &name) const {
+    auto it = vectorArrayMap.find(name);
+    return it == vectorArrayMap.end() ? vector<vec4>{} : it->second;
+}
+mat4 Material::GetMatrix(const string &name) const {
+    auto it = matrixMap.find(name);
+    return it == matrixMap.end() ? mat4(1.0f) : it->second;
 }
 
-void Material::SetMatrix(const char *name, const mat4 &value) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&value);
+vector<mat4> Material::GetMatrixArray(const string &name) const {
+    auto it = matrixArrayMap.find(name);
+    return it == matrixArrayMap.end() ? vector<mat4>{} : it->second;
 }
 
-void Material::SetMatrixArray(const char *name, const mat4 *value, int length) {
-    glUseProgram(program);
-    GLint location = glGetUniformLocation(program, name);
-    glUniformMatrix4fv(location, length, GL_FALSE, (const GLfloat *)value);
+shared_ptr<Texture> Material::GetSampler(const string &name) const {
+    auto it = samplerMap.find(name);
+    return it == samplerMap.end() ? nullptr : it->second;
 }
 
-void Material::UseTextures() {
-    glUseProgram(program);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, GetMainTexture()->GetId());
+void Material::SetInt(const string &name, int value) {
+    intMap[name] = value;
+}
+
+void Material::SetIntArray(const string &name, const vector<int> &value) {
+    intArrayMap[name] = value;
+}
+
+void Material::SetFloat(const string &name, float value) {
+    floatMap[name] = value;
+}
+
+void Material::SetFloatArray(const string &name, const vector<float> &value) {
+    floatArrayMap[name] = value;
+}
+
+void Material::SetVector(const string &name, const vec4 &value) {
+    vectorMap[name] = value;
+}
+
+void Material::SetVectorArray(const string &name, const vector<vec4> &value) {
+    vectorArrayMap[name] = value;
+}
+
+void Material::SetMatrix(const string &name, const mat4 &value) {
+    matrixMap[name] = value;
+}
+
+void Material::SetMatrixArray(const string &name, const vector<mat4> &value) {
+    matrixArrayMap[name] = value;
+}
+
+void Material::SetSampler(const string &name, const shared_ptr<Texture> &value) {
+    samplerMap[name] = value;
 }

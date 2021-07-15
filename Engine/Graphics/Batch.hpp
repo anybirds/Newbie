@@ -15,14 +15,16 @@ private:
     Material *material;
     std::unordered_set<Drawer *> drawers;
 
+    GLuint transformBuffer;
+    GLsizeiptr transformBufferSize;
+
 public:
-    Batch(Mesh *mesh, Material *material) : mesh(mesh), material(material) {}
+    Batch(Mesh *mesh, Material *material);
     virtual ~Batch();
 
     Mesh *GetMesh() const { return mesh; }
     Material *GetMaterial() const { return material; }
     
-    void Refresh();
     void AddDrawer(Drawer *drawer);
     void RemoveDrawer(Drawer *drawer);
     void Draw(Renderer *renderer);

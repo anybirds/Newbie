@@ -35,7 +35,7 @@ mat4 Transform::GetLocalToWorldMatrix() const {
         mat4 T = glm::translate(mat4(1.0f), localPosition);
         quat R = localRotation;
         mat4 S = glm::scale(mat4(1.0f), localScale);
-        mat4 P = parent? parent->GetLocalToWorldMatrix() : mat4(1.0f);
+        mat4 P = parent ? parent->GetLocalToWorldMatrix() : mat4(1.0f);
         localToWorldMatrix = P * T * toMat4(R) * S;
     }
     return localToWorldMatrix;

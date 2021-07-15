@@ -15,8 +15,6 @@ CLASS_ATTR(Drawer, Component, ENGINE_EXPORT) {
 	PROPERTY_GET(std::shared_ptr<Material>, material, Material);
 
 public:
-	virtual void Draw(Renderer *renderer);
-
 	virtual void OnTrack() override;
 	virtual void OnUntrack() override;
 

@@ -152,7 +152,7 @@ void ScenePanel::ShowContents() {
             gizmoOperation = ImGuizmo::SCALE;
         }
         
-        if (ImGui::IsKeyPressed(GLFW_KEY_W)) {
+        if (ImGui::IsKeyPressed(GLFW_KEY_G)) {
             gizmoMode = ImGuizmo::WORLD;
         } else if (ImGui::IsKeyPressed(GLFW_KEY_L)) {
             gizmoMode = ImGuizmo::LOCAL;

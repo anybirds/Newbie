@@ -51,18 +51,19 @@ void HierarchyPanel::ShowContents() {
         if (IsRenaming() && !GetLocalSelected() && GetSelected() == (void *)gameObject) {
             ShowRenamingItem(gameObject->GetName());
         } else {
-            ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == GetSelected());
+            if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == GetSelected())) {
+                GetSelected() = (Entity *)gameObject;
+            }
             if (ImGui::IsItemHovered()) {
                 hovered = gameObject;
-                if (ImGui::IsMouseDown(0)) {
-                    GetSelected() = (Entity *)gameObject;
-                }
             }
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                ImGui::SetDragDropPayload("GameObject", &GetSelected(), sizeof(GameObject *));
+                static GameObject *source;
+                source = gameObject;
+                ImGui::SetDragDropPayload("GameObject", &source, sizeof(GameObject *));
                 ImGui::Text(ICON_FA_CUBE);
                 ImGui::SameLine();
-                ImGui::Text(((GameObject *)GetSelected())->GetName().c_str());
+                ImGui::Text(source->GetName().c_str());
                 ImGui::EndDragDropSource();
             }
             if (ImGui::BeginDragDropTarget()) {
@@ -129,6 +130,7 @@ void HierarchyPanel::ShowContents() {
         if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)gameObject)) {
             GameObject::ToJson(copyed, gameObject);
             gameObject->Remove();
+            GetSelected() = nullptr;
         }
         if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)gameObject)) {
             GameObject::ToJson(copyed, gameObject);
@@ -150,6 +152,7 @@ void HierarchyPanel::ShowContents() {
         }
         if (ImGui::MenuItem("Remove", nullptr, nullptr, (bool)gameObject)) {
             gameObject->Remove();
+            GetSelected() = nullptr;
         }
         
         menu = true;

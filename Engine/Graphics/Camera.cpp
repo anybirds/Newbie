@@ -65,8 +65,8 @@ void Camera::Render() {
     glCullFace(GL_BACK);
 
     Scene &scene = Scene::GetInstance();
-    for (auto &order : scene.GetAllBatches()) {
-        for (auto &batch : order.second) {
+    for (auto &batches : scene.GetAllBatches()) {
+        for (auto &batch : batches.second) {
             batch.second->Draw(this);
         }
     }
