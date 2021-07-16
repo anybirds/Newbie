@@ -15,6 +15,7 @@ protected:
     Asset *asset; 
 
 public:
+    Resource() : asset(nullptr), serial(0) {} 
     Resource(Asset *asset) : asset(asset) {}
     
     virtual void Apply();

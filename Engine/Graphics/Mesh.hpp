@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <GL/glew.h>
 
 #include <Asset.hpp>
@@ -32,8 +33,18 @@ private:
     GLuint vbo;
     GLuint ebo;
 
+    bool GenerateBuffers(const std::vector<float> &vert, const std::vector<unsigned> &attrib, const std::vector<unsigned> &idx);
+
 public:
+    enum {
+        POSITION,
+        NORMAL,
+        UV,
+        TANGENT
+    };
+
     Mesh(AMesh *amesh);
+    Mesh(const std::vector<float> &vert, const std::vector<unsigned> &attrib, const std::vector<unsigned> &idx);
     virtual ~Mesh();
     
     virtual void Apply() override;

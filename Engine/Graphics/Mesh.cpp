@@ -18,8 +18,69 @@ shared_ptr<Resource> AMesh::GetResource() {
     return sp;
 }
 
+bool Mesh::GenerateBuffers(const vector<float> &vert, const vector<unsigned> &attrib, const vector<unsigned> &idx) {
+    // generate
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+
+    // bind
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // data
+    unsigned stride = 0;
+    unsigned acnt = (unsigned)attrib.size();
+    for (unsigned i = 0; i < acnt; i++) {
+        stride += attrib[i];
+    }
+    stride *= sizeof(float);
+    glBufferData(GL_ARRAY_BUFFER, vcnt * stride, vert.data(), GL_STATIC_DRAW);
+
+    // attribute
+    float *offset = nullptr;
+    for (unsigned i = 0; i < acnt; i++) {
+        if (attrib[i]) {
+            glEnableVertexAttribArray(i);
+            glVertexAttribPointer(i, attrib[i], GL_FLOAT, GL_FALSE, stride, (void *)offset);
+            offset += attrib[i];
+        }
+    }
+
+    if (icnt > 0) {
+        // indexed wireframe
+        glGenBuffers(1, &ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, icnt * sizeof(unsigned), idx.data(), GL_STATIC_DRAW);
+    }
+
+    glBindVertexArray(0);
+
+    if (glGetError() != GL_NO_ERROR) {
+        cerr << '[' << __FUNCTION__ << ']' << " cannot create Mesh: " << GetName() << '\n';
+        glDeleteBuffers(1, &ebo);
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        return false;
+    }
+
+    return true;
+}
+
 Mesh::Mesh(AMesh *amesh) : Resource(amesh), vcnt(0), icnt(0), vao(0), vbo(0), ebo(0) {
     Apply();
+}
+
+Mesh::Mesh(const vector<float> &vert, const vector<unsigned> &attrib, const vector<unsigned> &idx) : Resource(), index(0U), model(nullptr) {
+    unsigned asize = 0; // number of floats for each vertex
+    for (size_t i = 0; i < attrib.size(); i++) {
+        asize += attrib[i];
+    }
+    vcnt = (unsigned)vert.size() / asize; 
+    icnt = (unsigned)idx.size();
+    
+    if (!GenerateBuffers(vert, attrib, idx)) {
+        throw exception();
+    }
 }
 
 Mesh::~Mesh() {
@@ -51,24 +112,23 @@ void Mesh::Apply() {
     aiMesh *aimesh = scene->mMeshes[GetIndex()];
     unsigned base;
 
-    unsigned acnt = 3;
-    unsigned *attrib = new unsigned[acnt];
+    vector<unsigned> attrib(3);
     if (aimesh->HasPositions()) {
-        attrib[0] = 3;
+        attrib[POSITION] = 3;
     }
     if (aimesh->HasNormals()) {
-        attrib[1] = 3;
+        attrib[NORMAL] = 3;
     }
     if (aimesh->HasTextureCoords(0)) {
-        attrib[2] = 2;
+        attrib[UV] = 2;
     }
     unsigned asize = 0; // number of floats for each vertex
-    for (unsigned i = 0; i < acnt; i++) {
+    for (size_t i = 0; i < attrib.size(); i++) {
         asize += attrib[i];
-    }
+    } 
 
     vcnt = aimesh->mNumVertices;
-    float *vert = new float[vcnt * asize];
+    vector<float> vert(vcnt * asize);
     base = 0;
     for (unsigned i = 0; i < aimesh->mNumVertices; i++) {
         if (aimesh->HasPositions()) {
@@ -91,7 +151,7 @@ void Mesh::Apply() {
     }
 
     icnt = aimesh->mNumFaces * 3;
-    unsigned *idx = new unsigned[icnt];
+    vector<unsigned> idx(icnt);
     base = 0;
     for (unsigned i = 0; i < aimesh->mNumFaces; i++) {
         idx[base] = aimesh->mFaces[i].mIndices[0];
@@ -100,50 +160,7 @@ void Mesh::Apply() {
         base += 3;
     }
 
-    // generate
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    // bind
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // data
-    unsigned stride = 0;
-    for (unsigned i = 0; i < acnt; i++) {
-        stride += attrib[i];
-    }
-    stride *= sizeof(float);
-    glBufferData(GL_ARRAY_BUFFER, vcnt * stride, vert, GL_STATIC_DRAW);
-
-    // attribute
-    float *offset = nullptr;
-    for (unsigned i = 0; i < acnt; i++) {
-        if (attrib[i]) {
-            glEnableVertexAttribArray(i);
-            glVertexAttribPointer(i, attrib[i], GL_FLOAT, GL_FALSE, stride, (void *)offset);
-            offset += attrib[i];
-        }
-    }
-
-    if (icnt > 0) {
-        // indexed wireframe
-        glGenBuffers(1, &ebo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, icnt * sizeof(unsigned), idx, GL_STATIC_DRAW);
-    }
-
-    // restore
-    glBindVertexArray(0);
-    delete[] vert;
-    delete[] attrib;
-    delete[] idx;
-
-    if (glGetError() != GL_NO_ERROR) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot create Mesh: " << GetName() << '\n';
-        glDeleteBuffers(1, &ebo);
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
+    if (!GenerateBuffers(vert, attrib, idx)) {
         *this = backup;
         throw exception();
     }
