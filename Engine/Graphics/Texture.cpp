@@ -11,7 +11,8 @@
 using namespace std;
 
 ATexture::ATexture() : 
-    width(1024), height(1024), format(Texture::RGBA), 
+    width(1024), height(1024), 
+    internalFormat(Texture::RGBA), format(Texture::RGBA), dataType(Texture::UNSIGNED_BYTE),
     horizontalWrap(Texture::REPEAT), verticalWrap(Texture::REPEAT),
     minFilter(Texture::NEAREST), magFilter(Texture::LINEAR) {}
 
@@ -42,7 +43,9 @@ void Texture::Apply() {
     path = atexture->GetPath();
     width = atexture->GetWidth();
     height = atexture->GetHeight();
+    internalFormat = atexture->GetInternalFormat();
     format = atexture->GetFormat();
+    dataType = atexture->GetDataType();
     horizontalWrap = atexture->GetHorizontalWrap();
     verticalWrap = atexture->GetVerticalWrap();
     minFilter = atexture->GetMinFilter();
@@ -93,7 +96,7 @@ void Texture::Apply() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetMinFilter());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagFilter());
 
-    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GetFormat(), GetWidth(), GetHeight(), 0, GetFormat(), GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)GetInternalFormat(), GetWidth(), GetHeight(), 0, GetFormat(), GetDataType(), image);
 
     if (image) {
         stbi_image_free(image);

@@ -39,7 +39,7 @@ void Shader::Apply() {
 
     id = glCreateShader(GetShaderType());
     if (!id) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to create a new shader" << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " failed to create new Shader" << '\n';
         *this = backup;
         throw exception();
     }
@@ -54,7 +54,7 @@ void Shader::Apply() {
     }
     file.open(filesystem::u8path(absolute));
     if (!file.is_open()) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to find a shader: " << GetPath() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " failed to find Shader: " << GetPath() << '\n';
         glDeleteShader(id);
         *this = backup;
         throw exception();
@@ -67,22 +67,26 @@ void Shader::Apply() {
     glShaderSource(id, 1, &source_char, NULL);
 
     glCompileShader(id);
-    GLint status = 0;
+    GLint status;
     glGetShaderiv(id, GL_COMPILE_STATUS, &status);
-    if (status == GL_FALSE) {
-        cerr << '[' << __FUNCTION__ << ']' << " failed to Compile a shader: " << GetPath() << '\n';
-        glDeleteShader(id);
-        *this = backup;
-        throw exception();
-    }
-
     if (glGetError() != GL_NO_ERROR) {
-        cerr << '[' << __FUNCTION__ << ']' << " cannot create Shader: " << GetName() << '\n';
+        cerr << '[' << __FUNCTION__ << ']' << " failed to create Shader: " << GetName() << '\n';
         glDeleteShader(id);
         *this = backup;
         throw exception();
     }
-
+    if (status == GL_FALSE) {
+        cerr << '[' << __FUNCTION__ << ']' << " failed to compile Shader: " << GetPath() << '\n';
+        string msg;
+        int len;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &len);
+        msg.resize(len);
+        glGetShaderInfoLog(id, len, NULL, msg.data());
+        cerr << msg << '\n';
+        glDeleteShader(id);
+        *this = backup;
+        throw exception();
+    }
     glDeleteShader(backup.id);
     cerr << '[' << __FUNCTION__ << ']' << " created Shader: " << GetName() << '\n';
 }

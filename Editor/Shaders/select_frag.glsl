@@ -1,6 +1,6 @@
 #version 330 core
 
-in int id;
+flat in int id;
 out int _FRAG_INT;
 
 void main() {

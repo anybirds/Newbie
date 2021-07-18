@@ -9,7 +9,7 @@ class Material;
 class Drawer;
 class Renderer;
 
-class Batch {
+class ENGINE_EXPORT Batch {
 private:
     Mesh *mesh;
     Material *material;
@@ -24,10 +24,11 @@ public:
 
     Mesh *GetMesh() const { return mesh; }
     Material *GetMaterial() const { return material; }
-    
+    const std::unordered_set<Drawer *> &GetDrawers() const { return drawers; }
+
     void AddDrawer(Drawer *drawer);
     void RemoveDrawer(Drawer *drawer);
-    void Draw(Renderer *renderer);
-    
+    void Draw(Renderer *renderer, Material *material = nullptr);
+
     friend class Drawer;
 };

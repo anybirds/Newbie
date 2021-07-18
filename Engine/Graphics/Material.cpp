@@ -81,8 +81,22 @@ void Material::Apply() {
     glAttachShader(program, fragmentShader->GetId());
     glLinkProgram(program);
 
+    GLint status;
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (glGetError() != GL_NO_ERROR) {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Material: " << GetName() << '\n';
+        glDeleteProgram(program);
+        *this = backup;
+        throw exception();
+    }
+    if (status == GL_FALSE) {
+        cerr << '[' << __FUNCTION__ << ']' << " failed to link program Material: " << GetName() << '\n';
+        string msg;
+        int len;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        msg.resize(len);
+        glGetProgramInfoLog(program, len, NULL, msg.data());
+        cerr << msg << '\n';
         glDeleteProgram(program);
         *this = backup;
         throw exception();

@@ -118,6 +118,9 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     selectTexture = new ATexture();
     selectTexture->SetWidth(window.GetMonitorWidth());
     selectTexture->SetHeight(window.GetMonitorHeight());
+    selectTexture->SetInternalFormat(Texture::R32I);
+    selectTexture->SetFormat(Texture::RED_INTEGER);
+    selectTexture->SetDataType(Texture::INT);
     
     selectFramebuffer = new AFramebuffer();
     selectFramebuffer->SetColorTexture(selectTexture);
@@ -221,36 +224,33 @@ void ScenePanel::ShowContents() {
         // render selected object outline
         if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
             GameObject *gameObject = (GameObject *)GetSelected();
-            for (Component *component : gameObject->GetAllComponents()) {
-                Drawer *drawer = dynamic_cast<Drawer *>(component);
-                if (drawer) {
-                    // draw selected object with a single color
-                    whiteFramebufferResource->SetWidth((int)imgSize.x);
-                    whiteFramebufferResource->SetHeight((int)imgSize.y);
-                    shared_ptr<Material> backupMaterial = drawer->GetMaterial();
-                    drawer->SetMaterial<shared_ptr<Material>>(whiteMaterialResource);
-                    sceneCamera->SetFramebuffer(whiteFramebufferResource);
-                    sceneCamera->Render([this, &drawer](){
-                        drawer->Draw(this->sceneCamera);
-                    });
-                    drawer->SetMaterial<shared_ptr<Material>>(backupMaterial);
-                    
-                    // copy scene framebuffer
-                    copyFramebufferResource->SetWidth((int)imgSize.x);
-                    copyFramebufferResource->SetHeight((int)imgSize.y);
-                    Framebuffer::Blit(sceneFramebufferResource, copyFramebufferResource);
-                    
-                    // postprocessing
-                    outlineMaterialResource->SetVector("uvScale", 
-                        vec4(imgSize.x / (float)sceneFramebufferResource->GetMaxWidth(), imgSize.y / (float)sceneFramebufferResource->GetMaxHeight(), 0.0f, 0.0f));
-                    outlineMaterialResource->SetSampler("sceneTexture", copyFramebufferResource->GetColorTexture());
-                    outlineMaterialResource->SetSampler("whiteTexture", whiteFramebufferResource->GetColorTexture());
-                    outlineCamera->SetFramebuffer(sceneFramebufferResource);
-                    outlineCamera->Render([this](){
-                        this->outlineDrawer->Draw(this->outlineCamera);
-                    });
-                    sceneCamera->SetFramebuffer(sceneFramebufferResource);
-                }
+            vector<Drawer *> drawers = gameObject->GetComponents<Drawer>();
+            if (!drawers.empty()) {
+                // draw selected object with a single color
+                whiteFramebufferResource->SetWidth((int)imgSize.x);
+                whiteFramebufferResource->SetHeight((int)imgSize.y);
+                sceneCamera->SetFramebuffer(whiteFramebufferResource);
+                sceneCamera->Render([this, &drawers](){
+                    for (Drawer *drawer : drawers) {
+                        drawer->Draw(this->sceneCamera, this->whiteMaterialResource);
+                    }
+                });
+                
+                // copy scene framebuffer
+                copyFramebufferResource->SetWidth((int)imgSize.x);
+                copyFramebufferResource->SetHeight((int)imgSize.y);
+                Framebuffer::Blit(sceneFramebufferResource, copyFramebufferResource);
+                
+                // postprocessing
+                outlineMaterialResource->SetVector("uvScale", 
+                    vec4(imgSize.x / (float)sceneFramebufferResource->GetMaxWidth(), imgSize.y / (float)sceneFramebufferResource->GetMaxHeight(), 0.0f, 0.0f));
+                outlineMaterialResource->SetSampler("sceneTexture", copyFramebufferResource->GetColorTexture());
+                outlineMaterialResource->SetSampler("whiteTexture", whiteFramebufferResource->GetColorTexture());
+                outlineCamera->SetFramebuffer(sceneFramebufferResource);
+                outlineCamera->Render([this](){
+                    this->outlineDrawer->Draw(this->outlineCamera);
+                });
+                sceneCamera->SetFramebuffer(sceneFramebufferResource);
             }
         }
     } catch(...) {}
@@ -272,12 +272,7 @@ void ScenePanel::ShowContents() {
         input.SetMouseCursorMode(Input::MOUSE_CURSOR_NORMAL);
     }
 
-    if (ImGui::IsItemClicked(0)) {
-        int x = (int)(ImGui::GetMousePos().x - ImGui::GetItemRectMin().x);
-        int y = (int)(ImGui::GetMousePos().y - ImGui::GetItemRectMin().y);
-        // selectFramebufferResource->ReadPixels(x, y);
-    }
-
+    // gizmo control
     if (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
         if (ImGui::IsKeyPressed(GLFW_KEY_T)) {
             gizmoOperation = ImGuizmo::TRANSLATE;
@@ -312,5 +307,39 @@ void ScenePanel::ShowContents() {
             transform->SetLocalEulerAngles(rotation);
             transform->SetLocalScale(scale);
         }
+    }
+
+    // mouse picking
+    if (!ImGuizmo::IsOver() && ImGui::IsItemClicked(0)) {
+        try {
+            selectFramebufferResource->SetWidth((int)imgSize.x);
+            selectFramebufferResource->SetHeight((int)imgSize.y);
+            sceneCamera->SetFramebuffer(selectFramebufferResource);
+            vector<Drawer *> drawers;
+            sceneCamera->Render([this, &scene, &drawers](){
+                int base = 1;
+                for (auto &order : scene.GetAllBatches()) {
+                    for (auto &batch : order.second) {
+                        for (Drawer *drawer : batch.second->GetDrawers()) {
+                            drawers.push_back(drawer);
+                        }
+                        this->selectMaterialResource->SetInt("base", base);
+                        batch.second->Draw(this->sceneCamera, this->selectMaterialResource.get());
+                        base += (int)batch.second->GetDrawers().size();
+                    }
+                } 
+            });
+            sceneCamera->SetFramebuffer(sceneFramebufferResource);
+
+            int x = (int)(ImGui::GetMousePos().x - ImGui::GetItemRectMin().x);
+            int y = (int)(ImGui::GetItemRectSize().y - ImGui::GetMousePos().y + ImGui::GetItemRectMin().y);
+            int id;
+            selectFramebufferResource->ReadPixels(&id, x, y);
+            if (id) {
+                GetSelected() = drawers[id - 1]->GetGameObject();
+            } else {
+                GetSelected() = nullptr;
+            }
+        } catch(...) {}
     }
 }

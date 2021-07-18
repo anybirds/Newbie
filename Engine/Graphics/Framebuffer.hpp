@@ -62,7 +62,7 @@ public:
     void SetWidth(int width);
     void SetHeight(int height);
 
-    std::vector<uint8_t> ReadPixels(int x, int y, int width = 1, int height = 1);
+    void ReadPixels(void *data, int x, int y, int width = 1, int height = 1);
 
     friend class Camera;
 };

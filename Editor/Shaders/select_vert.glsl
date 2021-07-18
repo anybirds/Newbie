@@ -7,7 +7,7 @@ uniform mat4 _VIEW;
 uniform mat4 _NORM;
 
 uniform int base;
-out int id;
+flat out int id;
 
 void main() {
     id = base + gl_InstanceID;

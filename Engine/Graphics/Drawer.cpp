@@ -14,7 +14,8 @@
 using namespace std;
 using namespace glm;
 
-void Drawer::Draw(Renderer *renderer) {
+void Drawer::Draw(Renderer *renderer, std::shared_ptr<Material> material) {
+    material = material ? material : this->material;
     if (!(mesh && material)) {
         throw exception();
     }

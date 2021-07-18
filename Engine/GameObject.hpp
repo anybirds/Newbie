@@ -42,6 +42,15 @@ public:
         }
         return nullptr;
     }
+    template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
+    std::vector<T *> GetComponents() const {
+        std::vector<T *> ret;
+        for (Component *component : components) {
+            T *t = dynamic_cast<T *>(component);
+            if (t) { ret.push_back(t); }
+        }
+        return ret;
+    }
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
     T *AddComponent() {
         T *t = new T();

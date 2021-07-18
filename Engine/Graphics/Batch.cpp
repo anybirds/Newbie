@@ -27,7 +27,8 @@ void Batch::RemoveDrawer(Drawer *drawer) {
     drawers.erase(drawer);
 }
 
-void Batch::Draw(Renderer *renderer) {
+void Batch::Draw(Renderer *renderer, Material *material) {
+    material = material ? material : this->material;
     if (!(mesh && material)) {
         throw exception();
     }
@@ -72,11 +73,16 @@ void Batch::Draw(Renderer *renderer) {
     material->UpdateUniforms(); // also use program
 
     GLuint location;
-        location = glGetUniformLocation(material->GetProgram(), "_VIEW");
-        mat4 _VIEW = renderer->GetTransform()->GetWorldToLocalMatrix();
-        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_VIEW);
-        location = glGetUniformLocation(material->GetProgram(), "_NORM");
-        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&renderer->GetNormalization());
+    location = glGetUniformLocation(material->GetProgram(), "_VIEW");
+    mat4 _VIEW = renderer->GetTransform()->GetWorldToLocalMatrix();
+    glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_VIEW);
+    location = glGetUniformLocation(material->GetProgram(), "_NORM");
+    glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&renderer->GetNormalization());
+
+    if (glGetError() == GL_INVALID_OPERATION) {
+        cerr << material->GetProgram() << '\n';
+        cerr << "error before draw call\n";
+    }
 
     if (mesh->GetElementCount()) {
         // mesh with EBO
