@@ -9,7 +9,7 @@ Renderer::Renderer() :
     order(0U), dirty(true), orthographic(false), 
     fovy(60.0f), aspectRatio(1.0f), nr(0.1f), fr(1000.0f), size(5.0f) {}
 
-const mat4 &Renderer::GetNormalization() {
+const mat4 &Renderer::GetNormalization() const {
     if (dirty) {
         if (orthographic) {
             normalization = ortho(-size * aspectRatio, size * aspectRatio, -size, size, nr, fr);

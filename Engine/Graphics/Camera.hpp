@@ -1,11 +1,14 @@
 #pragma once
 
+#include <functional>
+
 #include <gl/glew.h>
 #include <glm/glm.hpp>
 
 #include <Graphics/Renderer.hpp>
 
-class Framebuffer;
+class Batch;
+class Drawer;
 
 CLASS_ATTR(Camera, Renderer, ENGINE_EXPORT) {
     TYPE(Camera);
@@ -21,4 +24,5 @@ public:
 
 public:
     virtual void Render() override;
+    void Render(const std::function<void()> &drawcalls);
 };

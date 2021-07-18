@@ -8,35 +8,58 @@
 #include <Graphics/Framebuffer.hpp>
 #include <Graphics/Shader.hpp>
 #include <Graphics/Material.hpp>
+#include <Graphics/Drawer.hpp>
 #include <GameObject.hpp>
 
 #include "imgui/ImGuizmo.h"
 
 class ScenePanel : public Panel {
 private:
+    static const std::string &GetWhiteVertexShader();
+    static const std::string &GetWhiteFragmentShader();
+    static const std::string &GetOutlineVertexShader();
+    static const std::string &GetOutlineFragmentShader();
     static const std::string &GetSelectVertexShader();
     static const std::string &GetSelectFragmentShader();
-
+    
 public:
     static ScenePanel &GetInstance() { static ScenePanel scenePanel; return scenePanel; }
 
 private:
     ScenePanel();
 
-    GameObject *sceneCamera;
-    Camera *camera;
-
+    Transform *sceneTransform;
+    Camera *sceneCamera;
     ATexture *sceneTexture;
     AFramebuffer *sceneFramebuffer;
+    std::shared_ptr<Framebuffer> sceneFramebufferResource;
+
+    ATexture *whiteTexture;
+    AFramebuffer *whiteFramebuffer;
+    AShader *whiteVertexShader;
+    AShader *whiteFragmentShader;
+    AMaterial *whiteMaterial;
+    std::shared_ptr<Material> whiteMaterialResource;
+    std::shared_ptr<Framebuffer> whiteFramebufferResource;
+    
+    ATexture *copyTexture;
+    AFramebuffer *copyFramebuffer;
+    std::shared_ptr<Framebuffer> copyFramebufferResource;
+
+    Transform *outlineTransform;
+    Camera *outlineCamera;
+    Drawer *outlineDrawer;
+    AShader *outlineVertexShader;
+    AShader *outlineFragmentShader;
+    AMaterial *outlineMaterial;
+    std::shared_ptr<Material> outlineMaterialResource;
     
     ATexture *selectTexture;
     AFramebuffer *selectFramebuffer;
     AShader *selectVertexShader;
     AShader *selectFragmentShader;
     AMaterial *selectMaterial;
-
     std::shared_ptr<Material> selectMaterialResource;
-    std::shared_ptr<Framebuffer> sceneFramebufferResource;
     std::shared_ptr<Framebuffer> selectFramebufferResource;
 
     bool control;

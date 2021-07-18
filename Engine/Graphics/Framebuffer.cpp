@@ -19,6 +19,13 @@ shared_ptr<Resource> AFramebuffer::GetResource() {
     return sp;
 }
 
+void Framebuffer::Blit(const shared_ptr<Framebuffer> &src, const shared_ptr<Framebuffer> &dest, unsigned mask, unsigned filter) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, src->fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest->fbo);
+    glBlitFramebuffer(0, 0, src->width, src->height, 0, 0, dest->width, dest->height, mask, filter);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 Framebuffer::Framebuffer(AFramebuffer *aframebuffer) : Resource(aframebuffer), fbo(0U), rbo(0U) {
     Apply();
 }

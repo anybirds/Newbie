@@ -8,6 +8,26 @@
 using namespace std;
 using namespace glm;
 
+const std::string &ScenePanel::GetWhiteVertexShader() {
+    static std::string whiteVertexShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/white_vert.glsl"); 
+    return whiteVertexShader;
+}
+
+const std::string &ScenePanel::GetWhiteFragmentShader() {
+    static std::string whiteFragmentShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/white_frag.glsl");
+    return whiteFragmentShader;
+}
+
+const std::string &ScenePanel::GetOutlineVertexShader() {
+    static std::string outlineVertexShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/outline_vert.glsl"); 
+    return outlineVertexShader;
+}
+
+const std::string &ScenePanel::GetOutlineFragmentShader() {
+    static std::string outlineFragmentShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/outline_frag.glsl");
+    return outlineFragmentShader;
+}
+
 const std::string &ScenePanel::GetSelectVertexShader() {
     static std::string selectVertexShader(std::string(NEWBIE_PATH) + "/Editor/Shaders/select_vert.glsl"); 
     return selectVertexShader;
@@ -32,11 +52,68 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     sceneFramebuffer->SetUseDepthRenderTexture(true);
     sceneFramebufferResource = dynamic_pointer_cast<Framebuffer>(sceneFramebuffer->GetResource());
 
-    sceneCamera = new GameObject();
-    Transform *t = sceneCamera->AddComponent<Transform>();
-    t->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-    camera = sceneCamera->AddComponent<Camera>();
-    camera->SetFramebuffer(sceneFramebufferResource);
+    GameObject *sceneGameObject = new GameObject();
+    sceneTransform = sceneGameObject->AddComponent<Transform>();
+    sceneTransform->SetLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    sceneCamera = sceneGameObject->AddComponent<Camera>();
+    sceneCamera->SetFramebuffer(sceneFramebufferResource);
+
+    whiteTexture = new ATexture();
+    whiteTexture->SetWidth(window.GetMonitorWidth());
+    whiteTexture->SetHeight(window.GetMonitorHeight());
+    
+    whiteFramebuffer = new AFramebuffer();
+    whiteFramebuffer->SetColorTexture(whiteTexture);
+    whiteFramebuffer->SetUseDepthRenderTexture(true);
+    whiteFramebufferResource = dynamic_pointer_cast<Framebuffer>(whiteFramebuffer->GetResource());
+    
+    whiteVertexShader = new AShader();
+    whiteVertexShader->SetShaderType(Shader::VERTEX);
+    whiteVertexShader->SetPath(GetWhiteVertexShader());
+
+    whiteFragmentShader = new AShader();
+    whiteFragmentShader->SetShaderType(Shader::FRAGMENT);
+    whiteFragmentShader->SetPath(GetWhiteFragmentShader());
+
+    whiteMaterial = new AMaterial();
+    whiteMaterial->SetVertexShader(whiteVertexShader);
+    whiteMaterial->SetFragmentShader(whiteFragmentShader);
+    whiteMaterialResource = dynamic_pointer_cast<Material>(whiteMaterial->GetResource());
+
+    copyTexture = new ATexture();
+    copyTexture->SetWidth(window.GetMonitorWidth());
+    copyTexture->SetHeight(window.GetMonitorHeight());
+    
+    copyFramebuffer = new AFramebuffer();
+    copyFramebuffer->SetColorTexture(copyTexture);
+    copyFramebuffer->SetUseDepthRenderTexture(true);
+    copyFramebufferResource = dynamic_pointer_cast<Framebuffer>(copyFramebuffer->GetResource());
+
+    outlineVertexShader = new AShader();
+    outlineVertexShader->SetShaderType(Shader::VERTEX);
+    outlineVertexShader->SetPath(GetOutlineVertexShader());
+
+    outlineFragmentShader = new AShader();
+    outlineFragmentShader->SetShaderType(Shader::FRAGMENT);
+    outlineFragmentShader->SetPath(GetOutlineFragmentShader());
+
+    outlineMaterial = new AMaterial();
+    outlineMaterial->SetVertexShader(outlineVertexShader);
+    outlineMaterial->SetFragmentShader(outlineFragmentShader);
+    outlineMaterialResource = dynamic_pointer_cast<Material>(outlineMaterial->GetResource());
+
+    GameObject *outlineGameObject = new GameObject();
+    outlineTransform = outlineGameObject->AddComponent<Transform>();
+    outlineCamera = outlineGameObject->AddComponent<Camera>();
+    outlineCamera->SetOrthographic(true);
+    outlineCamera->SetAspectRatioFixed(true);
+    outlineCamera->SetAspectRatio(1.0f);
+    outlineCamera->SetNear(-1.0f);
+    outlineCamera->SetFar(1.0f);
+    outlineCamera->SetSize(1.0f);
+    outlineDrawer = outlineGameObject->AddComponent<Drawer>();
+    outlineDrawer->SetMaterial<shared_ptr<Material>>(outlineMaterialResource);
+    outlineDrawer->SetMesh<shared_ptr<Mesh>>(Geometry::GetSquareMesh());
 
     selectTexture = new ATexture();
     selectTexture->SetWidth(window.GetMonitorWidth());
@@ -62,14 +139,44 @@ ScenePanel::ScenePanel() : Panel("Scene"),
 }
 
 void ScenePanel::Close() {
+    delete sceneTransform;
     delete sceneCamera;
-    delete sceneFramebuffer;
     delete sceneTexture;
+    delete sceneFramebuffer;
+    sceneFramebufferResource.reset();
+
+    delete whiteTexture;
+    delete whiteFramebuffer;
+    delete whiteVertexShader;
+    delete whiteFragmentShader;
+    delete whiteMaterial;
+    whiteMaterialResource.reset();
+    whiteFramebufferResource.reset();
+
+    delete copyTexture;
+    delete copyFramebuffer;
+    copyFramebufferResource.reset();
+
+    delete outlineTransform;
+    delete outlineCamera;
+    delete outlineDrawer;
+    delete outlineVertexShader;
+    delete outlineFragmentShader;
+    delete outlineMaterial;
+    outlineMaterialResource.reset();
+
+    delete selectTexture;
+    delete selectFramebuffer;
+    delete selectVertexShader;
+    delete selectFragmentShader;
+    delete selectMaterial;
+    selectMaterialResource.reset();
+    selectFramebufferResource.reset();
 }
 
 void ScenePanel::Update() {
     if (control) {
-        Transform *transform = sceneCamera->GetTransform();
+        Transform *transform = sceneTransform;
         Time &time = Time::GetInstance();
         float move = moveSpeed * time.GetDeltaTime();
         if (ImGui::IsKeyDown(GLFW_KEY_A)) {
@@ -109,29 +216,49 @@ void ScenePanel::ShowContents() {
         sceneFramebufferResource->SetWidth((int)imgSize.x);
         sceneFramebufferResource->SetHeight((int)imgSize.y);
 
-        camera->Render();
+        sceneCamera->Render();
 
-        // render selected outline
-        GameObject *gameObject = (GameObject *)GetSelected();
-        if (gameObject) {
-            /*
-            Drawer *drawer = gameObject->GetComponent<Drawer>();
-            Batch batch(drawer->GetMesh().get(), drawer->GetMaterial().get());
-            batch.AddDrawer(drawer);
-            camera->Render(batch);
-            Transform *transform = gameObject->GetTransform();
-            vec3 originalScale = transform->GetScale();
-            transform->SetScale(originalScale * 1.125f);
-            camera->Render(batch);
-            transform->SetScale(originalScale);
-            */
+        // render selected object outline
+        if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+            GameObject *gameObject = (GameObject *)GetSelected();
+            for (Component *component : gameObject->GetAllComponents()) {
+                Drawer *drawer = dynamic_cast<Drawer *>(component);
+                if (drawer) {
+                    // draw selected object with a single color
+                    whiteFramebufferResource->SetWidth((int)imgSize.x);
+                    whiteFramebufferResource->SetHeight((int)imgSize.y);
+                    shared_ptr<Material> backupMaterial = drawer->GetMaterial();
+                    drawer->SetMaterial<shared_ptr<Material>>(whiteMaterialResource);
+                    sceneCamera->SetFramebuffer(whiteFramebufferResource);
+                    sceneCamera->Render([this, &drawer](){
+                        drawer->Draw(this->sceneCamera);
+                    });
+                    drawer->SetMaterial<shared_ptr<Material>>(backupMaterial);
+                    
+                    // copy scene framebuffer
+                    copyFramebufferResource->SetWidth((int)imgSize.x);
+                    copyFramebufferResource->SetHeight((int)imgSize.y);
+                    Framebuffer::Blit(sceneFramebufferResource, copyFramebufferResource);
+                    
+                    // postprocessing
+                    outlineMaterialResource->SetVector("uvScale", 
+                        vec4(imgSize.x / (float)sceneFramebufferResource->GetMaxWidth(), imgSize.y / (float)sceneFramebufferResource->GetMaxHeight(), 0.0f, 0.0f));
+                    outlineMaterialResource->SetSampler("sceneTexture", copyFramebufferResource->GetColorTexture());
+                    outlineMaterialResource->SetSampler("whiteTexture", whiteFramebufferResource->GetColorTexture());
+                    outlineCamera->SetFramebuffer(sceneFramebufferResource);
+                    outlineCamera->Render([this](){
+                        this->outlineDrawer->Draw(this->outlineCamera);
+                    });
+                    sceneCamera->SetFramebuffer(sceneFramebufferResource);
+                }
+            }
         }
     } catch(...) {}
   
-    ImGui::Image((void *)(intptr_t)camera->GetFramebuffer()->GetColorTexture()->GetId(), 
+    ImGui::Image((void *)(intptr_t)sceneCamera->GetFramebuffer()->GetColorTexture()->GetId(), 
         imgSize,
-        ImVec2(0.0f, imgSize.y / camera->GetFramebuffer()->GetMaxHeight()),
-        ImVec2(imgSize.x / camera->GetFramebuffer()->GetMaxWidth(), 0.0f));
+        ImVec2(0.0f, imgSize.y / sceneCamera->GetFramebuffer()->GetMaxHeight()),
+        ImVec2(imgSize.x / sceneCamera->GetFramebuffer()->GetMaxWidth(), 0.0f));
     
     // viewport control
     Input &input = Input::GetInstance();
@@ -172,8 +299,8 @@ void ScenePanel::ShowContents() {
         ImGuizmo::SetDrawlist();
         GameObject *gameObject = (GameObject *)GetSelected();
         Transform *transform = gameObject->GetTransform();
-        mat4 view = sceneCamera->GetTransform()->GetWorldToLocalMatrix();
-        mat4 normalization = camera->GetNormalization();
+        mat4 view = sceneTransform->GetWorldToLocalMatrix();
+        mat4 normalization = sceneCamera->GetNormalization();
         mat4 object = transform->GetLocalToWorldMatrix();
         ImGuizmo::SetRect(ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y, ImGui::GetItemRectSize().x, ImGui::GetItemRectSize().y);
         ImGuizmo::Manipulate(value_ptr(view), value_ptr(normalization), gizmoOperation, gizmoOperation == ImGuizmo::SCALE ? ImGuizmo::LOCAL : gizmoMode, value_ptr(object));

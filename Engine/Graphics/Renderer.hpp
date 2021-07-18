@@ -13,6 +13,7 @@ CLASS_ATTR(Renderer, Component, ENGINE_EXPORT) {
     PROPERTY(unsigned, order, Order);
     PROPERTY_BOOL(bool, orthographic, Orthographic);
     PROPERTY(float, fovy, Fovy);
+    PROPERTY_BOOL(bool, aspectRatioFixed, AspectRatioFixed);
     PROPERTY(float, aspectRatio, AspectRatio);
     PROPERTY(float, nr, Near);
     PROPERTY(float, fr, Far);
@@ -27,7 +28,7 @@ public:
     Renderer();
     virtual void Render() = 0;
 
-    const glm::mat4 &GetNormalization();
+    const glm::mat4 &GetNormalization() const;
 
     void SetOrder(unsigned order);
     void SetOrthographic() { orthographic = true; dirty = true; }

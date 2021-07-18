@@ -19,6 +19,7 @@
 #include <Graphics/Camera.hpp>
 #include <Graphics/Drawer.hpp>
 #include <Graphics/Framebuffer.hpp>
+#include <Graphics/Geometry.hpp>
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
 #include <Graphics/Model.hpp>

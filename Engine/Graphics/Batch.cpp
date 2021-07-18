@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <Graphics/Batch.hpp>
 #include <Graphics/Drawer.hpp>
 #include <Graphics/Renderer.hpp>
@@ -26,6 +28,10 @@ void Batch::RemoveDrawer(Drawer *drawer) {
 }
 
 void Batch::Draw(Renderer *renderer) {
+    if (!(mesh && material)) {
+        throw exception();
+    }
+
     // resize transform buffer
     GLsizeiptr newSize = 1;
     while (newSize < (GLsizeiptr)drawers.size()) {
@@ -66,11 +72,11 @@ void Batch::Draw(Renderer *renderer) {
     material->UpdateUniforms(); // also use program
 
     GLuint location;
-    location = glGetUniformLocation(material->GetProgram(), "_VIEW");
-    mat4 _VIEW = renderer->GetTransform()->GetWorldToLocalMatrix();
-    glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_VIEW);
-    location = glGetUniformLocation(material->GetProgram(), "_NORM");
-    glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&renderer->GetNormalization());
+        location = glGetUniformLocation(material->GetProgram(), "_VIEW");
+        mat4 _VIEW = renderer->GetTransform()->GetWorldToLocalMatrix();
+        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&_VIEW);
+        location = glGetUniformLocation(material->GetProgram(), "_NORM");
+        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&renderer->GetNormalization());
 
     if (mesh->GetElementCount()) {
         // mesh with EBO

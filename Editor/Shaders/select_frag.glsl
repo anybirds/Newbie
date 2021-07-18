@@ -1,8 +1,8 @@
 #version 330 core
 
-uniform vec4 _ID;
-out vec4 _FRAG_COLOR;
+in int id;
+out int _FRAG_INT;
 
 void main() {
-    _FRAG_COLOR = _ID;
+    _FRAG_INT = id;
 }

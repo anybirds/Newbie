@@ -25,6 +25,9 @@ public:
 class ENGINE_EXPORT Framebuffer : public Resource {
     PROPERTY_GET(bool, useDepthRenderTexture, UseDepthRenderTexture);
 
+public: 
+    static void Blit(const std::shared_ptr<Framebuffer> &src, const std::shared_ptr<Framebuffer> &dest, unsigned mask = GL_COLOR_BUFFER_BIT, unsigned filter = GL_NEAREST);
+    
 private:
     std::shared_ptr<Texture> colorTexture;
     std::shared_ptr<Texture> depthTexture;
@@ -37,6 +40,12 @@ private:
     GLuint rbo;
     
 public:
+    enum {
+        COLOR = GL_COLOR_BUFFER_BIT,
+        DEPTH = GL_DEPTH_BUFFER_BIT,
+        STENCIL = GL_STENCIL_BUFFER_BIT
+    };
+
     Framebuffer(AFramebuffer *aframebuffer);
     virtual ~Framebuffer();
 
