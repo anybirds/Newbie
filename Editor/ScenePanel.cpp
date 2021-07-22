@@ -242,8 +242,8 @@ void ScenePanel::ShowContents() {
                 Framebuffer::Blit(sceneFramebufferResource, copyFramebufferResource);
                 
                 // postprocessing
-                outlineMaterialResource->SetVector("uvScale", 
-                    vec4(imgSize.x / (float)sceneFramebufferResource->GetMaxWidth(), imgSize.y / (float)sceneFramebufferResource->GetMaxHeight(), 0.0f, 0.0f));
+                outlineMaterialResource->SetVec2("uvScale", 
+                    vec2(imgSize.x / (float)sceneFramebufferResource->GetMaxWidth(), imgSize.y / (float)sceneFramebufferResource->GetMaxHeight()));
                 outlineMaterialResource->SetSampler("sceneTexture", copyFramebufferResource->GetColorTexture());
                 outlineMaterialResource->SetSampler("whiteTexture", whiteFramebufferResource->GetColorTexture());
                 outlineCamera->SetFramebuffer(sceneFramebufferResource);

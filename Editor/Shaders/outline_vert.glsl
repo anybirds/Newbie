@@ -7,11 +7,11 @@ uniform mat4 _MODEL;
 uniform mat4 _VIEW;
 uniform mat4 _NORM;
 
-uniform vec4 uvScale;
+uniform vec2 uvScale;
 
 out vec2 _FRAG_UV;
 
 void main() {
-    _FRAG_UV = _VERT_UV * uvScale.xy;
+    _FRAG_UV = _VERT_UV * uvScale;
     gl_Position = _NORM * _VIEW * _MODEL * vec4(_VERT_POS, 1.0);
 }
