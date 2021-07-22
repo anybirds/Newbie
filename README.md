@@ -21,6 +21,7 @@ Can one undergraduate student make a fully-functional game engine? Let's do this
 * Type `setup.bat`
 * Run `build/Editor/Release/Editor.exe`
 ### Linux
+* Install `g++-7`
 * Install the latest version of [CMake](https://cmake.org/)
 * Install the latest version of [Git](https://git-scm.com/)
 * Open `Linux Shell`

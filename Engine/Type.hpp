@@ -2,8 +2,7 @@
 
 #include <unordered_map>
 #include <string>
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <functional>
 #include <nlohmann/json.hpp>
 
 #include <EngineExport.hpp>
@@ -57,42 +56,12 @@
     private: \
     static void Serialize(nlohmann::json &, const Entity *); \
     static size_t Deserialize(const nlohmann::json &, Entity *); \
+    static void Visualize(); \
     friend void ::type_init() 
     
-
-/* serializing and deserializing possible for glm vector and matrix types */
-namespace glm {
-    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::vec3 &v);
-    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::vec4 &v);
-    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::mat3 &m);
-    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::mat4 &m);
-    void ENGINE_EXPORT to_json(nlohmann::json &js, const glm::quat &q);
-    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::vec3 &v);
-    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::vec4 &v);
-    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::mat3 &m);
-    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::mat4 &m);
-    void ENGINE_EXPORT from_json(const nlohmann::json &js, glm::quat &q);
-}
-
 class Entity;
 
-template <typename T,
-std::enable_if_t<std::is_base_of_v<Entity, T> && !std::is_abstract_v<T>, bool> = true>
-Entity *instantiate() {
-    return (Entity *)new T();
-}
-template <typename T,
-std::enable_if_t<std::is_base_of_v<Entity, T> && std::is_abstract_v<T>, bool> = true>
-Entity *instantiate() {
-    return nullptr;
-}
-
 class ENGINE_EXPORT Type final {
-public:
-    typedef Entity *(*FInstantiate)();
-    typedef void (*FSerialize)(nlohmann::json &, const Entity *);
-    typedef size_t (*FDeserialize)(const nlohmann::json &, Entity *);
-
 private:
     static std::unordered_map<std::string, const Type *> &GetAllTypes() {
         static std::unordered_map<std::string, const Type *> types;
@@ -111,9 +80,10 @@ public:
 
 private:
     std::string name;
-    FInstantiate instantiate;
-    FSerialize serialize;
-    FDeserialize deserialize;
+    std::function<Entity *()> instantiate;
+    std::function<void(nlohmann::json &, const Entity *)> serialize;
+    std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
+    std::function<void()> visualize;
 
 public:
     Type(const std::string &name);
@@ -121,11 +91,13 @@ public:
 
     const std::string &GetName() const { return name; }
 
-    void SetInstantiate(FInstantiate instantiate) { this->instantiate = instantiate; }
-    void SetSerialize(FSerialize serialize) { this->serialize = serialize; }
-    void SetDeserialize(FDeserialize deserialize) { this->deserialize = deserialize; }
+    void SetInstantiate(const std::function<Entity *()> &instantiate) { this->instantiate = instantiate; }
+    void SetSerialize(const std::function<void(nlohmann::json &, const Entity *)> &serialize) { this->serialize = serialize; }
+    void SetDeserialize(const std::function<size_t(const nlohmann::json &, Entity *)> &deserialize) { this->deserialize = deserialize; }
+    void SetVisualize(const std::function<void()> &visualize) { this->visualize = visualize; }
 
     Entity *Instantiate() const { return instantiate(); }
     void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
     size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
+    void Visualize() const { visualize(); }
 };

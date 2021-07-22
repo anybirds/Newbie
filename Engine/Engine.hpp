@@ -11,6 +11,7 @@
 #include <Resource.hpp>
 #include <Scene.hpp>
 #include <Script.hpp>
+#include <Static.hpp>
 #include <Time.hpp>
 #include <Transform.hpp>
 #include <Type.hpp>

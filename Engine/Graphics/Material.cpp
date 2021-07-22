@@ -63,18 +63,6 @@ void Material::Apply() {
         SetOrder(amaterial->GetOrder());
     } 
 
-    intMap = amaterial->GetIntMap();
-    intArrayMap = amaterial->GetIntArrayMap();
-    floatMap = amaterial->GetFloatMap();
-    floatArrayMap = amaterial->GetFloatArrayMap();
-    vectorMap = amaterial->GetVectorMap();
-    vectorArrayMap = amaterial->GetVectorArrayMap();
-    matrixMap = amaterial->GetMatrixMap();
-    matrixArrayMap = amaterial->GetMatrixArrayMap();
-    for (auto &p : amaterial->GetSamplerMap()) {
-        samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
-    }
-
     // attach shaders and link
     program = glCreateProgram();
     glAttachShader(program, vertexShader->GetId());
@@ -102,11 +90,32 @@ void Material::Apply() {
         throw exception();
     }
 
+    intMap = amaterial->GetIntMap();
+    intArrayMap = amaterial->GetIntArrayMap();
+    floatMap = amaterial->GetFloatMap();
+    floatArrayMap = amaterial->GetFloatArrayMap();
+    vec2Map = amaterial->GetVec2Map();
+    vec2ArrayMap = amaterial->GetVec2ArrayMap();
+    vec3Map = amaterial->GetVec3Map();
+    vec3ArrayMap = amaterial->GetVec3ArrayMap();
+    vec4Map = amaterial->GetVec4Map();
+    vec4ArrayMap = amaterial->GetVec4ArrayMap();
+    mat2Map = amaterial->GetMat2Map();
+    mat2ArrayMap = amaterial->GetMat2ArrayMap();
+    mat3Map = amaterial->GetMat3Map();
+    mat3ArrayMap = amaterial->GetMat3ArrayMap();
+    mat4Map = amaterial->GetMat4Map();
+    mat4ArrayMap = amaterial->GetMat4ArrayMap();
+    for (auto &p : amaterial->GetSamplerMap()) {
+        samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
+    }
+    ApplyUniforms();
+
     glDeleteProgram(backup.program);
     cerr << '[' << __FUNCTION__ << ']' << " created Material: " << GetName() << '\n';
 }
 
-void Material::UpdateUniforms() {
+void Material::ApplyUniforms() {
     glUseProgram(program);
     GLint location;
     for (auto &p : intMap) {
@@ -125,25 +134,68 @@ void Material::UpdateUniforms() {
         location = glGetUniformLocation(program, p.first.c_str());
         glUniform1fv(location, (GLsizei)p.second.size(), p.second.data());
     }
-    for (auto &p : vectorMap) {
+    for (auto &p : vec2Map) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform2fv(location, 1, value_ptr(p.second));
+    }
+    for (auto &p : vec2ArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform2fv(location, (GLsizei)p.second.size(), value_ptr(*p.second.data()));
+    }
+    for (auto &p : vec3Map) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform3fv(location, 1, value_ptr(p.second));
+    }
+    for (auto &p : vec3ArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniform3fv(location, (GLsizei)p.second.size(), value_ptr(*p.second.data()));
+    }
+    for (auto &p : vec4Map) {
         location = glGetUniformLocation(program, p.first.c_str());
         glUniform4fv(location, 1, value_ptr(p.second));
     }
-    for (auto &p : vectorArrayMap) {
+    for (auto &p : vec4ArrayMap) {
         location = glGetUniformLocation(program, p.first.c_str());
         glUniform4fv(location, (GLsizei)p.second.size(), value_ptr(*p.second.data()));
     }
-    for (auto &p : matrixMap) {
+    for (auto &p : mat2Map) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix2fv(location, 1, GL_FALSE, value_ptr(p.second));
+    }
+    for (auto &p : mat2ArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix2fv(location, (GLsizei)p.second.size(), GL_FALSE, value_ptr(*p.second.data()));
+    }
+    for (auto &p : mat3Map) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(p.second));
+    }
+    for (auto &p : mat3ArrayMap) {
+        location = glGetUniformLocation(program, p.first.c_str());
+        glUniformMatrix3fv(location, (GLsizei)p.second.size(), GL_FALSE, value_ptr(*p.second.data()));
+    }
+    for (auto &p : mat4Map) {
         location = glGetUniformLocation(program, p.first.c_str());
         glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(p.second));
     }
-    for (auto &p : matrixArrayMap) {
+    for (auto &p : mat4ArrayMap) {
         location = glGetUniformLocation(program, p.first.c_str());
         glUniformMatrix4fv(location, (GLsizei)p.second.size(), GL_FALSE, value_ptr(*p.second.data()));
     }
     GLint i = 0;
     for (auto &p : samplerMap) {
         location = glGetUniformLocation(program, p.first.c_str());
+        glUniform1i(location, i);
+        glActiveTexture(GL_TEXTURE0 + i++);
+        glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+    }
+}
+
+void Material::UseProgramAndTextures() {
+    glUseProgram(program);
+    GLint i = 0;
+    for (auto &p : samplerMap) {
+        GLuint location = glGetUniformLocation(program, p.first.c_str());
         glUniform1i(location, i);
         glActiveTexture(GL_TEXTURE0 + i++);
         glBindTexture(GL_TEXTURE_2D, p.second->GetId());
@@ -170,23 +222,64 @@ vector<float> Material::GetFloatArray(const string &name) const {
     return it == floatArrayMap.end() ? vector<float>{} : it->second;
 }
 
-vec4 Material::GetVector(const string &name) const {
-    auto it = vectorMap.find(name);
-    return it == vectorMap.end() ? vec4{0.0f} : it->second;
+vec2 Material::GetVec2(const string &name) const {
+    auto it = vec2Map.find(name);
+    return it == vec2Map.end() ? vec2{0.0f} : it->second;
 }
 
-vector<vec4> Material::GetVectorArray(const string &name) const {
-    auto it = vectorArrayMap.find(name);
-    return it == vectorArrayMap.end() ? vector<vec4>{} : it->second;
-}
-mat4 Material::GetMatrix(const string &name) const {
-    auto it = matrixMap.find(name);
-    return it == matrixMap.end() ? mat4(1.0f) : it->second;
+vector<vec2> Material::GetVec2Array(const string &name) const {
+    auto it = vec2ArrayMap.find(name);
+    return it == vec2ArrayMap.end() ? vector<vec2>{} : it->second;
 }
 
-vector<mat4> Material::GetMatrixArray(const string &name) const {
-    auto it = matrixArrayMap.find(name);
-    return it == matrixArrayMap.end() ? vector<mat4>{} : it->second;
+vec3 Material::GetVec3(const string &name) const {
+    auto it = vec3Map.find(name);
+    return it == vec3Map.end() ? vec3{0.0f} : it->second;
+}
+
+vector<vec3> Material::GetVec3Array(const string &name) const {
+    auto it = vec3ArrayMap.find(name);
+    return it == vec3ArrayMap.end() ? vector<vec3>{} : it->second;
+}
+
+vec4 Material::GetVec4(const string &name) const {
+    auto it = vec4Map.find(name);
+    return it == vec4Map.end() ? vec4{0.0f} : it->second;
+}
+
+vector<vec4> Material::GetVec4Array(const string &name) const {
+    auto it = vec4ArrayMap.find(name);
+    return it == vec4ArrayMap.end() ? vector<vec4>{} : it->second;
+}
+
+mat2 Material::GetMat2(const string &name) const {
+    auto it = mat2Map.find(name);
+    return it == mat2Map.end() ? mat2(1.0f) : it->second;
+}
+
+vector<mat2> Material::GetMat2Array(const string &name) const {
+    auto it = mat2ArrayMap.find(name);
+    return it == mat2ArrayMap.end() ? vector<mat2>{} : it->second;
+}
+
+mat3 Material::GetMat3(const string &name) const {
+    auto it = mat3Map.find(name);
+    return it == mat3Map.end() ? mat3(1.0f) : it->second;
+}
+
+vector<mat3> Material::GetMat3Array(const string &name) const {
+    auto it = mat3ArrayMap.find(name);
+    return it == mat3ArrayMap.end() ? vector<mat3>{} : it->second;
+}
+
+mat4 Material::GetMat4(const string &name) const {
+    auto it = mat4Map.find(name);
+    return it == mat4Map.end() ? mat4(1.0f) : it->second;
+}
+
+vector<mat4> Material::GetMat4Array(const string &name) const {
+    auto it = mat4ArrayMap.find(name);
+    return it == mat4ArrayMap.end() ? vector<mat4>{} : it->second;
 }
 
 shared_ptr<Texture> Material::GetSampler(const string &name) const {
@@ -196,34 +289,130 @@ shared_ptr<Texture> Material::GetSampler(const string &name) const {
 
 void Material::SetInt(const string &name, int value) {
     intMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform1i(location, value);
+    glUseProgram(0);
 }
 
 void Material::SetIntArray(const string &name, const vector<int> &value) {
     intArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform1iv(location, (GLsizei)value.size(), value.data());
+    glUseProgram(0);
 }
 
 void Material::SetFloat(const string &name, float value) {
     floatMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform1f(location, value);
+    glUseProgram(0);
 }
 
 void Material::SetFloatArray(const string &name, const vector<float> &value) {
     floatArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform1fv(location, (GLsizei)value.size(), value.data());
+    glUseProgram(0);
 }
 
-void Material::SetVector(const string &name, const vec4 &value) {
-    vectorMap[name] = value;
+void Material::SetVec2(const string &name, const vec2 &value) {
+    vec2Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform2fv(location, 1, value_ptr(value));
+    glUseProgram(0);
 }
 
-void Material::SetVectorArray(const string &name, const vector<vec4> &value) {
-    vectorArrayMap[name] = value;
+void Material::SetVec2Array(const string &name, const vector<vec2> &value) {
+    vec2ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform2fv(location, (GLsizei)value.size(), value_ptr(*value.data()));
+    glUseProgram(0);
 }
 
-void Material::SetMatrix(const string &name, const mat4 &value) {
-    matrixMap[name] = value;
+void Material::SetVec3(const string &name, const vec3 &value) {
+    vec3Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform3fv(location, 1, value_ptr(value));
+    glUseProgram(0);
 }
 
-void Material::SetMatrixArray(const string &name, const vector<mat4> &value) {
-    matrixArrayMap[name] = value;
+void Material::SetVec3Array(const string &name, const vector<vec3> &value) {
+    vec3ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform3fv(location, (GLsizei)value.size(), value_ptr(*value.data()));
+    glUseProgram(0);
+}
+
+void Material::SetVec4(const string &name, const vec4 &value) {
+    vec4Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform4fv(location, 1, value_ptr(value));
+    glUseProgram(0);
+}
+
+void Material::SetVec4Array(const string &name, const vector<vec4> &value) {
+    vec4ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniform4fv(location, (GLsizei)value.size(), value_ptr(*value.data()));
+    glUseProgram(0);
+}
+
+void Material::SetMat2(const string &name, const mat2 &value) {
+    mat2Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix2fv(location, 1, GL_FALSE, value_ptr(value));
+    glUseProgram(0);
+}
+
+void Material::SetMat2Array(const string &name, const vector<mat2> &value) {
+    mat2ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix2fv(location, (GLsizei)value.size(), GL_FALSE, value_ptr(*value.data()));
+    glUseProgram(0);
+}
+
+void Material::SetMat3(const string &name, const mat3 &value) {
+    mat3Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(value));
+    glUseProgram(0);
+}
+
+void Material::SetMat3Array(const string &name, const vector<mat3> &value) {
+    mat3ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix3fv(location, (GLsizei)value.size(), GL_FALSE, value_ptr(*value.data()));
+    glUseProgram(0);
+}
+
+void Material::SetMat4(const string &name, const mat4 &value) {
+    mat4Map[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(value));
+    glUseProgram(0);
+}
+
+void Material::SetMat4Array(const string &name, const vector<mat4> &value) {
+    mat4ArrayMap[name] = value;
+    glUseProgram(program);
+    GLuint location = glGetUniformLocation(program, name.c_str());
+    glUniformMatrix4fv(location, (GLsizei)value.size(), GL_FALSE, value_ptr(*value.data()));
+    glUseProgram(0);
 }
 
 void Material::SetSampler(const string &name, const shared_ptr<Texture> &value) {

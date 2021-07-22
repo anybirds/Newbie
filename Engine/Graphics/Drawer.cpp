@@ -21,7 +21,7 @@ void Drawer::Draw(Renderer *renderer, std::shared_ptr<Material> material) {
     }
 
     glBindVertexArray(mesh->GetVertexArray());
-    material->UpdateUniforms(); // also use program
+    material->UseProgramAndTextures();
 
     GLuint location;
     location = glGetUniformLocation(material->GetProgram(), "_MODEL");

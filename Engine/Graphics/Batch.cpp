@@ -70,7 +70,7 @@ void Batch::Draw(Renderer *renderer, Material *material) {
     glVertexAttribDivisor(7, 1);
 
     // GPU instanced rendering
-    material->UpdateUniforms(); // also use program
+    material->UseProgramAndTextures();
 
     GLuint location;
     location = glGetUniformLocation(material->GetProgram(), "_VIEW");
