@@ -14,6 +14,7 @@ namespace HeaderTool {
 
         void Serialize();
         void Deserialize();
+        void Visualize();
         void TypeInit();
         void TypeClear();
         

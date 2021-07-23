@@ -16,9 +16,9 @@ CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
     PROPERTY_NONE(std::vector<Transform *>, children);
     PROPERTY_NONE(Transform *, parent);
     PROPERTY(glm::vec3, localPosition, LocalPosition);
-    PROPERTY(glm::quat, localRotation, LocalRotation);
-    PROPERTY(glm::vec3, localScale, LocalScale);
     PROPERTY(glm::vec3, localEulerAngles, LocalEulerAngles);
+    PROPERTY(glm::vec3, localScale, LocalScale);
+    PROPERTY_NONE(glm::quat, localRotation);
 
 private:
     mutable bool dirty;
@@ -31,6 +31,7 @@ public:
 
     const std::vector<Transform *> &GetChildren() const { return children; }
     Transform *GetParent() const { return parent; }
+    const glm::quat &GetLocalRotation() const { return localRotation; }
     glm::mat4 GetLocalToWorldMatrix() const;
     glm::mat4 GetWorldToLocalMatrix() const;
     glm::vec3 GetPosition() const;

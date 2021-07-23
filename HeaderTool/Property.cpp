@@ -1,5 +1,6 @@
 #include <cassert>
 #include <sstream>
+#include <iostream>
 
 #include <Property.hpp>
 
@@ -7,6 +8,31 @@ using namespace std;
 using namespace HeaderTool;
 
 Property::Property(const string &macro) {
+    if (macro[8] == '_') {
+        switch (macro[9]) {
+            case 'N':
+                mod = NONE;
+                break;
+            case 'G':
+                mod = GET;
+                break;
+            case 'I':
+                mod = IS;
+                break;
+            case 'S':
+                mod = SET;
+                break;
+            case 'B':
+                mod = BOOL;
+                break;
+            default:
+                mod = DEFAULT;
+                break;
+        }
+    } else {
+        mod = DEFAULT;
+    }
+
     stringstream ss;
     ss << macro;
     char c;
@@ -28,5 +54,8 @@ Property::Property(const string &macro) {
     assert(!ss.eof());
     
     type = args[0];
-    name = args[1];
+    memberName = args[1];
+    if (mod != NONE) {
+        propertyName = args[2];
+    }
 }

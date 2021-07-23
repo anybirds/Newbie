@@ -57,7 +57,7 @@ void Generator::Serialize() {
 
             cout << "  const " << cs->name << " *e = (const " << cs->name << " *)entity;\n";
             for (Property *p : cs->properties) {
-                cout << "  js.push_back(e->" << p->name << ");\n";
+                cout << "  js.push_back(e->" << p->memberName << ");\n";
             }
 
             cout << "}\n";
@@ -88,10 +88,58 @@ void Generator::Deserialize() {
             cout << "  " << cs->name << " *e = (" << cs->name << " *)entity;\n";
             for (size_t i = 0; i < cs->properties.size(); i++) {
                 Property *p = cs->properties[i];
-                cout << "  e->" << p->name << " = js[i++].get<" << p->type << ">();\n";
+                cout << "  e->" << p->memberName << " = js[i++].get<" << p->type << ">();\n";
+            }
+            cout << "  return i;\n";
+
+            cout << "}\n";
+        }
+    };
+    for (Namespace *ns : namespaces) {
+        write(ns);
+    }
+}
+
+void Generator::Visualize() {
+    function<void(Namespace *ns)> write = [&write](Namespace *ns) {
+        for (Namespace *n : ns->namespaces) {
+            cout << "namespace " << n->name << " {\n";
+            write(n);
+            cout << "}\n";
+        }
+        for (Class *cs : ns->classes) {
+            cout << "void " << cs->name << "::Visualize(Entity *entity) {\n";
+
+            if (!cs->base.empty()) {
+                cout << "  " << cs->base << "::StaticType()->Visualize(entity);\n";
             }
 
-            cout << "  return i;\n";
+            cout << "  " << cs->name << " *e = (" << cs->name << " *)entity;\n";
+            for (size_t i = 0; i < cs->properties.size(); i++) {
+                Property *p = cs->properties[i];
+                switch (p->mod) {
+                    case Property::DEFAULT:
+                        cout << "  " << p->type << " " << p->memberName << " = e->" << "Get" << p->propertyName << "();\n";
+                        cout << "  GetVisualizeProperty()(\"" << p->propertyName << "\", visualize<decltype(" << p->memberName << ")>, (void *)&" << p->memberName << ");\n";
+                        cout << "  e->" << "Set" << p->propertyName << "(" << p->memberName << ");\n";
+                        break;
+                    case Property::BOOL:
+                        cout << "  " << p->type << " " << p->memberName << " = e->" << "Is" << p->propertyName << "();\n";
+                        cout << "  GetVisualizeProperty()(\"" << p->propertyName << "\", visualize<decltype(" << p->memberName << ")>, (void *)&" << p->memberName << ");\n";
+                        cout << "  e->" << "Set" << p->propertyName << "(" << p->memberName << ");\n";
+                        break;
+                    case Property::GET:
+                        cout << "  " << p->type << " " << p->memberName << " = e->" << "Get" << p->propertyName << "();\n";
+                        cout << "  GetVisualizeProperty()(\"" << p->propertyName << "\", visualize<decltype(" << p->memberName << "), false>, (void *)&" << p->memberName << ");\n";
+                        break;
+                    case Property::IS:
+                        cout << "  " << p->type << " " << p->memberName << " = e->" << "Is" << p->propertyName << "();\n";
+                        cout << "  GetVisualizeProperty()(\"" << p->propertyName << "\", visualize<decltype(" << p->memberName << "), false>, (void *)&" << p->memberName << ");\n";
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             cout << "}\n";
         }
@@ -120,6 +168,7 @@ void Generator::TypeInit() {
             cout << "  " << name << "::StaticType()->SetInstantiate(" << "instantiate<" << name << ", true>);\n";
             cout << "  " << name << "::StaticType()->SetSerialize(" << name << "::Serialize);\n";
             cout << "  " << name << "::StaticType()->SetDeserialize(" << name << "::Deserialize);\n";
+            cout << "  " << name << "::StaticType()->SetVisualize(" << name << "::Visualize);\n";
         }
     };
 
@@ -166,6 +215,7 @@ void Generator::Generate() {
 
     Serialize();
     Deserialize();
+    Visualize();
     TypeInit();
     TypeClear();
 }

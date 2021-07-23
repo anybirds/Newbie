@@ -56,7 +56,7 @@
     private: \
     static void Serialize(nlohmann::json &, const Entity *); \
     static size_t Deserialize(const nlohmann::json &, Entity *); \
-    static void Visualize(); \
+    static void Visualize(Entity *); \
     friend void ::type_init() 
     
 class Entity;
@@ -83,7 +83,7 @@ private:
     std::function<Entity *()> instantiate;
     std::function<void(nlohmann::json &, const Entity *)> serialize;
     std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
-    std::function<void()> visualize;
+    std::function<void(Entity *)> visualize;
 
 public:
     Type(const std::string &name);
@@ -94,10 +94,10 @@ public:
     void SetInstantiate(const std::function<Entity *()> &instantiate) { this->instantiate = instantiate; }
     void SetSerialize(const std::function<void(nlohmann::json &, const Entity *)> &serialize) { this->serialize = serialize; }
     void SetDeserialize(const std::function<size_t(const nlohmann::json &, Entity *)> &deserialize) { this->deserialize = deserialize; }
-    void SetVisualize(const std::function<void()> &visualize) { this->visualize = visualize; }
+    void SetVisualize(const std::function<void(Entity *)> &visualize) { this->visualize = visualize; }
 
     Entity *Instantiate() const { return instantiate(); }
     void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
     size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
-    void Visualize() const { visualize(); }
+    void Visualize(Entity *entity) const { visualize(entity); }
 };
