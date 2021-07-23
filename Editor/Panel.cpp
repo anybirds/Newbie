@@ -1,4 +1,5 @@
 #include <Panel.hpp>
+#include <Engine.hpp>
 
 using namespace std;
 
@@ -18,4 +19,51 @@ void Panel::Show() {
     }
     ShowContents();
     ImGui::End();
+}
+
+void Panel::ShowIcon(Asset *asset) {
+    Type *type = asset->GetType();
+    if (type == AMaterial::StaticType()) {
+        ImGui::Text(ICON_FA_ADJUST);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
+    } else if (type == AMesh::StaticType()) {
+        ImGui::Text(ICON_FA_DRAW_POLYGON);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mesh");
+    } else if (type == ATexture::StaticType()) {
+        ImGui::Text(ICON_FA_IMAGE);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Texture");
+    } else if (type == AShader::StaticType()) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::Text(ICON_FA_SCROLL);
+        ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shader");
+    } else if (type == AModel::StaticType()) {
+        ImGui::Text(ICON_FA_BOXES);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Model");
+    } else if (type == AFramebuffer::StaticType()) {
+        ImGui::Text(ICON_FA_LAYER_GROUP);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
+    } else if (type == APrefab::StaticType()) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::Text(ICON_FA_CUBE);
+        ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
+    }
+}
+
+void Panel::ShowIcon(Component *component) {
+    Type *type = component->GetType();
+    if (type == Transform::StaticType()) {
+        ImGui::Text(ICON_FA_PROJECT_DIAGRAM);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera");
+    } else if (type == Camera::StaticType()) {
+        ImGui::Text(ICON_FA_CAMERA);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera");
+    } else if (type == Drawer::StaticType()) {
+        ImGui::Text(ICON_FA_PAINT_BRUSH);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Drawer");
+    } else {
+        ImGui::Text(ICON_FA_SCROLL);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip(type->GetName().c_str());
+    }
 }

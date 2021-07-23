@@ -3,6 +3,7 @@
 
 #include <HierarchyPanel.hpp>
 #include <Scene.hpp>
+#include <GameObject.hpp>
 #include <Transform.hpp>
 #include <Prefab.hpp>
 

@@ -10,6 +10,7 @@
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
 #include <HierarchyPanel.hpp>
+#include <InspectorPanel.hpp>
 
 #include <Project.hpp>
 #include <Graphics/Window.hpp>
@@ -56,10 +57,12 @@ int main(int argc, char **argv) {
     ScenePanel &scenePanel = ScenePanel::GetInstance();
     AssetPanel &assetPanel = AssetPanel::GetInstance();
     HierarchyPanel &hierarchyPanel = HierarchyPanel::GetInstance();
+    InspectorPanel &inspectorPanel = InspectorPanel::GetInstance();
 
     scenePanel.SetOpen(true);
     assetPanel.SetOpen(true);
     hierarchyPanel.SetOpen(true);
+    inspectorPanel.SetOpen(true);
     
     Time &time = Time::GetInstance();
     time.Init();
@@ -82,6 +85,7 @@ int main(int argc, char **argv) {
         scenePanel.Show();
         assetPanel.Show();
         hierarchyPanel.Show();
+        inspectorPanel.Show();
 
         ImGui::ShowDemoWindow();
 

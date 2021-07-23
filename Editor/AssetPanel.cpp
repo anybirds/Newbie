@@ -1,43 +1,14 @@
-#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <functional>
 
+#include <Engine.hpp>
 #include <AssetPanel.hpp>
 #include <GamePanel.hpp>
 #include <NewDialog.hpp>
-#include <Engine.hpp>
 
 using namespace std;
 using json = nlohmann::json;
-
-void AssetPanel::ShowIcon(Asset *asset) {
-    Type *type = asset->GetType();
-    if (type == AMaterial::StaticType()) {
-        ImGui::Text(ICON_FA_TINT);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
-    } else if (type == AMesh::StaticType()) {
-        ImGui::Text(ICON_FA_DRAW_POLYGON);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mesh");
-    } else if (type == ATexture::StaticType()) {
-        ImGui::Text(ICON_FA_IMAGE);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Texture");
-    } else if (type == AShader::StaticType()) {
-        ImGui::Text(ICON_FA_FILE_CODE);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shader");
-    } else if (type == AModel::StaticType()) {
-        ImGui::Text(ICON_FA_SHAPES);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Model");
-    } else if (type == AFramebuffer::StaticType()) {
-        ImGui::Text(ICON_FA_DESKTOP);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
-    } else if (type == APrefab::StaticType()) {
-        ImGui::Text(ICON_FA_CUBE);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
-    } else {
-        ImGui::Text(ICON_FA_FILE);
-    }
-}
 
 void AssetPanel::ShowContents() {
     Project &project = Project::GetInstance();

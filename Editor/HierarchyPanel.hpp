@@ -1,10 +1,8 @@
 #pragma once
 
-#include <utility>
 #include <nlohmann/json.hpp>
 
 #include <Panel.hpp>
-#include <GameObject.hpp>
 
 class HierarchyPanel : public Panel {
 public:
@@ -20,6 +18,6 @@ public:
     HierarchyPanel(const HierarchyPanel &) = delete;
     HierarchyPanel &operator=(const HierarchyPanel &) = delete;
 
-    virtual void ShowContents();
+    virtual void ShowContents() override;
     void Clear();
 };

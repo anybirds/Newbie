@@ -2,7 +2,8 @@
 
 #include <Widget.hpp>
 
-class Entity;
+class Asset;
+class Component;
 
 class Panel : public Widget {
 protected:
@@ -11,7 +12,7 @@ protected:
     ImGuiWindowFlags flags;
 
 public:
-    Panel(const std::string &title) : open(false), title(title), flags(ImGuiWindowFlags_None) {}
+    Panel(const std::string &title) : open(false), title(title), flags(ImGuiWindowFlags_HorizontalScrollbar) {}
 
     bool IsOpen() { return open; }
     void SetOpen(bool open) { this->open = open; }
@@ -20,4 +21,7 @@ public:
     virtual void Show() override;
     virtual void ShowContents() = 0;
     virtual void Update() {}
+
+    void ShowIcon(Asset *asset);
+    void ShowIcon(Component *component);
 };

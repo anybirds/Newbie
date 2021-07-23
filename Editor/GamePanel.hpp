@@ -3,8 +3,10 @@
 #include <memory>
 
 #include <Panel.hpp>
-#include <Graphics/Texture.hpp>
-#include <Graphics/Framebuffer.hpp>
+
+class ATexture;
+class AFramebuffer;
+class Framebuffer;
 
 class GamePanel : public Panel {
 public:

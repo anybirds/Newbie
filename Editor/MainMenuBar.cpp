@@ -10,6 +10,7 @@
 #include <ScenePanel.hpp>
 #include <AssetPanel.hpp>
 #include <HierarchyPanel.hpp>
+#include <InspectorPanel.hpp>
 
 using namespace std;
 
@@ -61,6 +62,10 @@ void MainMenuBar::Show() {
             HierarchyPanel &hierarchyPanel = HierarchyPanel::GetInstance();
             if (ImGui::MenuItem("Hierarchy", nullptr, hierarchyPanel.IsOpen())) {
                 hierarchyPanel.Toggle();
+            } 
+            InspectorPanel &inspectorPanel = InspectorPanel::GetInstance();
+            if (ImGui::MenuItem("Inspector", nullptr, inspectorPanel.IsOpen())) {
+                inspectorPanel.Toggle();
             } 
             ImGui::EndMenu();
         }

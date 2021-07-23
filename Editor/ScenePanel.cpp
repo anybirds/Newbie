@@ -3,8 +3,6 @@
 #include <Engine.hpp>
 #include <ScenePanel.hpp>
 
-#include <iostream>
-
 using namespace std;
 using namespace glm;
 

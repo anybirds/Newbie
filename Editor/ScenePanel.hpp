@@ -3,15 +3,17 @@
 #include <memory>
 
 #include <Panel.hpp>
-#include <Graphics/Camera.hpp>
-#include <Graphics/Texture.hpp>
-#include <Graphics/Framebuffer.hpp>
-#include <Graphics/Shader.hpp>
-#include <Graphics/Material.hpp>
-#include <Graphics/Drawer.hpp>
-#include <GameObject.hpp>
+#include <imgui/ImGuizmo.h>
 
-#include "imgui/ImGuizmo.h"
+class Transform;
+class Camera;
+class ATexture;
+class AFramebuffer;
+class Framebuffer;
+class AShader;
+class AMaterial;
+class Material;
+class Drawer;
 
 class ScenePanel : public Panel {
 private:

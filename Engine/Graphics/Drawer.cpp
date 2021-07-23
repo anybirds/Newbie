@@ -84,6 +84,10 @@ void Drawer::OnUntrack() {
 }
 
 void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
+    if (mesh == this->mesh) {
+        return;
+    }
+
     Scene &scene = Scene::GetInstance();
     auto i = scene.batches.find(material->GetOrder());
     if (i != scene.batches.end()) {
@@ -104,6 +108,10 @@ void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
 }
 
 void Drawer::SetMaterial(const shared_ptr<Material> &material) {
+    if (material == this->material) {
+        return;
+    }
+    
     Scene &scene = Scene::GetInstance();
     auto i = scene.batches.find(this->material->GetOrder());
     if (i != scene.batches.end()) {

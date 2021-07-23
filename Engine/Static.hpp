@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -61,7 +62,7 @@ template <template<typename...> typename R, bool E>
 ENGINE_EXPORT inline std::function<void(const std::vector<std::function<void(void *)>> &, void *)> &GetVisualize() { static std::function<void(const std::vector<std::function<void(void *)>> &, void *)> f; return f; }
 
 template <typename T, bool E = !std::is_const<T>::value, 
-std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value || 
+std::enable_if_t<std::is_fundamental<T>::value || 
 std::is_same<std::remove_cv_t<T>, std::string>::value || 
 std::is_same<std::remove_cv_t<T>, glm::vec2>::value || std::is_same<std::remove_cv_t<T>, glm::vec3>::value || std::is_same<std::remove_cv_t<T>, glm::vec4>::value || 
 std::is_same<std::remove_cv_t<T>, glm::mat2>::value || std::is_same<std::remove_cv_t<T>, glm::mat3>::value || std::is_same<std::remove_cv_t<T>, glm::mat4>::value ||
@@ -87,7 +88,7 @@ template <typename T, bool E = !std::is_const<T>::value, std::enable_if_t<is_spe
 void visualize(void *p);
 
 template <typename T, bool E, 
-std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value || 
+std::enable_if_t<std::is_fundamental<T>::value || 
 std::is_same<std::remove_cv_t<T>, std::string>::value || 
 std::is_same<std::remove_cv_t<T>, glm::vec2>::value || std::is_same<std::remove_cv_t<T>, glm::vec3>::value || std::is_same<std::remove_cv_t<T>, glm::vec4>::value || 
 std::is_same<std::remove_cv_t<T>, glm::mat2>::value || std::is_same<std::remove_cv_t<T>, glm::mat3>::value || std::is_same<std::remove_cv_t<T>, glm::mat4>::value ||
