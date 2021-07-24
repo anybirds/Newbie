@@ -16,7 +16,9 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Model : public Resource {
+CLASS_RESOURCE_ATTR(Model, Resource, ENGINE_EXPORT) {
+    TYPE(Model);
+    
     PROPERTY_GET(std::string, path, Path);
 
 private:
@@ -28,6 +30,5 @@ public:
 
     virtual void Apply() override;
 
-    friend class Scene;
     friend class Mesh;
 };

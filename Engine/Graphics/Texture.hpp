@@ -25,7 +25,9 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Texture : public Resource {
+CLASS_RESOURCE_ATTR(Texture, Resource, ENGINE_EXPORT) {
+    TYPE(Texture);
+
     PROPERTY_GET(std::string, path, Path);
     PROPERTY_GET(int, width, Width);
     PROPERTY_GET(int, height, Height);
@@ -36,9 +38,7 @@ class ENGINE_EXPORT Texture : public Resource {
     PROPERTY_GET(int, verticalWrap, VerticalWrap);
     PROPERTY_GET(int, minFilter, MinFilter);
     PROPERTY_GET(int, magFilter, MagFilter);
-    
-private:
-    GLuint id;
+    PROPERTY_GET(GLuint, id, Id);
 
 public:
     enum { 
@@ -54,6 +54,4 @@ public:
     virtual ~Texture();
     
     virtual void Apply() override;
-
-    int GetId() const { return id; }
 };

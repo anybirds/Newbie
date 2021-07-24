@@ -79,11 +79,6 @@ void Batch::Draw(Renderer *renderer, Material *material) {
     location = glGetUniformLocation(material->GetProgram(), "_NORM");
     glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)&renderer->GetNormalization());
 
-    if (glGetError() == GL_INVALID_OPERATION) {
-        cerr << material->GetProgram() << '\n';
-        cerr << "error before draw call\n";
-    }
-
     if (mesh->GetElementCount()) {
         // mesh with EBO
         glDrawElementsInstanced(GL_TRIANGLES, mesh->GetElementCount(), GL_UNSIGNED_INT, 0, (GLsizei)drawers.size());

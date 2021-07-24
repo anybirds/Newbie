@@ -7,7 +7,11 @@
 using namespace std;
 using namespace HeaderTool;
 
-Class::Class(const std::string &macro) {
+Class::Class(const std::string &macro) : resource(false) {
+    if (macro[5] == '_' && macro[6] == 'R') {
+        resource = true;
+    }
+
     stringstream ss;
     ss << macro;
     char c;

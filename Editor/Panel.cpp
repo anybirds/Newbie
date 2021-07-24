@@ -21,9 +21,11 @@ void Panel::Show() {
     ImGui::End();
 }
 
-void Panel::ShowIcon(Asset *asset) {
-    Type *type = asset->GetType();
-    if (type == AMaterial::StaticType()) {
+void Panel::ShowIcon(Type *type) {
+    if (type == GameObject::StaticType()) {
+        ImGui::Text(ICON_FA_CUBE);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("GameObject");
+    } else if (type == AMaterial::StaticType()) {
         ImGui::Text(ICON_FA_ADJUST);
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
     } else if (type == AMesh::StaticType()) {
@@ -48,14 +50,9 @@ void Panel::ShowIcon(Asset *asset) {
         ImGui::Text(ICON_FA_CUBE);
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
-    }
-}
-
-void Panel::ShowIcon(Component *component) {
-    Type *type = component->GetType();
-    if (type == Transform::StaticType()) {
+    } else if (type == Transform::StaticType()) {
         ImGui::Text(ICON_FA_PROJECT_DIAGRAM);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera");
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Transform");
     } else if (type == Camera::StaticType()) {
         ImGui::Text(ICON_FA_CAMERA);
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera");

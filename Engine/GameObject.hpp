@@ -24,7 +24,6 @@ public:
 public:
     GameObject() : transform(nullptr) {}
     
-    std::string &GetName() { return name; }
     const std::vector<Component *> &GetAllComponents() const { return components; }
     bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
     bool IsEnabled() const { return transform->IsEnabled(); }

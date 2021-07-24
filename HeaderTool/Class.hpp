@@ -15,6 +15,7 @@ namespace HeaderTool {
         std::string base;
         std::vector<std::string> args;
         std::vector<Property *> properties;
+        bool resource;
 
     public:
         Class(const std::string &macro);

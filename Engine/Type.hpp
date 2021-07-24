@@ -44,6 +44,8 @@
 #define CLASS_FINAL(Derived, Base) CLASS_FINAL_ATTR(Derived, Base, )
 #define CLASS_ATTR(Derived, Base, Attr) class Attr Derived : public Base
 #define CLASS(Derived, Base) CLASS_ATTR(Derived, Base, )
+#define CLASS_RESOURCE_ATTR(Derived, Base, Attr) CLASS_ATTR(Derived, Base, Attr)
+#define CLASS_RESOURCE(Derived, Base) CLASS(Derived, Base)
 
 #define NAMESPACE_ATTR(Name, Attr) namespace Attr Name 
 #define NAMESPACE(Name) NAMESPACE_ATTR(Name, )

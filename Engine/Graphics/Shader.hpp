@@ -17,12 +17,12 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Shader : public Resource {
+CLASS_RESOURCE_ATTR(Shader, Resource, ENGINE_EXPORT) {
+    TYPE(Shader);
+
     PROPERTY_GET(std::string, path, Path);
     PROPERTY_GET(unsigned, shaderType, ShaderType);
-    
-private:
-    GLuint id;
+    PROPERTY_GET(GLuint, id, Id);
 
 public:
     enum { VERTEX = GL_VERTEX_SHADER, FRAGMENT = GL_FRAGMENT_SHADER };
@@ -31,6 +31,4 @@ public:
     virtual ~Shader();
 
     virtual void Apply() override;
-
-    GLuint GetId() const { return id; }
 };

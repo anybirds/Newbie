@@ -47,10 +47,12 @@ void HierarchyPanel::ShowContents() {
         }
         bool open = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, "");
         ImGui::SameLine();
-        ImGui::Text(ICON_FA_CUBE);
+        ShowIcon(GameObject::StaticType());
         ImGui::SameLine();
         if (IsRenaming() && !GetLocalSelected() && GetSelected() == (void *)gameObject) {
-            ShowRenamingItem(gameObject->GetName());
+            string name = gameObject->GetName();
+            ShowRenamingItem(name);
+            gameObject->SetName(name);
         } else {
             if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == GetSelected())) {
                 GetSelected() = (Entity *)gameObject;
@@ -62,7 +64,7 @@ void HierarchyPanel::ShowContents() {
                 static GameObject *source;
                 source = gameObject;
                 ImGui::SetDragDropPayload("GameObject", &source, sizeof(GameObject *));
-                ImGui::Text(ICON_FA_CUBE);
+                ShowIcon(GameObject::StaticType());
                 ImGui::SameLine();
                 ImGui::Text(source->GetName().c_str());
                 ImGui::EndDragDropSource();

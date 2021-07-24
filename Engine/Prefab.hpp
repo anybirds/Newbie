@@ -7,7 +7,7 @@
 
 class GameObject;
 
-CLASS_FINAL_ATTR(APrefab, Asset, ENGINE_EXPORT) {
+CLASS_ATTR(APrefab, Asset, ENGINE_EXPORT) {
     TYPE(APrefab);
 
     PROPERTY(std::string, path, Path);
@@ -16,11 +16,15 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Prefab : public Resource {
+CLASS_RESOURCE_ATTR(Prefab, Resource, ENGINE_EXPORT) {
+    TYPE(Prefab);
+
     PROPERTY_GET(std::string, path, Path);
-    PROPERTY_GET(nlohmann::json, js, Json);
+    nlohmann::json js;
 
 public:
     Prefab(APrefab *aprefab);
     virtual void Apply() override;
+
+    const nlohmann::json &GetJson() const { return js; }
 };

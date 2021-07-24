@@ -6,23 +6,18 @@
 #include <EngineExport.hpp>
 #include <Asset.hpp>
 
-class ENGINE_EXPORT Resource {
-private:
-    uint64_t serial;
-    std::string name;
+CLASS_RESOURCE_ATTR(Resource, Entity, ENGINE_EXPORT) {
+    TYPE(Resource);
 
-protected:
-    Asset *asset; 
+    PROPERTY_GET(uint64_t, serial, Serial);
+    PROPERTY_GET(std::string, name, Name);
+    PROPERTY_GET_ACCESS(Asset *, asset, Asset, protected, public);
 
 public:
     Resource() : asset(nullptr), serial(0) {} 
     Resource(Asset *asset) : asset(asset) {}
     
     virtual void Apply();
-
-    const uint64_t GetSerial() const { return serial; }
-    const std::string &GetName() const { return name; }
-    Asset *GetAsset() const { return asset; }
 
     friend class Asset;
 };

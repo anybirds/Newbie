@@ -2,8 +2,7 @@
 
 #include <Widget.hpp>
 
-class Asset;
-class Component;
+class Type;
 
 class Panel : public Widget {
 protected:
@@ -22,6 +21,5 @@ public:
     virtual void ShowContents() = 0;
     virtual void Update() {}
 
-    void ShowIcon(Asset *asset);
-    void ShowIcon(Component *component);
+    void ShowIcon(Type *type);
 };

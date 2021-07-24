@@ -22,22 +22,21 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Framebuffer : public Resource {
+CLASS_RESOURCE_ATTR(Framebuffer, Resource, ENGINE_EXPORT) {
+    TYPE(Framebuffer);
+    
+    PROPERTY_GET(std::shared_ptr<Texture>, colorTexture, ColorTexture);
+    PROPERTY_GET(std::shared_ptr<Texture>, depthTexture, DepthTexture);
     PROPERTY_GET(bool, useDepthRenderTexture, UseDepthRenderTexture);
+    PROPERTY_GET(int, maxWidth, MaxWidth);
+    PROPERTY_GET(int, maxHeight, MaxHeight);
+    PROPERTY(int, width, Width);
+    PROPERTY(int, height, Height);
+    PROPERTY_GET(GLuint, fbo, Id);
+    PROPERTY_NONE(GLuint, rbo);
 
 public: 
     static void Blit(const std::shared_ptr<Framebuffer> &src, const std::shared_ptr<Framebuffer> &dest, unsigned mask = GL_COLOR_BUFFER_BIT, unsigned filter = GL_NEAREST);
-    
-private:
-    std::shared_ptr<Texture> colorTexture;
-    std::shared_ptr<Texture> depthTexture;
-
-    int maxWidth;
-    int maxHeight;
-    int width;
-    int height;
-    GLuint fbo;
-    GLuint rbo;
     
 public:
     enum {
@@ -50,14 +49,6 @@ public:
     virtual ~Framebuffer();
 
     virtual void Apply() override;
-
-    GLuint GetId() const { return fbo; }
-    int GetMaxWidth() const { return maxWidth; }
-    int GetMaxHeight() const { return maxHeight; }
-    int GetWidth() const { return width; }
-    int GetHeight() const { return height; }
-    std::shared_ptr<Texture> GetColorTexture() const { return colorTexture; }
-    std::shared_ptr<Texture> GetDepthTexture() const { return depthTexture; }
 
     void SetWidth(int width);
     void SetHeight(int height);

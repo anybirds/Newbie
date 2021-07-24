@@ -15,7 +15,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
-#include <EngineExport.hpp>
+#include <Type.hpp>
 
 /* serialize and deserialize glm types */
 namespace glm {
@@ -99,20 +99,22 @@ void visualize(void *p) {
 
 template <typename T, bool E, std::enable_if_t<std::is_pointer<T>::value, bool>>
 void visualize(void *p) {
-    GetVisualize<Entity *, E>()(p);
+    using P = std::remove_cv_t<std::remove_pointer_t<T>>;
+    std::pair<Type *, void *> arg{P::StaticType(), p};
+    GetVisualize<Entity *, E>()(&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<T, std::shared_ptr>::value, bool>>
 void visualize(void *p) {
-    GetVisualize<std::shared_ptr<Resource>, E>()(p);
+    using P = typename std::remove_cv_t<T>::element_type;
+    std::pair<Type *, void *> arg{P::StaticType(), p};
+    GetVisualize<std::shared_ptr<Resource>, E>()(&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::pair>::value, bool>>
 void visualize(void *p) {
     T &v = *(T *)p;
-    std::pair<void *, void *> arg;
-    arg.first = (void *)&v.first;
-    arg.second = (void *)&v.second;
+    std::pair<void *, void *> arg{(void *)&v.first, (void *)&v.second};
     GetVisualize<std::pair, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::first_type, E && !std::is_const<typename T::first_type>::value>, visualize<typename T::second_type, E && !std::is_const<typename T::second_type>::value>}, (void *)&arg);
 }
 

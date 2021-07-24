@@ -20,10 +20,12 @@ void AssetPanel::ShowContents() {
     ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     for (auto &p : project.GetAllAssets()) {
         Asset *asset = p.second;
-        ShowIcon(asset);
+        ShowIcon(asset->GetType());
         ImGui::SameLine();
         if (IsRenaming() && !GetLocalSelected() && GetSelected() == (Entity *)asset) {
-            ShowRenamingItem(asset->GetName());
+            string name = asset->GetName();
+            ShowRenamingItem(name);
+            asset->SetName(name);
         } else {
             if (ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), GetSelected() == (void *)asset)) {
                 GetSelected() = (Entity *)asset;
@@ -32,7 +34,7 @@ void AssetPanel::ShowContents() {
                 static Asset *source;
                 source = asset;
                 ImGui::SetDragDropPayload("Asset", &source, sizeof(Asset *));
-                ShowIcon(source);
+                ShowIcon(source->GetType());
                 ImGui::SameLine();
                 ImGui::Text(source->GetName().c_str());
                 ImGui::EndDragDropSource();

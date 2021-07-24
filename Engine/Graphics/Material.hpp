@@ -31,6 +31,7 @@ using Mat3ArrayMap = std::unordered_map<std::string, std::vector<glm::mat3>>;
 using Mat4Map = std::unordered_map<std::string, glm::mat4>;
 using Mat4ArrayMap = std::unordered_map<std::string, std::vector<glm::mat4>>;
 using SamplerMap  = std::unordered_map<std::string, ATexture *>;
+using SamplerResourceMap = std::unordered_map<std::string, std::shared_ptr<Texture>>;
 
 CLASS_ATTR(AMaterial, Asset, ENGINE_EXPORT) {
     TYPE(AMaterial);
@@ -62,38 +63,60 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Material : public Resource {
-private:
-    unsigned order;
-    std::shared_ptr<Shader> vertexShader;
-    std::shared_ptr<Shader> fragmentShader;
+CLASS_RESOURCE_ATTR(Material, Resource, ENGINE_EXPORT) {
+    TYPE(Material);
+
+    PROPERTY(unsigned, order, Order);
+    PROPERTY_GET(std::shared_ptr<Shader>, vertexShader, VertexShader);
+    PROPERTY_GET(std::shared_ptr<Shader>, fragmentShader, FragmentShader);
+
+    PROPERTY(IntMap, intMap, IntMap);
+    PROPERTY(IntArrayMap, intArrayMap, IntArrayMap);
+    PROPERTY(FloatMap, floatMap, FloatMap);
+    PROPERTY(FloatArrayMap, floatArrayMap, FloatArrayMap);
+    PROPERTY(Vec2Map, vec2Map, Vec2Map);
+    PROPERTY(Vec2ArrayMap, vec2ArrayMap, Vec2ArrayMap);
+    PROPERTY(Vec3Map, vec3Map, Vec3Map);
+    PROPERTY(Vec3ArrayMap, vec3ArrayMap, Vec3ArrayMap);
+    PROPERTY(Vec4Map, vec4Map, Vec4Map);
+    PROPERTY(Vec4ArrayMap, vec4ArrayMap, Vec4ArrayMap);
+    PROPERTY(Mat2Map, mat2Map, Mat2Map);
+    PROPERTY(Mat2ArrayMap, mat2ArrayMap, Mat2ArrayMap);
+    PROPERTY(Mat3Map, mat3Map, Mat3Map);
+    PROPERTY(Mat3ArrayMap, mat3ArrayMap, Mat3ArrayMap);
+    PROPERTY(Mat4Map, mat4Map, Mat4Map);
+    PROPERTY(Mat4ArrayMap, mat4ArrayMap, Mat4ArrayMap);
+    PROPERTY(SamplerResourceMap, samplerMap, SamplerMap);
     
-    IntMap intMap;
-    IntArrayMap intArrayMap;
-    FloatMap floatMap;
-    FloatArrayMap floatArrayMap;
-    Vec2Map vec2Map;
-    Vec2ArrayMap vec2ArrayMap;
-    Vec3Map vec3Map;
-    Vec3ArrayMap vec3ArrayMap;
-    Vec4Map vec4Map;
-    Vec4ArrayMap vec4ArrayMap;
-    Mat2Map mat2Map;
-    Mat2ArrayMap mat2ArrayMap;
-    Mat3Map mat3Map;
-    Mat3ArrayMap mat3ArrayMap;
-    Mat4Map mat4Map;
-    Mat4ArrayMap mat4ArrayMap;
-    std::unordered_map<std::string, std::shared_ptr<Texture>> samplerMap;
-    
-    GLuint program;
+    PROPERTY_GET(GLuint, program, Program);
 
 public:
     Material(AMaterial *amaterial);
     virtual ~Material();
     
     virtual void Apply() override;
+
+    void SetOrder(unsigned order);
+    void ApplyUniforms();
+    void UseProgramAndTextures();
     
+    void SetIntMap(const IntMap &intMap);
+    void SetIntArrayMap(const IntArrayMap &intArrayMap);
+    void SetFloatMap(const FloatMap &floatMap);
+    void SetFloatArrayMap(const FloatArrayMap &floatArrayMap);
+    void SetVec2Map(const Vec2Map &vec2Map);
+    void SetVec2ArrayMap(const Vec2ArrayMap &vec2ArrayMap);
+    void SetVec3Map(const Vec3Map &vec3Map);
+    void SetVec3ArrayMap(const Vec3ArrayMap &vec3ArrayMap);
+    void SetVec4Map(const Vec4Map &vec4Map);
+    void SetVec4ArrayMap(const Vec4ArrayMap &vec4ArrayMap);
+    void SetMat2Map(const Mat2Map &mat2Map);
+    void SetMat2ArrayMap(const Mat2ArrayMap &mat2ArrayMap);
+    void SetMat3Map(const Mat3Map &mat3Map);
+    void SetMat3ArrayMap(const Mat3ArrayMap &mat3ArrayMap);
+    void SetMat4Map(const Mat4Map &mat4Map);
+    void SetMat4ArrayMap(const Mat4ArrayMap &mat4ArrayMap);
+
     int GetInt(const std::string &name) const;
     std::vector<int> GetIntArray(const std::string &name) const;
     float GetFloat(const std::string &name) const;
@@ -129,14 +152,4 @@ public:
     void SetMat4(const std::string &name, const glm::mat4 &value);
     void SetMat4Array(const std::string &name, const std::vector<glm::mat4> &value);
     void SetSampler(const std::string &name, const std::shared_ptr<Texture> &value);
-
-    void ApplyUniforms();
-    void UseProgramAndTextures();
-
-    unsigned GetOrder() const { return order; }
-    void SetOrder(unsigned order);
-
-    std::shared_ptr<Shader> GetVertexShader() const { return vertexShader; }
-    std::shared_ptr<Shader> GetFragmentShader() const { return fragmentShader; }
-    GLuint GetProgram() const { return program; }
 };

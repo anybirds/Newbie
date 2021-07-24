@@ -13,7 +13,7 @@ class Resource;
 CLASS_ATTR(Asset, Entity, ENGINE_EXPORT) {
     TYPE(Asset);
 
-    PROPERTY_NONE(uint64_t, serial);
+    PROPERTY_GET(uint64_t, serial, Serial);
     PROPERTY(std::string, name, Name);
 
 protected:
@@ -22,8 +22,6 @@ protected:
 public:
     void Apply();
     virtual std::shared_ptr<Resource> GetResource() = 0;
-    uint64_t GetSerial() const { return serial; }
-    std::string &GetName() { return name; }
     
     friend class Project;
 };

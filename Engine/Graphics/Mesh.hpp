@@ -20,15 +20,15 @@ public:
     virtual std::shared_ptr<Resource> GetResource() override;
 };
 
-class ENGINE_EXPORT Mesh : public Resource {
+CLASS_RESOURCE_ATTR(Mesh, Resource, ENGINE_EXPORT) {
+    TYPE(Mesh);
+
+    PROPERTY_GET(std::shared_ptr<Model>, model, Model);
     PROPERTY_GET(uint32_t, index, Index);
-
-private:
-    std::shared_ptr<Model> model;
+    PROPERTY_GET(unsigned, vcnt, VertexCount);
+    PROPERTY_GET(unsigned, icnt, ElementCount);
     
-    unsigned vcnt;
-    unsigned icnt;
-
+private:
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
@@ -52,8 +52,5 @@ public:
     GLuint GetVertexArray() const { return vao; }
     GLuint GetVertexBuffer() const { return vbo; }
     GLuint GetElementBuffer() const { return ebo; }
-    unsigned GetVertexCount() const { return vcnt; }
-    unsigned GetElementCount() const { return icnt; }
     unsigned GetFaceCount() const { return icnt / 3; }
-    std::shared_ptr<Model> GetModel() const { return model; }
 };
