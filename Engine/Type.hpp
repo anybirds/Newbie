@@ -65,13 +65,13 @@ class Entity;
 
 class ENGINE_EXPORT Type final {
 private:
-    static std::unordered_map<std::string, const Type *> &GetAllTypes() {
-        static std::unordered_map<std::string, const Type *> types;
+    static std::unordered_map<std::string, Type *> &GetAllTypes() {
+        static std::unordered_map<std::string, Type *> types;
         return types;
     }
 
 public:
-    static const Type *GetType(const std::string &name) {
+    static Type *GetType(const std::string &name) {
         auto &types = GetAllTypes();
         auto it = types.find(name);
         if (it == types.end()) {
@@ -82,6 +82,7 @@ public:
 
 private:
     std::string name;
+    Type *base;
     std::function<Entity *()> instantiate;
     std::function<void(nlohmann::json &, const Entity *)> serialize;
     std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
@@ -92,6 +93,8 @@ public:
     ~Type();
 
     const std::string &GetName() const { return name; }
+    Type *GetBase() const { return base; }
+    void SetBase(Type *base) { this->base = base; }
 
     void SetInstantiate(const std::function<Entity *()> &instantiate) { this->instantiate = instantiate; }
     void SetSerialize(const std::function<void(nlohmann::json &, const Entity *)> &serialize) { this->serialize = serialize; }

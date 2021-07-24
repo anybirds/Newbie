@@ -26,6 +26,8 @@ Prefab::Prefab(APrefab *aprefab) : Resource(aprefab) {
 }
 
 void Prefab::Apply() {
+    Prefab backup(*this);
+
     Resource::Apply();
     APrefab *aprefab = (APrefab *)asset;
     path = aprefab->GetPath();
@@ -41,6 +43,7 @@ void Prefab::Apply() {
     file.open(filesystem::u8path(absolute));
     if (!file.is_open()) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find a prefab: " << GetPath() << '\n';
+        *this = backup;
         throw exception();
     }
 

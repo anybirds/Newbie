@@ -66,7 +66,7 @@ bool Mesh::GenerateBuffers(const vector<float> &vert, const vector<unsigned> &at
     return true;
 }
 
-Mesh::Mesh(AMesh *amesh) : Resource(amesh), vcnt(0), icnt(0), vao(0), vbo(0), ebo(0) {
+Mesh::Mesh(AMesh *amesh) : Resource(amesh), index(0), vcnt(0), icnt(0), vao(0), vbo(0), ebo(0) {
     Apply();
 }
 
@@ -105,6 +105,9 @@ void Mesh::Apply() {
     if (!model) {
         cerr << '[' << __FUNCTION__ << ']' << " missing Model in Mesh: " << GetName() << '\n';
         *this = backup;
+        backup.vao = 0;
+        backup.vbo = 0;
+        backup.ebo = 0;
         throw exception();
     }
 
@@ -162,11 +165,11 @@ void Mesh::Apply() {
 
     if (!GenerateBuffers(vert, attrib, idx)) {
         *this = backup;
+        backup.vao = 0;
+        backup.vbo = 0;
+        backup.ebo = 0;
         throw exception();
     }
 
-    glDeleteBuffers(1, &backup.ebo);
-    glDeleteVertexArrays(1, &backup.vao);
-    glDeleteBuffers(1, &backup.vbo);
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }

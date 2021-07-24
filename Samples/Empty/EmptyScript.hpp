@@ -1,9 +1,11 @@
 #pragma once
 
 #include <Engine.hpp>
-#include <UserExport.hpp>
 
-CLASS_ATTR(EmptyScript, Script, USER_EXPORT) {
+CLASS(EmptyScript, Script) {
     TYPE(EmptyScript);
-    
+
+public:
+    virtual void Start() override;
+    virtual void Update() override;
 };

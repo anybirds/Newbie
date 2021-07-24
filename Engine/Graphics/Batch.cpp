@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <Graphics/Batch.hpp>
 #include <Graphics/Drawer.hpp>
 #include <Graphics/Renderer.hpp>

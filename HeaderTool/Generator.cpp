@@ -161,10 +161,10 @@ void Generator::Visualize() {
 
 void Generator::TypeInit() {
     vector<Namespace *> stack;
-    function<void(Namespace *ns)> write = [&write, &stack](Namespace *ns) {
+    function<void(Namespace *)> instantiate = [&instantiate, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
             stack.push_back(n);
-            write(n);
+            instantiate(n);
             stack.pop_back();
         }
         if (ns->classes.empty()) {
@@ -179,6 +179,34 @@ void Generator::TypeInit() {
         for (Class *cs : ns->classes) {
             string name = prefix + cs->name;
             cout << "  " << name << "::SetType(new Type(\"" << name << "\"));\n";
+        }
+    };
+
+    function<void(Namespace *)> config = [&config, &stack](Namespace *ns) {
+        for (Namespace *n : ns->namespaces) {
+            stack.push_back(n);
+            config(n);
+            stack.pop_back();
+        }
+        if (ns->classes.empty()) {
+            return;
+        }
+
+        string prefix;
+        for (Namespace *n : stack) {
+            prefix += n->name;
+            prefix += "::";
+        }
+        for (Class *cs : ns->classes) {
+            string name = prefix + cs->name;
+            string candidate; // candidate for base class namespace
+            // in order to compile, only one should pass the if statement
+            cout << "  if (Type *base = Type::GetType(\"" << cs->base << "\")) { " << name << "::StaticType()->SetBase(base); }\n";
+            for (Namespace *n : stack) {
+                candidate += n->name;
+                candidate += "::";
+                cout << "  if (Type *base = Type::GetType(\"" << candidate << cs->base << "\")) { " << name << "::StaticType()->SetBase(base); }\n";
+            }
             if (!cs->resource) {
                 cout << "  " << name << "::StaticType()->SetInstantiate(" << "instantiate<" << name << ", true>);\n";
                 cout << "  " << name << "::StaticType()->SetSerialize(" << name << "::Serialize);\n";
@@ -190,17 +218,20 @@ void Generator::TypeInit() {
 
     cout << "void type_init() {\n";
     for (Namespace *ns : namespaces) {
-        write(ns);
+        instantiate(ns);
+    }
+    for (Namespace *ns : namespaces) {
+        config(ns);
     }
     cout << "}\n";
 }
 
 void Generator::TypeClear() {
     vector<Namespace *> stack;
-    function<void(Namespace *ns)> write = [&write, &stack](Namespace *ns) {
+    function<void(Namespace *)> clear = [&clear, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
             stack.push_back(n);
-            write(n);
+            clear(n);
             stack.pop_back();
         }
         if (ns->classes.empty()) {
@@ -220,7 +251,7 @@ void Generator::TypeClear() {
 
     cout << "void type_clear() {\n";
     for (Namespace *ns : namespaces) {
-        write(ns);
+        clear(ns);
     }
     cout << "}\n";
 }

@@ -43,7 +43,7 @@ void GameObject::FromJson(const json &js, GameObject *&gameObject, bool nullify)
     // read entities
     const json &entities = js["entities"];
     for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
-        const Type *type = Type::GetType(i.key());
+        Type *type = Type::GetType(i.key());
         for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
             Entity *entity = type->Instantiate();
             GetMap().insert({stoull(j.key()), (uintptr_t)entity});
@@ -51,7 +51,7 @@ void GameObject::FromJson(const json &js, GameObject *&gameObject, bool nullify)
     }
 
     for (json::const_iterator i = entities.begin(); i != entities.end(); i++) {
-        const Type *type = Type::GetType(i.key());
+        Type *type = Type::GetType(i.key());
         for (json::const_iterator j = i.value().begin(); j != i.value().end(); j++) {
             type->Deserialize(j.value(), (Entity *)GetMap().at(stoull(j.key())));
         }

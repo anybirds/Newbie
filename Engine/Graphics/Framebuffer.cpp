@@ -76,6 +76,8 @@ void Framebuffer::Apply() {
         glDeleteFramebuffers(1, &fbo);
         glDeleteRenderbuffers(1, &rbo);
         *this = backup;
+        backup.fbo = 0;
+        backup.rbo = 0;
         throw exception();
     }
 
@@ -86,11 +88,11 @@ void Framebuffer::Apply() {
         glDeleteFramebuffers(1, &fbo);
         glDeleteRenderbuffers(1, &rbo);
         *this = backup;
+        backup.fbo = 0;
+        backup.rbo = 0;
         throw exception();
     }
 
-    glDeleteFramebuffers(1, &backup.fbo);
-    glDeleteRenderbuffers(1, &backup.rbo);
     cerr << '[' << __FUNCTION__ << ']' << " created Mesh: " << GetName() << '\n';
 }
 

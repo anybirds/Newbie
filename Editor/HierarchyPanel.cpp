@@ -24,7 +24,7 @@ void HierarchyPanel::ShowContents() {
     function<void(GameObject *)> recurse = [&](GameObject *gameObject) {
         Transform *transform = gameObject->GetTransform();
 
-        ImGui::InvisibleButton(("##" + to_string((uintptr_t)gameObject)).c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 3.0f));
+        ImGui::InvisibleButton(("##Space" + to_string((uintptr_t)gameObject)).c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 3.0f));
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset")) {
                 IM_ASSERT(payload->DataSize == sizeof(Asset *));

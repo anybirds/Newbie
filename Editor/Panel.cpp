@@ -22,45 +22,41 @@ void Panel::Show() {
 }
 
 void Panel::ShowIcon(Type *type) {
-    if (type == GameObject::StaticType()) {
-        ImGui::Text(ICON_FA_CUBE);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("GameObject");
-    } else if (type == AMaterial::StaticType()) {
-        ImGui::Text(ICON_FA_ADJUST);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Material");
-    } else if (type == AMesh::StaticType()) {
-        ImGui::Text(ICON_FA_DRAW_POLYGON);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mesh");
-    } else if (type == ATexture::StaticType()) {
-        ImGui::Text(ICON_FA_IMAGE);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Texture");
-    } else if (type == AShader::StaticType()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
-        ImGui::Text(ICON_FA_SCROLL);
-        ImGui::PopStyleColor();
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shader");
-    } else if (type == AModel::StaticType()) {
-        ImGui::Text(ICON_FA_BOXES);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Model");
-    } else if (type == AFramebuffer::StaticType()) {
-        ImGui::Text(ICON_FA_LAYER_GROUP);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Framebuffer");
-    } else if (type == APrefab::StaticType()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
-        ImGui::Text(ICON_FA_CUBE);
-        ImGui::PopStyleColor();
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Prefab");
-    } else if (type == Transform::StaticType()) {
-        ImGui::Text(ICON_FA_PROJECT_DIAGRAM);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Transform");
-    } else if (type == Camera::StaticType()) {
-        ImGui::Text(ICON_FA_CAMERA);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera");
-    } else if (type == Drawer::StaticType()) {
-        ImGui::Text(ICON_FA_PAINT_BRUSH);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Drawer");
-    } else {
-        ImGui::Text(ICON_FA_SCROLL);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip(type->GetName().c_str());
+    static unordered_map<Type *, char *> iconMap {
+        { Entity::StaticType(), ICON_FA_SQUARE },
+        { Component::StaticType(), ICON_FA_BOX },
+        { Asset::StaticType(), ICON_FA_BOX_OPEN },
+        { Resource::StaticType(), ICON_FA_BOX_OPEN },
+        { GameObject::StaticType(), ICON_FA_CUBE },
+
+        { AMaterial::StaticType(), ICON_FA_ADJUST },
+        { Material::StaticType(), ICON_FA_ADJUST },
+        { AMesh::StaticType(), ICON_FA_DRAW_POLYGON },
+        { Mesh::StaticType(), ICON_FA_DRAW_POLYGON },
+        { ATexture::StaticType(), ICON_FA_IMAGE },
+        { Texture::StaticType(), ICON_FA_IMAGE },
+        { AShader::StaticType(), ICON_FA_MAGIC },
+        { Shader::StaticType(), ICON_FA_MAGIC },
+        { AModel::StaticType(), ICON_FA_BOXES },
+        { Model::StaticType(), ICON_FA_BOXES },
+        { AFramebuffer::StaticType(), ICON_FA_LAYER_GROUP },
+        { Framebuffer::StaticType(), ICON_FA_LAYER_GROUP },
+        { APrefab::StaticType(), ICON_FA_CUBES },
+        { Prefab::StaticType(), ICON_FA_CUBES },
+        
+        { Transform::StaticType(), ICON_FA_PROJECT_DIAGRAM },
+        { Renderer::StaticType(), ICON_FA_CAMERA },
+        { Drawer::StaticType(), ICON_FA_PAINT_BRUSH },
+        { Script::StaticType(), ICON_FA_SCROLL }
+    };
+
+    while (type) {
+        auto it = iconMap.find(type);
+        if (it != iconMap.end()) {
+            ImGui::Text(it->second);
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip(type->GetName().c_str());
+            break;
+        }
+        type = type->GetBase();
     }
 }

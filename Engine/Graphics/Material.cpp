@@ -23,7 +23,7 @@ shared_ptr<Resource> AMaterial::GetResource() {
     return sp;
 }
 
-Material::Material(AMaterial *amaterial) : Resource(amaterial), program(0) {
+Material::Material(AMaterial *amaterial) : Resource(amaterial), order(0), program(0) {
     Apply();
 }
 
@@ -45,17 +45,20 @@ void Material::Apply() {
     if (!vertexShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing vertex shader in Material: " << GetName() << '\n';
         *this = backup;
+        backup.program = 0;
         throw exception();
     }
     if (!fragmentShader) {
         cerr << '[' << __FUNCTION__ << ']' << " missing fragment shader in Material: " << GetName() << '\n';
         *this = backup;
+        backup.program = 0;
         throw exception();
     }
     if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
         fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
         cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch in Material: " << GetName() << '\n';
         *this = backup;
+        backup.program = 0;
         throw exception();
     }
 
@@ -75,6 +78,7 @@ void Material::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Material: " << GetName() << '\n';
         glDeleteProgram(program);
         *this = backup;
+        backup.program = 0;
         throw exception();
     }
     if (status == GL_FALSE) {
@@ -87,6 +91,7 @@ void Material::Apply() {
         cerr << msg << '\n';
         glDeleteProgram(program);
         *this = backup;
+        backup.program = 0;
         throw exception();
     }
 
@@ -106,12 +111,12 @@ void Material::Apply() {
     mat3ArrayMap = amaterial->GetMat3ArrayMap();
     mat4Map = amaterial->GetMat4Map();
     mat4ArrayMap = amaterial->GetMat4ArrayMap();
+    samplerMap.clear();
     for (auto &p : amaterial->GetSamplerMap()) {
         samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
     }
     ApplyUniforms();
 
-    glDeleteProgram(backup.program);
     cerr << '[' << __FUNCTION__ << ']' << " created Material: " << GetName() << '\n';
 }
 

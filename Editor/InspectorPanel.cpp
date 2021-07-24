@@ -196,8 +196,9 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     GetVisualize<Entity *, false>() = [](void *p) {
         ImGui::Button("const pointer");
     };
-    GetVisualize<shared_ptr<Resource>, true>() = [](void *p) {
-        ImGui::Button("shared pointer");
+    GetVisualize<shared_ptr<Resource>, true>() = [this](void *p) {
+        pair<Type *, void *> &v = *(pair<Type *, void *> *)p;
+        ShowIcon(v.first);
     };
     GetVisualize<shared_ptr<Resource>, false>() = [](void *p) {
         ImGui::Button("const shared pointer");
@@ -330,5 +331,19 @@ void InspectorPanel::ShowContents() {
         ImGui::Text(asset->GetName().c_str());
         ImGui::Separator();
         type->Visualize(entity);
+        
+        // show Resource
+        if (asset->IsResourced()) {
+            ImGui::Separator();
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 95.0f);
+            if (ImGui::Button("Apply", ImVec2(80.0f, 0.0f))) {
+                asset->Apply();
+            }
+            shared_ptr<Resource> resource = asset->GetResource();
+            type = resource->GetType();
+            if (ImGui::CollapsingHeader(type->GetName().c_str())) {
+                type->Visualize(resource.get());
+            }
+        }
     }
 }

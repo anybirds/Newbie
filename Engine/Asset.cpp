@@ -7,7 +7,9 @@ using namespace std;
 
 void Asset::Apply() {
     if (shared_ptr<Resource> sp = resource.lock()) {
-        sp->Apply();
+        try {
+            sp->Apply();
+        } catch (...) {}
     }
 }
 

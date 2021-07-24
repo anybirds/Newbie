@@ -4,7 +4,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-Type::Type(const string &name) : name(name) {
+Type::Type(const string &name) : name(name), base(nullptr) {
     GetAllTypes().insert({name, this});
 }
 

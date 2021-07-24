@@ -4,7 +4,7 @@ using namespace std;
 using namespace glm;
 
 void SampleScript::Start() {
-
+    
 }
 
 void SampleScript::Update() {

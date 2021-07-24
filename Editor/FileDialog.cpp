@@ -78,7 +78,7 @@ void FileDialog::ShowContents() {
     ImGui::EndChild();
 
     ImGui::Separator();
-    ImGui::Indent(ImGui::GetWindowWidth() - 95.0f);
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 95.0f);
     if (ImGui::Button("Select", ImVec2(80.0f, 0.0f))) {
         if (GetLocalSelected() && (folder || filesystem::is_regular_file(filesystem::u8path(arg)))) {
             callback(arg);

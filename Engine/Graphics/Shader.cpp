@@ -41,6 +41,7 @@ void Shader::Apply() {
     if (!id) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create new Shader" << '\n';
         *this = backup;
+        backup.id = 0;
         throw exception();
     }
 
@@ -57,6 +58,7 @@ void Shader::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " failed to find Shader: " << GetPath() << '\n';
         glDeleteShader(id);
         *this = backup;
+        backup.id = 0;
         throw exception();
     }
 
@@ -73,6 +75,7 @@ void Shader::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create Shader: " << GetName() << '\n';
         glDeleteShader(id);
         *this = backup;
+        backup.id = 0;
         throw exception();
     }
     if (status == GL_FALSE) {
@@ -85,8 +88,9 @@ void Shader::Apply() {
         cerr << msg << '\n';
         glDeleteShader(id);
         *this = backup;
+        backup.id = 0;
         throw exception();
     }
-    glDeleteShader(backup.id);
+    
     cerr << '[' << __FUNCTION__ << ']' << " created Shader: " << GetName() << '\n';
 }

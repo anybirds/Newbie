@@ -101,7 +101,7 @@ bool Project::Load(const string &path) {
         // read assets
         json &assets = js["assets"];
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
-            const Type *type = Type::GetType(i.key());
+            Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 Entity *entity = type->Instantiate();
                 this->assets.insert({stoull(j.key()), dynamic_cast<Asset *>(entity)});
@@ -109,7 +109,7 @@ bool Project::Load(const string &path) {
         }
         
         for (json::iterator i = assets.begin(); i != assets.end(); i++) {
-            const Type *type = Type::GetType(i.key());
+            Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 type->Deserialize(j.value(), this->assets.at(stoull(j.key())));
             }

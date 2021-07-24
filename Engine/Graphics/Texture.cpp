@@ -64,29 +64,33 @@ void Texture::Apply() {
         } else {
             absolute = GetPath();
         }
-        image = stbi_load(absolute.c_str(), &width, &height, &channel, 0);
+
+        image = stbi_load(absolute.c_str(), &width, &height, &channel, 0);  
         if (!image) {
             cerr << '[' << __FUNCTION__ << ']' << " cannot load image file: " << atexture->GetPath() << '\n';
             *this = backup;
+            backup.id = 0;
             throw exception();
         }
 
         GLenum format;
         switch (channel) {
         case 3:
-            format = GL_RGB;
+            format = RGB;
             break;
         case 4:
-            format = GL_RGBA;
+            format = RGBA;
             break;
         default:
-            format = GL_RGB;
+            format = RGB;
             break;
         }
 
-        atexture->SetWidth(width);
-        atexture->SetHeight(height);
-        atexture->SetFormat(format);
+        this->width = width;
+        this->height = height;
+        this->internalFormat = format;
+        this->format = format;
+        this->dataType = UNSIGNED_BYTE;
     }
 
     glGenTextures(1, &id);
@@ -106,9 +110,9 @@ void Texture::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " cannot create Texture: " << GetName() << '\n';
         glDeleteTextures(1, &id);
         *this = backup;
+        backup.id = 0;
         throw exception();
     }
 
-    glDeleteTextures(1, &backup.id);
     cerr << '[' << __FUNCTION__ << ']' << " created Texture: " << GetName() << '\n';
 }

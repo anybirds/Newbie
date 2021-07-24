@@ -24,7 +24,9 @@ Model::Model(AModel *amodel) : Resource(amodel), importer(nullptr) {
 }
 
 Model::~Model() {
-    delete importer;
+    if (importer) {
+        delete importer;
+    }
 }
 
 void Model::Apply() {
@@ -49,11 +51,9 @@ void Model::Apply() {
         cerr << '[' << __FUNCTION__ << ']' << " cannot open file: " << GetPath() << '\n';
         if (scene) { delete scene; }
         *this = backup;
+        backup.importer = nullptr;
         throw exception();
     }
 
-    if (backup.importer) {
-        delete backup.importer;
-    }
     cerr << '[' << __FUNCTION__ << ']' << " created Model: " << GetName() << '\n';
 }
