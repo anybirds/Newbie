@@ -21,6 +21,7 @@ protected:
 
 public:
     void Apply();
+    bool IsRemoved();
     bool IsResourced() { return !resource.expired(); }
     virtual std::shared_ptr<Resource> GetResource() = 0;
     

@@ -35,21 +35,31 @@ public:
 
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
     T *GetComponent() const {
+        return (T *)GetComponent(T::StaticType());
+    }
+    Component *GetComponent(Type *type) const {
         for (Component *component : components) {
-            T *t = dynamic_cast<T *>(component);
-            if (t) { return t; }
+            if (Type::IsBaseOf(type, component->GetType())) { return component; }
         }
         return nullptr;
     }
+
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
     std::vector<T *> GetComponents() const {
         std::vector<T *> ret;
         for (Component *component : components) {
-            T *t = dynamic_cast<T *>(component);
-            if (t) { ret.push_back(t); }
+            if (Type::IsBaseOf(T::StaticType(), component->GetType())) { ret.push_back((T *)component); }
         }
         return ret;
     }
+    std::vector<Component *> GetComponents(Type *type) const {
+        std::vector<Component *> ret;
+        for (Component *component : components) {
+            if (Type::IsBaseOf(type, component->GetType())) { ret.push_back(component); }
+        }
+        return ret;
+    }
+
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
     T *AddComponent() {
         T *t = new T();
@@ -57,6 +67,7 @@ public:
         components.push_back(t);
         return t;
     }
+
     template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
     T *AddComponent() {
         // prohibit adding multiple transforms
@@ -68,6 +79,34 @@ public:
         components.push_back(t);
         transform = t;
         return t;
+    }
+
+    template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
+    std::vector<T *> FindComponents() const {
+        std::vector<T *> ret;
+        std::function<void(const GameObject *)> find = [&, this](const GameObject *gameObject) {
+            for (Transform *t : gameObject->GetTransform()->GetChildren()) {
+                find(t->GetGameObject());
+            }
+            for (Component *component : gameObject->GetAllComponents()) {
+                if (Type::IsBaseOf(T::StaticType(), component->GetType())) { ret.push_back((T *)component); }
+            }
+        };
+        find(this);
+        return ret;
+    }
+    std::vector<Component *> FindComponents(Type *type) const {
+        std::vector<Component *> ret;
+        std::function<void(const GameObject *)> find = [&, this](const GameObject *gameObject) {
+            for (Transform *t : gameObject->GetTransform()->GetChildren()) {
+                find(t->GetGameObject());
+            }
+            for (Component *component : gameObject->GetAllComponents()) {
+                if (Type::IsBaseOf(type, component->GetType())) { ret.push_back(component); }
+            }
+        };
+        find(this);
+        return ret;
     }
 
     GameObject *AddGameObject();

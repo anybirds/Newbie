@@ -1,4 +1,3 @@
-#include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -17,7 +16,7 @@ using namespace glm;
 void Drawer::Draw(Renderer *renderer, std::shared_ptr<Material> material) {
     material = material ? material : this->material;
     if (!(mesh && material)) {
-        throw exception();
+        return;
     }
 
     glBindVertexArray(mesh->GetVertexArray());
@@ -75,8 +74,8 @@ void Drawer::OnUntrack() {
     auto j = i->second.find(make_pair(mesh.get(), material.get()));
     j->second->RemoveDrawer(this);
     if (j->second->drawers.empty()) {
-        i->second.erase(j);
         delete j->second;
+        i->second.erase(j);
         if (i->second.empty()) {
             scene.batches.erase(i);
         }
@@ -95,13 +94,14 @@ void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
         if (j != i->second.end()) {
             j->second->RemoveDrawer(this);
             if (j->second->drawers.empty()) {
-                i->second.erase(j);
                 delete j->second;
-                if (i->second.empty()) {
-                    scene.batches.erase(i);
-                }
+                i->second.erase(j);
             }
-            i->second[make_pair(mesh.get(), material.get())]->AddDrawer(this);
+            Batch *&batch = i->second[make_pair(mesh.get(), material.get())];
+            if (!batch) {
+                batch = new Batch(mesh.get(), material.get());
+            }
+            batch->AddDrawer(this);
         }
     }
     this->mesh = mesh;
@@ -111,21 +111,28 @@ void Drawer::SetMaterial(const shared_ptr<Material> &material) {
     if (material == this->material) {
         return;
     }
-    
+
+    unsigned prevOrder = this->material ? this->material->GetOrder() : 0;
+    unsigned nextOrder = material ? material->GetOrder() : 0;
+
     Scene &scene = Scene::GetInstance();
-    auto i = scene.batches.find(this->material->GetOrder());
+    auto i = scene.batches.find(prevOrder);
     if (i != scene.batches.end()) {
         auto j = i->second.find(make_pair(mesh.get(), this->material.get()));
         if (j != i->second.end()) {
             j->second->RemoveDrawer(this);
             if (j->second->drawers.empty()) {
-                i->second.erase(j);
                 delete j->second;
+                i->second.erase(j);
                 if (i->second.empty()) {
                     scene.batches.erase(i);
                 }
             }
-            scene.batches[material->GetOrder()][make_pair(mesh.get(), material.get())]->AddDrawer(this);
+            Batch *&batch = scene.batches[nextOrder][make_pair(mesh.get(), material.get())];
+            if (!batch) {
+                batch = new Batch(mesh.get(), material.get());
+            }
+            batch->AddDrawer(this);
         }
     }
     this->material = material;

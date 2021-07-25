@@ -25,6 +25,7 @@ CLASS_RESOURCE_ATTR(Shader, Resource, ENGINE_EXPORT) {
     PROPERTY_GET(GLuint, id, Id);
 
 public:
+    using asset_type = AShader;
     enum { VERTEX = GL_VERTEX_SHADER, FRAGMENT = GL_FRAGMENT_SHADER };
 
     Shader(AShader *ashader);

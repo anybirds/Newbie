@@ -36,7 +36,7 @@ add_custom_command(
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_library(User SHARED ${USER_SOURCE} generated.cpp)
+add_library(User SHARED ${USER_HEADER} ${USER_SOURCE} generated.cpp)
 
 target_compile_definitions(User PRIVATE USER_LIBRARY)
 target_link_libraries(User PRIVATE Engine)

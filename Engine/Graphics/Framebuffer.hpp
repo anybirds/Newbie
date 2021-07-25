@@ -39,6 +39,7 @@ public:
     static void Blit(const std::shared_ptr<Framebuffer> &src, const std::shared_ptr<Framebuffer> &dest, unsigned mask = GL_COLOR_BUFFER_BIT, unsigned filter = GL_NEAREST);
     
 public:
+    using asset_type = AFramebuffer;
     enum {
         COLOR = GL_COLOR_BUFFER_BIT,
         DEPTH = GL_DEPTH_BUFFER_BIT,

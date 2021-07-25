@@ -72,12 +72,19 @@ private:
 
 public:
     static Type *GetType(const std::string &name) {
-        auto &types = GetAllTypes();
+        auto &types = GetAllTypes(); 
         auto it = types.find(name);
         if (it == types.end()) {
             return nullptr;
         }
         return it->second;
+    }
+    static bool IsBaseOf(Type *base, Type *derived) {
+        while (derived) {
+            if (derived == base) { return true; }
+            derived = derived->GetBase();
+        }
+        return false;
     }
 
 private:

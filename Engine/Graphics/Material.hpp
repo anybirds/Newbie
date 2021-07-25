@@ -91,6 +91,8 @@ CLASS_RESOURCE_ATTR(Material, Resource, ENGINE_EXPORT) {
     PROPERTY_GET(GLuint, program, Program);
 
 public:
+    using asset_type = AMaterial;
+    
     Material(AMaterial *amaterial);
     virtual ~Material();
     

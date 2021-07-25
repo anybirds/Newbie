@@ -34,8 +34,9 @@ Material::~Material() {
 void Material::Apply() {
     Material backup(*this);
 
-    Resource::Apply();
     AMaterial *amaterial = (AMaterial *)asset;
+    vertexShader.reset();
+    fragmentShader.reset();
     if (amaterial->GetVertexShader()) {
         vertexShader = dynamic_pointer_cast<Shader>(amaterial->GetVertexShader()->GetResource());
     }
@@ -113,7 +114,9 @@ void Material::Apply() {
     mat4ArrayMap = amaterial->GetMat4ArrayMap();
     samplerMap.clear();
     for (auto &p : amaterial->GetSamplerMap()) {
-        samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
+        if (p.second) {
+            samplerMap.insert({p.first, dynamic_pointer_cast<Texture>(p.second->GetResource())});
+        }
     }
     ApplyUniforms();
 
@@ -213,10 +216,12 @@ void Material::ApplyUniforms() {
     }
     GLint i = 0;
     for (auto &p : samplerMap) {
-        location = glGetUniformLocation(program, p.first.c_str());
-        glUniform1i(location, i);
-        glActiveTexture(GL_TEXTURE0 + i++);
-        glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+        if (p.second) {
+            location = glGetUniformLocation(program, p.first.c_str());
+            glUniform1i(location, i);
+            glActiveTexture(GL_TEXTURE0 + i++);
+            glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+        }
     }
 
     glUseProgram(0);
@@ -226,10 +231,12 @@ void Material::UseProgramAndTextures() {
     glUseProgram(program);
     GLint i = 0;
     for (auto &p : samplerMap) {
-        GLuint location = glGetUniformLocation(program, p.first.c_str());
-        glUniform1i(location, i);
-        glActiveTexture(GL_TEXTURE0 + i++);
-        glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+        if (p.second) {
+            GLuint location = glGetUniformLocation(program, p.first.c_str());
+            glUniform1i(location, i);
+            glActiveTexture(GL_TEXTURE0 + i++);
+            glBindTexture(GL_TEXTURE_2D, p.second->GetId());
+        }
     }
 }
 

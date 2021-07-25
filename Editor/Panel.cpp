@@ -21,8 +21,8 @@ void Panel::Show() {
     ImGui::End();
 }
 
-void Panel::ShowIcon(Type *type) {
-    static unordered_map<Type *, char *> iconMap {
+const char *Panel::GetIconCharacter(Type *type) { 
+    static unordered_map<Type *, const char *> iconMap {
         { Entity::StaticType(), ICON_FA_SQUARE },
         { Component::StaticType(), ICON_FA_BOX },
         { Asset::StaticType(), ICON_FA_BOX_OPEN },
@@ -53,10 +53,16 @@ void Panel::ShowIcon(Type *type) {
     while (type) {
         auto it = iconMap.find(type);
         if (it != iconMap.end()) {
-            ImGui::Text(it->second);
-            if (ImGui::IsItemHovered()) ImGui::SetTooltip(type->GetName().c_str());
-            break;
+            return it->second;
         }
         type = type->GetBase();
     }
+
+    // not reached 
+    return nullptr;
+}
+void Panel::ShowIcon(Type *type) {
+    const char *icon = GetIconCharacter(type);
+    ImGui::Text(icon);
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip(type->GetName().c_str());
 }

@@ -38,9 +38,10 @@ Framebuffer::~Framebuffer() {
 void Framebuffer::Apply() {
     Framebuffer backup(*this);
 
-    Resource::Apply();
     AFramebuffer *aframebuffer = (AFramebuffer *)asset;
     useDepthRenderTexture = aframebuffer->GetUseDepthRenderTexture();
+    colorTexture.reset();
+    depthTexture.reset();
     if (aframebuffer->GetColorTexture()) {
         colorTexture = dynamic_pointer_cast<Texture>(aframebuffer->GetColorTexture()->GetResource());
     }

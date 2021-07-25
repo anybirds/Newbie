@@ -20,6 +20,7 @@ public:
     virtual void Show() override;
     virtual void ShowContents() = 0;
     virtual void Update() {}
-
+    
+    const char *GetIconCharacter(Type *type);
     void ShowIcon(Type *type);
 };

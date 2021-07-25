@@ -96,9 +96,9 @@ Mesh::~Mesh() {
 void Mesh::Apply() {
     Mesh backup(*this);
 
-    Resource::Apply();
     AMesh *amesh = (AMesh *)asset;
     index = amesh->GetIndex();
+    model.reset();
     if (amesh->GetModel()) {
         model = dynamic_pointer_cast<Model>(amesh->GetModel()->GetResource());    
     }

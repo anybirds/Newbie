@@ -27,9 +27,11 @@ void AssetPanel::ShowContents() {
             ShowRenamingItem(name);
             asset->SetName(name);
         } else {
-            if (ImGui::Selectable((asset->GetName() + "##" + to_string((uintptr_t)asset)).c_str(), GetSelected() == (void *)asset)) {
+            ImGui::PushID(asset);
+            if (ImGui::Selectable(asset->GetName().c_str(), GetSelected() == (void *)asset)) {
                 GetSelected() = (Entity *)asset;
             }
+            ImGui::PopID();
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                 static Asset *source;
                 source = asset;

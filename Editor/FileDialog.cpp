@@ -25,9 +25,11 @@ void FileDialog::ShowContents() {
             ImGui::SameLine();
         }
         ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
-        if (ImGui::SmallButton((it->first + "##" + to_string(index)).c_str())) {
+        ImGui::PushID((const void *)index);
+        if (ImGui::SmallButton(it->first.c_str())) {
             temp = it->second.u8string();
         }
+        ImGui::PopID();
         ImGui::PopStyleColor();
         index++;
     }
@@ -43,13 +45,15 @@ void FileDialog::ShowContents() {
                 if (filesystem::is_directory(p.path())) {
                     ImGui::Text(ICON_FA_FOLDER);
                     ImGui::SameLine();
-                    if (ImGui::Selectable((name + "##" + to_string(index)).c_str(), GetLocalSelected() == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
+                    ImGui::PushID((const void *)index);
+                    if (ImGui::Selectable(name.c_str(), GetLocalSelected() == (void *)index, ImGuiSelectableFlags_AllowDoubleClick)) {
                         if (ImGui::IsMouseDoubleClicked(0)) {
                             temp = p.path().u8string();
                         }
                         GetLocalSelected() = (void *)index;
                         arg = p.path().u8string();
                     }
+                    ImGui::PopID();
                 }
             } else {
                 if (filesystem::is_directory(p.path())) {

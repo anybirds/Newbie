@@ -54,9 +54,11 @@ void SceneDialog::ShowContents() {
     const string *deleted = nullptr;
     ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
     for (const string &path : project.GetAllScenes()) {
-        if (ImGui::Button((string(ICON_FA_TIMES"##") + to_string((uintptr_t)&path)).c_str())) {
+        ImGui::PushID(&path);
+        if (ImGui::Button(ICON_FA_TIMES)) {
             deleted = &path;
         }
+        ImGui::PopID();
         ImGui::SameLine();
         if (ImGui::Selectable(path.c_str(), GetLocalSelected() == (void *)&path, ImGuiSelectableFlags_AllowDoubleClick)) {
             if (ImGui::IsMouseDoubleClicked(0)) {

@@ -28,7 +28,6 @@ Prefab::Prefab(APrefab *aprefab) : Resource(aprefab) {
 void Prefab::Apply() {
     Prefab backup(*this);
 
-    Resource::Apply();
     APrefab *aprefab = (APrefab *)asset;
     path = aprefab->GetPath();
 

@@ -36,6 +36,7 @@ private:
     bool GenerateBuffers(const std::vector<float> &vert, const std::vector<unsigned> &attrib, const std::vector<unsigned> &idx);
 
 public:
+    using asset_type = AMesh;
     enum {
         POSITION,
         NORMAL,

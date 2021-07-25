@@ -41,6 +41,7 @@ CLASS_RESOURCE_ATTR(Texture, Resource, ENGINE_EXPORT) {
     PROPERTY_GET(GLuint, id, Id);
 
 public:
+    using asset_type = ATexture;
     enum { 
         NEAREST = GL_NEAREST, LINEAR = GL_LINEAR, 
         CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE, CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER, 

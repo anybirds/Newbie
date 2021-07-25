@@ -18,13 +18,14 @@ public:
 
 CLASS_RESOURCE_ATTR(Model, Resource, ENGINE_EXPORT) {
     TYPE(Model);
-    
+
     PROPERTY_GET(std::string, path, Path);
 
 private:
     Assimp::Importer *importer;
 
 public:
+    using asset_type = AModel;
     Model(AModel *amodel);
     virtual ~Model();
 

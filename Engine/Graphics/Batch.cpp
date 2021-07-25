@@ -28,7 +28,7 @@ void Batch::RemoveDrawer(Drawer *drawer) {
 void Batch::Draw(Renderer *renderer, Material *material) {
     material = material ? material : this->material;
     if (!(mesh && material)) {
-        throw exception();
+        return;
     }
 
     // resize transform buffer

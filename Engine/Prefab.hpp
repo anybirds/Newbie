@@ -23,6 +23,7 @@ CLASS_RESOURCE_ATTR(Prefab, Resource, ENGINE_EXPORT) {
     nlohmann::json js;
 
 public:
+    using asset_type = APrefab;
     Prefab(APrefab *aprefab);
     virtual void Apply() override;
 

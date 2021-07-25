@@ -32,7 +32,6 @@ Model::~Model() {
 void Model::Apply() {
     Model backup(*this);
 
-    Resource::Apply();
     AModel *amodel = (AModel *)asset;
     path = amodel->GetPath();
     

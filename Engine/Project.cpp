@@ -104,7 +104,7 @@ bool Project::Load(const string &path) {
             Type *type = Type::GetType(i.key());
             for (json::iterator j = i.value().begin(); j != i.value().end(); j++) {
                 Entity *entity = type->Instantiate();
-                this->assets.insert({stoull(j.key()), dynamic_cast<Asset *>(entity)});
+                this->assets.insert({stoull(j.key()), (Asset *)entity});
             }
         }
         

@@ -32,7 +32,6 @@ Shader::~Shader() {
 void Shader::Apply() {
     Shader backup(*this);
 
-    Resource::Apply();
     AShader *ashader = (AShader *)asset;
     path = ashader->GetPath();
     shaderType = ashader->GetShaderType();

@@ -107,7 +107,7 @@ void visualize(void *p) {
 template <typename T, bool E, std::enable_if_t<is_specialization<T, std::shared_ptr>::value, bool>>
 void visualize(void *p) {
     using P = typename std::remove_cv_t<T>::element_type;
-    std::pair<Type *, void *> arg{P::StaticType(), p};
+    std::pair<Type *, void *> arg{P::asset_type::StaticType(), p};
     GetVisualize<std::shared_ptr<Resource>, E>()(&arg);
 }
 

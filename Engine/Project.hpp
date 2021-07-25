@@ -75,15 +75,32 @@ public:
     void RemoveScene(const std::string &path) { scenes.erase(path); }
 
     const std::unordered_map<uint64_t, Asset *> &GetAllAssets() const { return assets; }
-    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
-    T *GetAsset(uint64_t serial) const {
+
+    Asset *GetAsset(uint64_t serial) const {
         auto it = assets.find(serial);
         if (it != assets.end()) {
-            return dynamic_cast<T *>(it->second);
+            return it->second;
         } else {
             return nullptr;
         }
     }
+
+    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
+    std::vector<T *> GetAssets() const {
+        std::vector<T *> ret;
+        for (auto &p : GetAllAssets()) {
+            if (Type::IsBaseOf(T::StaticType(), p.second->GetType())) { ret.push_back((T *)p.second); }
+        }
+        return ret;
+    }
+    std::vector<Asset *> GetAssets(Type *type) const {
+        std::vector<Asset *> ret;
+        for (auto &p : GetAllAssets()) {
+            if (Type::IsBaseOf(type, p.second->GetType())) { ret.push_back(p.second); }
+        }
+        return ret;
+    }
+
     template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
     T *AddAsset() {
         T *asset = new T();
@@ -91,6 +108,7 @@ public:
         assets.insert({asset->serial, asset});
         return asset;
     }
+
     void RemoveAsset(Asset *asset) { assets.erase(asset->GetSerial()); }
     void DestroyAsset(Asset *asset) { assets.erase(asset->GetSerial()); delete asset; }
 

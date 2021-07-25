@@ -24,7 +24,9 @@ void HierarchyPanel::ShowContents() {
     function<void(GameObject *)> recurse = [&](GameObject *gameObject) {
         Transform *transform = gameObject->GetTransform();
 
-        ImGui::InvisibleButton(("##Space" + to_string((uintptr_t)gameObject)).c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 3.0f));
+        ImGui::PushID(gameObject);
+        ImGui::InvisibleButton("##", ImVec2(ImGui::GetContentRegionAvailWidth(), 3.0f));
+        ImGui::PopID();
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset")) {
                 IM_ASSERT(payload->DataSize == sizeof(Asset *));
@@ -45,7 +47,7 @@ void HierarchyPanel::ShowContents() {
         if (transform->GetChildren().empty()) {
             flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
-        bool open = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, "");
+        bool open = ImGui::TreeNodeEx((const void*)gameObject, flags, "");
         ImGui::SameLine();
         ShowIcon(GameObject::StaticType());
         ImGui::SameLine();
@@ -54,9 +56,11 @@ void HierarchyPanel::ShowContents() {
             ShowRenamingItem(name);
             gameObject->SetName(name);
         } else {
-            if (ImGui::Selectable((gameObject->GetName() + "##" + to_string((uintptr_t)gameObject)).c_str(), (void *)gameObject == GetSelected())) {
+            ImGui::PushID(gameObject);
+            if (ImGui::Selectable(gameObject->GetName().c_str(), (void *)gameObject == GetSelected())) {
                 GetSelected() = (Entity *)gameObject;
             }
+            ImGui::PopID();
             if (ImGui::IsItemHovered()) {
                 hovered = gameObject;
             }

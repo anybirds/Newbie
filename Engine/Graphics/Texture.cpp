@@ -38,7 +38,6 @@ Texture::~Texture() {
 void Texture::Apply() {
     Texture backup(*this);
 
-    Resource::Apply();
     ATexture *atexture = (ATexture *)asset;
     path = atexture->GetPath();
     width = atexture->GetWidth();
