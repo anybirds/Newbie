@@ -10,7 +10,8 @@ private:
     
 public:
     Script() : Component(), start(true) {}
-
+    virtual ~Script() = 0 {}
+    
     virtual void Start() {}
     virtual void Update() {}
 

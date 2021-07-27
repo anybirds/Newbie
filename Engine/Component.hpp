@@ -23,6 +23,7 @@ private:
 
 public:
     Component() : localEnabled(true), flags(0U), gameObject(nullptr) {}
+    virtual ~Component() = 0 {}
 
     bool IsEnabled() const;
     bool IsRemoved() const { return flags & REMOVED; } 

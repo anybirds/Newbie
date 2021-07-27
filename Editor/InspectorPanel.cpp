@@ -1,10 +1,11 @@
+#include <tsl/htrie_map.h>
+
 #include <Engine.hpp>
 #include <InspectorPanel.hpp>
 #include <AssetPanel.hpp>
 
-#include <iostream>
-
 using namespace std;
+using namespace tsl;
 using namespace glm;
 
 InspectorPanel::InspectorPanel() : Panel("Inspector") {
@@ -517,6 +518,7 @@ void InspectorPanel::ShowContents() {
         return;
     }
 
+    Component *hovered = nullptr;
     Entity *entity = GetSelected();
     if (entity) {
         if (entity->GetType() == GameObject::StaticType()) {
@@ -529,8 +531,68 @@ void InspectorPanel::ShowContents() {
                 Type *type = component->GetType();
                 ShowIcon(type);
                 ImGui::SameLine();
-                ImGui::Text(type->GetName().c_str());
+                ImGui::PushID(component);
+                ImGui::Selectable(type->GetName().c_str());
+                ImGui::PopID();
+                if (ImGui::IsItemHovered()) {
+                    hovered = component;
+                }
                 type->Visualize(component);
+            }
+
+            if (ImGui::BeginPopupContextWindow())
+            {
+                static Component *component;
+                if (!menu) {
+                    component = hovered;
+                }
+                if (ImGui::MenuItem("Cut", nullptr, nullptr, component && component->GetType() != Transform::StaticType())) {
+                    copyedType = component->GetType();
+                    copyedType->Serialize(copyed, component);
+                    component->Remove();
+                }
+                if (ImGui::MenuItem("Copy", nullptr, nullptr, component && component->GetType() != Transform::StaticType())) {
+                    copyedType = component->GetType();
+                    copyedType->Serialize(copyed, component);
+                }
+                if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
+                    gameObject->AddComponent(copyedType, copyed);
+                }
+                ImGui::Separator();
+                if (ImGui::BeginMenu("Add Component")) {
+                    // prefix-search asset types
+                    ImGui::Text(ICON_FA_SEARCH);
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth(-FLT_MIN);
+                    ImGui::InputText("##Search", &searchAdd);
+                    ImGui::PopItemWidth();
+                    ImGui::Separator();
+
+                    htrie_map<char, Type *> trie;
+                    for (auto &p : Type::GetAllTypes()) {
+                        Type *type = p.second;
+                        if (!type->IsAbstract() && type != Transform::StaticType() && Type::IsBaseOf(Component::StaticType(), type)) {
+                            trie.insert(type->GetName(), type);   
+                        }
+                    }
+                    auto range = trie.equal_prefix_range(searchAdd);
+                    
+                    for (auto it = range.first; it != range.second; it++) {
+                        Type *type = *it;
+                        if (ImGui::MenuItem((GetIconCharacter(type) + type->GetName()).c_str())) {
+                            gameObject->AddComponent(type);
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::MenuItem("Remove", nullptr, nullptr, component && component->GetType() != Transform::StaticType())) {
+                    component->Remove();
+                }
+                
+                menu = true;
+                ImGui::EndPopup();
+            } else {
+                menu = false;
             }
         } else if (Type::IsBaseOf(Asset::StaticType(), entity->GetType())) {
             Asset *asset = (Asset *)entity;

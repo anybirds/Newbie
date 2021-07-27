@@ -10,7 +10,7 @@
 using namespace std;
 using namespace glm;
 
-AMaterial::AMaterial() : vertexShader(nullptr), fragmentShader(nullptr) {}
+AMaterial::AMaterial() : order(0), vertexShader(nullptr), fragmentShader(nullptr) {}
 
 shared_ptr<Resource> AMaterial::GetResource() {
     shared_ptr<Resource> sp;
@@ -63,9 +63,7 @@ void Material::Apply() {
         throw exception();
     }
 
-    if (order != amaterial->GetOrder()) {
-        SetOrder(amaterial->GetOrder());
-    } 
+    SetOrder(amaterial->GetOrder());
 
     // attach shaders and link
     program = glCreateProgram();
@@ -124,6 +122,10 @@ void Material::Apply() {
 }
 
 void Material::SetOrder(unsigned order) {
+    if (this->order == order) {
+        return;
+    }
+
     // batch reordering
     Scene &scene = Scene::GetInstance();
     auto it = scene.batches.find(this->order);

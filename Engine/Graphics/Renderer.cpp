@@ -22,16 +22,20 @@ const mat4 &Renderer::GetNormalization() const {
 }
 
 void Renderer::SetOrder(unsigned order) {
+    if (this->order == order) {
+        return;
+    }
+
     Scene &scene = Scene::GetInstance();
     auto it = scene.renderers.find(this->order);
     if (it != scene.renderers.end()) {
         auto &rendset = it->second;
         if (rendset.find(this) != rendset.end()) {
             rendset.erase(this);
-            this->order = order;
-            rendset.insert(this);
         }
     }
+    scene.renderers[order].insert(this);
+    this->order = order;
 }
 
 void Renderer::OnTrack() {

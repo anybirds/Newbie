@@ -23,7 +23,7 @@ public:
 
 public:
     GameObject() : transform(nullptr) {}
-    
+
     const std::vector<Component *> &GetAllComponents() const { return components; }
     bool IsLocalEnabled() const { return transform->IsLocalEnabled(); }
     bool IsEnabled() const { return transform->IsEnabled(); }
@@ -35,9 +35,15 @@ public:
 
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
     T *GetComponent() const {
-        return (T *)GetComponent(T::StaticType());
+        for (Component *component : components) {
+            if (Type::IsBaseOf(T::StaticType(), component->GetType())) { return (T *)component; }
+        }
+        return nullptr;
     }
     Component *GetComponent(Type *type) const {
+        if (!Type::IsBaseOf(Component::StaticType(), type)) {
+            return nullptr;
+        }
         for (Component *component : components) {
             if (Type::IsBaseOf(type, component->GetType())) { return component; }
         }
@@ -54,20 +60,22 @@ public:
     }
     std::vector<Component *> GetComponents(Type *type) const {
         std::vector<Component *> ret;
+        if (!Type::IsBaseOf(Component::StaticType(), type)) {
+            return ret;
+        }
         for (Component *component : components) {
             if (Type::IsBaseOf(type, component->GetType())) { ret.push_back(component); }
         }
         return ret;
     }
 
-    template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_same_v<Transform, T>, bool> = true> 
+    template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_abstract_v<T> && !std::is_same_v<Transform, T>, bool> = true> 
     T *AddComponent() {
         T *t = new T();
         t->gameObject = this;
         components.push_back(t);
         return t;
     }
-
     template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
     T *AddComponent() {
         // prohibit adding multiple transforms
@@ -79,6 +87,95 @@ public:
         components.push_back(t);
         transform = t;
         return t;
+    }
+    Component *AddComponent(Type *type) {
+        if (!Type::IsBaseOf(Component::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        if (Transform::StaticType() == type) {
+            return AddComponent<Transform>();
+        } else {
+            Component *component = (Component *)type->Instantiate();
+            component->gameObject = this;
+            components.push_back(component);
+            return component;
+        }
+    }
+    template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_abstract_v<T> && !std::is_same_v<Transform, T>, bool> = true> 
+    T *AddComponent(T *component) {
+        nlohmann::json js;
+        T::Serialize(js, component);
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->gameObject = this;
+        components.push_back(t);
+        return t;
+    }
+    template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
+    T *AddComponent(T *component) {
+        // prohibit adding multiple transforms
+        if (transform) {
+            return transform;
+        }
+        nlohmann::json js;
+        T::Serialize(js, component);
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->gameObject = this;
+        components.push_back(t);
+        transform = t;
+        return t;
+    }
+    Component *AddComponent(Type *type, Component *component) {
+        if (!Type::IsBaseOf(Component::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        if (Transform::StaticType() == type) {
+            return AddComponent<Transform>((Transform *)component);
+        } else {
+            nlohmann::json js;
+            type->Serialize(js, component);
+            Component *ret = (Component *)type->Instantiate();
+            type->Deserialize(js, ret);
+            ret->gameObject = this;
+            components.push_back(ret);
+            return ret;
+        }
+    }
+    template <class T, std::enable_if_t<std::is_base_of_v<Component, T> && !std::is_abstract_v<T> && !std::is_same_v<Transform, T>, bool> = true> 
+    T *AddComponent(const nlohmann::json &js) {
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->gameObject = this;
+        components.push_back(t);
+        return t;
+    }
+    template <class T, std::enable_if_t<std::is_same_v<Transform, T>, bool> = true> 
+    T *AddComponent(const nlohmann::json &js) {
+        // prohibit adding multiple transforms
+        if (transform) {
+            return transform;
+        }
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->gameObject = this;
+        components.push_back(t);
+        transform = t;
+        return t;
+    }
+    Component *AddComponent(Type *type, const nlohmann::json &js) {
+        if (!Type::IsBaseOf(Component::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        if (Transform::StaticType() == type) {
+            return AddComponent<Transform>(js);
+        } else {
+            Component *component = (Component *)type->Instantiate();
+            type->Deserialize(js, component);
+            component->gameObject = this;
+            components.push_back(component);
+            return component;
+        }
     }
 
     template <class T, std::enable_if_t<std::is_base_of_v<Component, T>, bool> = true>
@@ -97,6 +194,9 @@ public:
     }
     std::vector<Component *> FindComponents(Type *type) const {
         std::vector<Component *> ret;
+        if (!Type::IsBaseOf(Component::StaticType(), type)) {
+            return ret;
+        }
         std::function<void(const GameObject *)> find = [&, this](const GameObject *gameObject) {
             for (Transform *t : gameObject->GetTransform()->GetChildren()) {
                 find(t->GetGameObject());

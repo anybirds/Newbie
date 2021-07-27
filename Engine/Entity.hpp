@@ -16,5 +16,5 @@ public:
     static void SetNullify(bool nullify) { GetNullify() = nullify; }
 
 public:
-    virtual ~Entity() {}
+    virtual ~Entity() = 0 {}
 };

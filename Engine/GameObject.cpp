@@ -25,12 +25,12 @@ void GameObject::ToJson(json &js, const GameObject *gameObject) {
         for (Component *component : gameObject->components) {
             Type *type = component->GetType();
                 type->Serialize(
-                    entities[type->GetName()][to_string(reinterpret_cast<uint64_t>(component))],
+                    entities[type->GetName()][to_string((uintptr_t)component)],
                     component); 
         }
 
         GameObject::StaticType()->Serialize(
-            entities[GameObject::StaticType()->GetName()][to_string(reinterpret_cast<uint64_t>(gameObject))], 
+            entities[GameObject::StaticType()->GetName()][to_string((uintptr_t)gameObject)], 
             gameObject);
     };
     recurse(gameObject);
@@ -76,18 +76,27 @@ GameObject *GameObject::AddGameObject(GameObject *gameObject) {
     GameObject *child;
     ToJson(js, gameObject);
     FromJson(js, child, false);
-    child->SetParent(this);
+    Transform *t = child->GetTransform();
+    t->parent = transform;
+    transform->children.push_back(t);
+    t->Propagate();
     return child;
 }
 
 GameObject *GameObject::AddGameObject(const std::shared_ptr<Prefab> &prefab) {
-    return AddGameObject(prefab->GetJson());
+    GameObject *child;
+    FromJson(prefab->GetJson(), child);
+    child->SetParent(this);
+    return child;
 }
 
 GameObject *GameObject::AddGameObject(const json &js) {
     GameObject *child;
-    FromJson(js, child);
-    child->SetParent(this);
+    FromJson(js, child, false);
+    Transform *t = child->GetTransform();
+    t->parent = transform;
+    transform->children.push_back(t);
+    t->Propagate();
     return child;
 }
 

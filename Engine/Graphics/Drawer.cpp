@@ -46,14 +46,11 @@ void Drawer::Draw(Renderer *renderer, std::shared_ptr<Material> material) {
 }
 
 void Drawer::OnTrack() {
-    if (!material) {
-        return;
-    }
-
     Scene &scene = Scene::GetInstance();
     Batch *batch;
     auto key = make_pair(mesh.get(), material.get());
-    auto &batchmap = scene.batches[material->GetOrder()];
+    unsigned order = material ? material->GetOrder() : 0;
+    auto &batchmap = scene.batches[order];
     auto it = batchmap.find(key);
     if (it == batchmap.end()) {
         batch = new Batch(key.first, key.second);
@@ -65,12 +62,9 @@ void Drawer::OnTrack() {
 }
 
 void Drawer::OnUntrack() {
-    if (!material) {
-        return;
-    }
-
     Scene &scene = Scene::GetInstance();
-    auto i = scene.batches.find(material->GetOrder());
+    unsigned order = material ? material->GetOrder() : 0;
+    auto i = scene.batches.find(order);
     auto j = i->second.find(make_pair(mesh.get(), material.get()));
     j->second->RemoveDrawer(this);
     if (j->second->drawers.empty()) {
@@ -88,7 +82,8 @@ void Drawer::SetMesh(const shared_ptr<Mesh> &mesh) {
     }
 
     Scene &scene = Scene::GetInstance();
-    auto i = scene.batches.find(material->GetOrder());
+    unsigned order = material ? material->GetOrder() : 0;
+    auto i = scene.batches.find(order);
     if (i != scene.batches.end()) {
         auto j = i->second.find(make_pair(this->mesh.get(), material.get()));
         if (j != i->second.end()) {

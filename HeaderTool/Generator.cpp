@@ -55,6 +55,7 @@ void Generator::Serialize() {
             }
 
             cout << "void " << cs->name << "::Serialize(json &js, const Entity *entity) {\n";
+            cout << "  js.clear();\n";
             
             if (!cs->base.empty()) {
                 cout << "  " << cs->base << "::StaticType()->Serialize(js, entity);\n";
@@ -213,6 +214,7 @@ void Generator::TypeInit() {
                 cout << "  " << name << "::StaticType()->SetDeserialize(" << name << "::Deserialize);\n";
             }
             cout << "  " << name << "::StaticType()->SetVisualize(" << name << "::Visualize);\n";
+            cout << "  " << name << "::StaticType()->SetAbstract(std::is_abstract<" << name << ">::value);\n";
         }
     };
 

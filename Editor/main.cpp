@@ -79,13 +79,13 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        Widget::Update();
         mainMenuBar.Show();
         gamePanel.Show();
         scenePanel.Show();
         assetPanel.Show();
         hierarchyPanel.Show();
         inspectorPanel.Show();
+        Widget::Update();
 
         ImGui::ShowDemoWindow();
 
@@ -99,6 +99,7 @@ int main(int argc, char **argv) {
         window.SwapBuffers();
     }
     
+    assetPanel.Clear();
     hierarchyPanel.Clear();
     Project::GetInstance().Close();
     

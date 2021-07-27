@@ -9,9 +9,7 @@ void Widget::ShowRenamingItem(string &str) {
     ImGui::SetKeyboardFocusHere();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
-    ImGui::PushID(&str);
-    ImGui::InputText("", &str, ImGuiInputTextFlags_AutoSelectAll);
-    ImGui::PopID();
+    ImGui::InputText("##Rename", &str, ImGuiInputTextFlags_AutoSelectAll);
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     IsClickedRenamingItem() = ImGui::IsItemClicked();

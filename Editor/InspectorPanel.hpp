@@ -1,6 +1,10 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <Panel.hpp>
+
+class Type;
 
 class InspectorPanel : public Panel {
 public:
@@ -8,6 +12,11 @@ public:
 
 private:
     InspectorPanel();
+
+    std::string searchAdd;
+    bool menu;
+    Type *copyedType;
+    nlohmann::json copyed;
 
 public:
     InspectorPanel(const InspectorPanel &) = delete;

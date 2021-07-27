@@ -8,6 +8,8 @@
 #include <Entity.hpp>
 #include <Type.hpp>
 
+#include <iostream>
+
 class Resource;
 
 CLASS_ATTR(Asset, Entity, ENGINE_EXPORT) {
@@ -21,6 +23,7 @@ protected:
 
 public:
     void Apply();
+    void Remove();
     bool IsRemoved();
     bool IsResourced() { return !resource.expired(); }
     virtual std::shared_ptr<Resource> GetResource() = 0;
@@ -38,7 +41,7 @@ void to_json(nlohmann::json &js, const T *t) {
 template <typename T, std::enable_if_t<std::is_base_of_v<Entity, T> &&
 !std::is_base_of_v<Asset, T>, bool> = true>
 void to_json(nlohmann::json &js, const T *t) {
-    js = reinterpret_cast<uint64_t>(t);
+    js = (uint64_t)t;
 }
 
 template <typename T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>

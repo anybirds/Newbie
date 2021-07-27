@@ -9,6 +9,7 @@
 #include <ProjectDialog.hpp>
 #include <FileDialog.hpp>
 #include <NewDialog.hpp>
+#include <AssetPanel.hpp>
 #include <HierarchyPanel.hpp>
 #include <MainMenuBar.hpp>
 
@@ -60,6 +61,7 @@ void ProjectDialog::RemoveProject(const string &dir) {
 
 void ProjectDialog::LoadProject(const string &dir) {
     // clear temporary copies
+    AssetPanel::GetInstance().Clear();
     HierarchyPanel::GetInstance().Clear();
 
     Project &project = Project::GetInstance();

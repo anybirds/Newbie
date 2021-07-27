@@ -55,22 +55,18 @@
     static Type *&StaticType() { static Type *type; return type; } \
     static void SetType(Type *type) { StaticType() = type; } \
     virtual Type *GetType() const { return T::StaticType(); } \
-    private: \
     static void Serialize(nlohmann::json &, const Entity *); \
     static size_t Deserialize(const nlohmann::json &, Entity *); \
-    static void Visualize(Entity *); \
-    friend void ::type_init() 
+    static void Visualize(Entity *) \
     
 class Entity;
 
 class ENGINE_EXPORT Type final {
-private:
+public:
     static std::unordered_map<std::string, Type *> &GetAllTypes() {
         static std::unordered_map<std::string, Type *> types;
         return types;
     }
-
-public:
     static Type *GetType(const std::string &name) {
         auto &types = GetAllTypes(); 
         auto it = types.find(name);
@@ -88,6 +84,7 @@ public:
     }
 
 private:
+    bool abstract;
     std::string name;
     Type *base;
     std::function<Entity *()> instantiate;
@@ -95,21 +92,25 @@ private:
     std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
     std::function<void(Entity *)> visualize;
 
-public:
-    Type(const std::string &name);
-    ~Type();
-
-    const std::string &GetName() const { return name; }
-    Type *GetBase() const { return base; }
+    void SetAbstract(bool abstract) { this->abstract = abstract; }
     void SetBase(Type *base) { this->base = base; }
-
     void SetInstantiate(const std::function<Entity *()> &instantiate) { this->instantiate = instantiate; }
     void SetSerialize(const std::function<void(nlohmann::json &, const Entity *)> &serialize) { this->serialize = serialize; }
     void SetDeserialize(const std::function<size_t(const nlohmann::json &, Entity *)> &deserialize) { this->deserialize = deserialize; }
     void SetVisualize(const std::function<void(Entity *)> &visualize) { this->visualize = visualize; }
 
+public:
+    Type(const std::string &name);
+    ~Type();
+
+    bool IsAbstract() const { return abstract; }
+    const std::string &GetName() const { return name; }
+    Type *GetBase() const { return base; }
+
     Entity *Instantiate() const { return instantiate(); }
     void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
     size_t Deserialize(const nlohmann::json &js, Entity *entity) const { return deserialize(js, entity); }
     void Visualize(Entity *entity) const { visualize(entity); }
+
+    friend void ::type_init();
 };

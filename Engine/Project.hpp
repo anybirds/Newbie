@@ -95,22 +95,72 @@ public:
     }
     std::vector<Asset *> GetAssets(Type *type) const {
         std::vector<Asset *> ret;
+        if (!Type::IsBaseOf(Asset::StaticType(), type)) {
+            return ret;
+        }
         for (auto &p : GetAllAssets()) {
             if (Type::IsBaseOf(type, p.second->GetType())) { ret.push_back(p.second); }
         }
         return ret;
     }
 
-    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool> = true>
+    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T> && !std::is_abstract_v<T>, bool> = true>
     T *AddAsset() {
-        T *asset = new T();
+        T *t = new T();
+        t->serial = setting->GetSerial();
+        assets.insert({t->serial, t});
+        return t;
+    }
+    Asset *AddAsset(Type *type) {
+        if (!Type::IsBaseOf(Asset::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        Asset *asset = (Asset *)type->Instantiate();
+        asset->serial = setting->GetSerial();
+        assets.insert({asset->serial, asset});
+        return asset;
+    }
+    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T> && !std::is_abstract_v<T>, bool> = true>
+    T *AddAsset(T *asset) {
+        nlohmann::json js;
+        T::Serialize(js, asset);
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->serial = setting->GetSerial();
+        assets.insert({t->serial, t});
+        return t;
+    }
+    Asset *AddAsset(Type *type, Asset *asset) {
+        if (!Type::IsBaseOf(Asset::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        nlohmann::json js;
+        type->Serialize(js, asset);
+        Asset *ret = (Asset *)type->Instantiate();
+        type->Deserialize(js, ret);
+        ret->serial = setting->GetSerial();
+        assets.insert({ret->serial, ret});
+        return ret;
+    }
+    template <class T, std::enable_if_t<std::is_base_of_v<Asset, T> && !std::is_abstract_v<T>, bool> = true>
+    T *AddAsset(const nlohmann::json &js) {
+        T *t = new T();
+        T::Deserialize(js, t);
+        t->serial = setting->GetSerial();
+        assets.insert({t->serial, t});
+        return t;
+    }
+    Asset *AddAsset(Type *type, const nlohmann::json &js) {
+        if (!Type::IsBaseOf(Asset::StaticType(), type) || type->IsAbstract()) {
+            return nullptr;
+        }
+        Asset *asset = (Asset *)type->Instantiate();
+        type->Deserialize(js, asset);
         asset->serial = setting->GetSerial();
         assets.insert({asset->serial, asset});
         return asset;
     }
 
-    void RemoveAsset(Asset *asset) { assets.erase(asset->GetSerial()); }
-    void DestroyAsset(Asset *asset) { assets.erase(asset->GetSerial()); delete asset; }
-
     friend class Scene;
+    friend class Asset;
 };

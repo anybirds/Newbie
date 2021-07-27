@@ -47,7 +47,7 @@ void HierarchyPanel::ShowContents() {
         if (transform->GetChildren().empty()) {
             flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
-        bool open = ImGui::TreeNodeEx((const void*)gameObject, flags, "");
+        bool open = ImGui::TreeNodeEx((const void*)transform, flags, "");
         ImGui::SameLine();
         ShowIcon(GameObject::StaticType());
         ImGui::SameLine();
@@ -100,7 +100,8 @@ void HierarchyPanel::ShowContents() {
         }
     };
     
-    ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("Hierarchy", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, 0.0f));
     recurse(root);
     ImGui::PopStyleVar();
@@ -133,7 +134,6 @@ void HierarchyPanel::ShowContents() {
             GetSelected() = (Entity *)hovered;
         }
         gameObject = (GameObject *)GetSelected();
-        Scene &scene = Scene::GetInstance();
         if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)gameObject)) {
             GameObject::ToJson(copyed, gameObject);
             gameObject->Remove();
@@ -167,7 +167,9 @@ void HierarchyPanel::ShowContents() {
     } else {
         menu = false;
     }
+
     ImGui::EndChild();
+
     if (ImGui::BeginDragDropTarget() && !hovered) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset")) {
             IM_ASSERT(payload->DataSize == sizeof(Asset *));
