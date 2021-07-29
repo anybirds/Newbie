@@ -146,8 +146,10 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<mat2, true>() = [](void *p) {
         mat2 &v = *(mat2 *)p;
-        ImGui::InputFloat2("col0", (float *)&v[0][0]);
-        ImGui::InputFloat2("col1", (float *)&v[1][0]);
+        mat2 t = transpose(v);
+        ImGui::InputFloat2("##0", (float *)&t[0][0]);
+        ImGui::InputFloat2("##1", (float *)&t[1][0]);
+        v = transpose(t);
     };
     GetVisualize<mat2, false>() = [](void *p) {
         ImGui::PushDisabled(true);
@@ -156,9 +158,11 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<mat3, true>() = [](void *p) {
         mat3 &v = *(mat3 *)p;
-        ImGui::InputFloat3("col0", (float *)&v[0][0]);
-        ImGui::InputFloat3("col1", (float *)&v[1][0]);
-        ImGui::InputFloat3("col2", (float *)&v[2][0]);
+        mat3 t = transpose(v);
+        ImGui::InputFloat3("##0", (float *)&t[0][0]);
+        ImGui::InputFloat3("##1", (float *)&t[1][0]);
+        ImGui::InputFloat3("##2", (float *)&t[2][0]);
+        v = transpose(t);
     };
     GetVisualize<mat3, false>() = [](void *p) {
         ImGui::PushDisabled(true);
@@ -168,10 +172,12 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<mat4, true>() = [](void *p) {
         mat4 &v = *(mat4 *)p;
-        ImGui::InputFloat4("col0", (float *)&v[0][0]);
-        ImGui::InputFloat4("col1", (float *)&v[1][0]);
-        ImGui::InputFloat4("col2", (float *)&v[2][0]);
-        ImGui::InputFloat4("col3", (float *)&v[3][0]);
+        mat4 t = transpose(v);
+        ImGui::InputFloat4("##0", (float *)&t[0][0]);
+        ImGui::InputFloat4("##1", (float *)&t[1][0]);
+        ImGui::InputFloat4("##2", (float *)&t[2][0]);
+        ImGui::InputFloat4("##3", (float *)&t[3][0]);
+        v = transpose(t);
     };
     GetVisualize<mat4, false>() = [](void *p) {
         ImGui::PushDisabled(true);
@@ -409,29 +415,55 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<vector, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        int j = -1;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = i;
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                f[1](nullptr);
+            }
+            if (j >= 0) {
+                f[2]((void *)(uintptr_t)j);
             }
             ImGui::TreePop();
         }
     };
     GetVisualize<vector, false>() = [](const vector<function<void(void *)>> &f, void *p) {
-        ImGui::PushDisabled(true);
+        ImGui::PushDisabled(true);    
         GetVisualize<vector, true>()(f, p);
         ImGui::PopDisabled();
     };
     GetVisualize<list, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        int j = -1;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = i;
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                f[1](nullptr);
+            }
+            if (j >= 0) {
+                f[2]((void *)(uintptr_t)j);
             }
             ImGui::TreePop();
         }
@@ -443,12 +475,41 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<set, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        void *j = nullptr;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = v[i];
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+
+            ImGuiStorage *storage = ImGui::GetStateStorage();
+            ImGuiID id = ImGui::GetID(ICON_FA_PLUS);
+            void *in = storage->GetVoidPtr(id);
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                if (in) {
+                    f[4](in); // insert
+                    f[3](in); // delete
+                    in = nullptr;
+                    storage->SetVoidPtr(id, in);
+                } else {
+                    f[2]((void *)&in); // new
+                    storage->SetVoidPtr(id, in);
+                }
+            }
+            if (in) {
+                ImGui::SameLine();
+                f[1](in); // visualize
+            }
+            if (j) {
+                f[5](j); // erase
             }
             ImGui::TreePop();
         }
@@ -460,12 +521,41 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<unordered_set, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        void *j = nullptr;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = v[i];
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+
+            ImGuiStorage *storage = ImGui::GetStateStorage();
+            ImGuiID id = ImGui::GetID(ICON_FA_PLUS);
+            void *in = storage->GetVoidPtr(id);
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                if (in) {
+                    f[4](in); // insert
+                    f[3](in); // delete
+                    in = nullptr;
+                    storage->SetVoidPtr(id, in);
+                } else {
+                    f[2]((void *)&in); // new
+                    storage->SetVoidPtr(id, in);
+                }
+            }
+            if (in) {
+                ImGui::SameLine();
+                f[1](in); // visualize
+            }
+            if (j) {
+                f[5](j); // erase
             }
             ImGui::TreePop();
         }
@@ -477,12 +567,41 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<map, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        void *j = nullptr;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = v[i];
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+
+            ImGuiStorage *storage = ImGui::GetStateStorage();
+            ImGuiID id = ImGui::GetID(ICON_FA_PLUS);
+            void *in = storage->GetVoidPtr(id);
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                if (in) {
+                    f[4](in); // insert
+                    f[3](in); // delete
+                    in = nullptr;
+                    storage->SetVoidPtr(id, in);
+                } else {
+                    f[2]((void *)&in); // new
+                    storage->SetVoidPtr(id, in);
+                }
+            }
+            if (in) {
+                ImGui::SameLine();
+                f[1](in); // visualize
+            }
+            if (j) {
+                f[5](j); // erase
             }
             ImGui::TreePop();
         }
@@ -494,12 +613,41 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
     };
     GetVisualize<unordered_map, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         vector<void *> &v = *(vector<void *> *)p;
+        void *j = nullptr;
         if (ImGui::TreeNodeEx("##", ImGuiTreeNodeFlags_OpenOnArrow)) {
             int size = (int)v.size();
             for (int i = 0; i < size; i++) {
                 ImGui::PushID(i);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ChildBg]);
+                if (ImGui::Button(ICON_FA_TIMES)) {
+                    j = v[i];
+                }
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 f[0](v[i]);
                 ImGui::PopID();
+            }
+
+            ImGuiStorage *storage = ImGui::GetStateStorage();
+            ImGuiID id = ImGui::GetID(ICON_FA_PLUS);
+            void *in = storage->GetVoidPtr(id);
+            if (ImGui::Button(ICON_FA_PLUS)) {
+                if (in) {
+                    f[4](in); // insert
+                    f[3](in); // delete
+                    in = nullptr;
+                    storage->SetVoidPtr(id, in);
+                } else {
+                    f[2]((void *)&in); // new
+                    storage->SetVoidPtr(id, in);
+                }
+            }
+            if (in) {
+                ImGui::SameLine();
+                f[1](in); // visualize
+            }
+            if (j) {
+                f[5](j); // erase
             }
             ImGui::TreePop();
         }
@@ -533,11 +681,11 @@ void InspectorPanel::ShowContents() {
                 ImGui::SameLine();
                 ImGui::PushID(component);
                 ImGui::Selectable(type->GetName().c_str());
-                ImGui::PopID();
                 if (ImGui::IsItemHovered()) {
                     hovered = component;
                 }
                 type->Visualize(component);
+                ImGui::PopID();
             }
 
             if (ImGui::BeginPopupContextWindow())
@@ -601,7 +749,9 @@ void InspectorPanel::ShowContents() {
             ImGui::SameLine();
             ImGui::Text(asset->GetName().c_str());
             ImGui::Separator();
+            ImGui::PushID(asset);
             type->Visualize(entity);
+            ImGui::PopID();
             
             // show Resource
             if (asset->IsResourced()) {

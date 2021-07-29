@@ -125,7 +125,8 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::vector, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>}, (void *)&arg);
+    GetVisualize<std::vector, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>, 
+    [&v](void *p){ v.emplace_back(); }, [&v](void *p){ v.erase(v.begin() + (size_t)p); }}, (void *)&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::list>::value, bool>>
@@ -135,7 +136,8 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::list, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>}, (void *)&arg);
+    GetVisualize<std::list, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>,
+    [&v](void *p){ v.emplace_back(); }, [&v](void *p){ auto it = v.begin(); std::advance(it, (size_t)p); v.erase(it); }}, (void *)&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::set>::value, bool>>
@@ -145,7 +147,13 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::set, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, false>}, (void *)&arg);
+    using K = typename T::value_type;
+    using I = std::remove_cv_t<K>;
+    GetVisualize<std::set, E>()(std::vector<std::function<void(void *)>>{visualize<K, false>, visualize<I, true>,
+    [](void *p) { void *&in = *(void **)p; in = (void *)new I{}; },
+    [](void *p) { delete (I *)p; },
+    [&v](void *p){ I &in = *(I *)p; v.insert(in); in = I{}; },
+    [&v](void *p){ K &k = *(K *)p; v.erase(k); }}, (void *)&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::unordered_set>::value, bool>>
@@ -155,7 +163,13 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::unordered_set, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, false>}, (void *)&arg);
+    using K = typename T::value_type;
+    using I = std::remove_cv_t<K>;
+    GetVisualize<std::unordered_set, E>()(std::vector<std::function<void(void *)>>{visualize<K, false>, visualize<I, true>,
+    [](void *p) { void *&in = *(void **)p; in = (void *)new I{}; },
+    [](void *p) { delete (I *)p; },
+    [&v](void *p){ I &in = *(I *)p; v.insert(in); in = I{}; },
+    [&v](void *p){ K &k = *(K *)p; v.erase(k); }}, (void *)&arg);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::map>::value, bool>>
@@ -165,7 +179,13 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::map, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>}, (void *)&arg);
+    using K = typename T::key_type;
+    using I = std::remove_cv_t<K>;
+    GetVisualize<std::map, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>, visualize<I, true>,
+    [](void *p) { void *&in = *(void **)p; in = (void *)new I{}; },
+    [](void *p) { delete (I *)p; },
+    [&v](void *p){ I &in = *(I *)p; v[in]; in = I{}; },
+    [&v](void *p){ K &k = *(K *)p; v.erase(k); }}, (void *)&arg);
 } 
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::unordered_map>::value, bool>>
@@ -175,5 +195,11 @@ void visualize(void *p) {
     for (auto &e : v) {
         arg.push_back((void *)&e);
     }
-    GetVisualize<std::unordered_map, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>}, (void *)&arg);
+    using K = typename T::key_type;
+    using I = std::remove_cv_t<K>;
+    GetVisualize<std::unordered_map, E>()(std::vector<std::function<void(void *)>>{visualize<typename T::value_type, E && !std::is_const<typename T::value_type>::value>, visualize<I, true>,
+    [](void *p) { void *&in = *(void **)p; in = (void *)new I{}; },
+    [](void *p) { delete (I *)p; },
+    [&v](void *p){ I &in = *(I *)p; v[in]; in = I{}; },
+    [&v](void *p){ K &k = *(K *)p; v.erase(k); }}, (void *)&arg);
 } 

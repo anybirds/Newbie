@@ -6,7 +6,8 @@ CLASS(SampleScript, Script) {
     TYPE(SampleScript);
 
     PROPERTY(float, rate, Rate);
-    PROPERTY(std::vector<int>, vec, Vec);
+    PROPERTY(std::set<int>, set, Set);
+    PROPERTY(IntMap, intMap, IntMap);
     
 public:
     virtual void Start() override;
