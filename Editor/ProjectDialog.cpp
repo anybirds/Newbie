@@ -61,13 +61,7 @@ void ProjectDialog::RemoveProject(const string &dir) {
 }
 
 void ProjectDialog::LoadProject(const string &dir) {
-    // clear temporary copies
-    AssetPanel::GetInstance().Clear();
-    HierarchyPanel::GetInstance().Clear();
-    InspectorPanel::GetInstance().Clear();
-    
-    GetLocalSelected() = nullptr;
-    GetSelected() = nullptr; // nothing should be selected after the project loads
+    Widget::Clear();
     MainMenuBar::GetInstance().StopGamePlay();
 
     Project &project = Project::GetInstance();

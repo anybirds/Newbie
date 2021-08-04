@@ -9,15 +9,11 @@ public:
     static HierarchyPanel &GetInstance() { static HierarchyPanel hierarchyPanel; return hierarchyPanel; }
 
 private:
-    HierarchyPanel() : Panel("Hierarchy"), menu(false) {}
-
-    bool menu;
-    nlohmann::json copyed;
+    HierarchyPanel() : Panel("Hierarchy") {}
 
 public:
     HierarchyPanel(const HierarchyPanel &) = delete;
     HierarchyPanel &operator=(const HierarchyPanel &) = delete;
 
     virtual void ShowContents() override;
-    void Clear();
 };

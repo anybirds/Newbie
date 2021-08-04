@@ -99,9 +99,7 @@ int main(int argc, char **argv) {
         window.SwapBuffers();
     }
     
-    assetPanel.Clear();
-    hierarchyPanel.Clear();
-    inspectorPanel.Clear();
+    Widget::Clear();
     Project::GetInstance().Close();
     
     gamePanel.Close();

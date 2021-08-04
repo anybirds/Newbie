@@ -6,6 +6,7 @@
 #include <GameObject.hpp>
 #include <Transform.hpp>
 #include <Prefab.hpp>
+#include <Graphics/Window.hpp>
 
 using namespace std;
 
@@ -128,6 +129,7 @@ void HierarchyPanel::ShowContents() {
         }
     }
 
+    static bool menu;
     if (ImGui::BeginPopupContextWindow())
     {
         if (!menu) {
@@ -135,26 +137,28 @@ void HierarchyPanel::ShowContents() {
         }
         gameObject = (GameObject *)GetSelected();
         if (ImGui::MenuItem("Cut", nullptr, nullptr, (bool)gameObject)) {
-            GameObject::ToJson(copyed, gameObject);
+            GetCopyedType() = GameObject::StaticType();
+            GameObject::ToJson(GetCopyed(), gameObject);
             gameObject->Remove();
             GetSelected() = nullptr;
         }
         if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)gameObject)) {
-            GameObject::ToJson(copyed, gameObject);
+            GetCopyedType() = GameObject::StaticType();
+            GameObject::ToJson(GetCopyed(), gameObject);
         }
-        if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
+        if (ImGui::MenuItem("Paste", nullptr, nullptr, GetCopyedType() == GameObject::StaticType() && !GetCopyed().empty())) {
             if (gameObject) {
-                gameObject->AddGameObject(copyed);
+                GetSelected() = gameObject->AddGameObject(GetCopyed());
             } else {
-                root->AddGameObject(copyed);
+                GetSelected() = root->AddGameObject(GetCopyed());
             }
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Add GameObject", nullptr, nullptr)) {
             if (gameObject) {
-                gameObject->AddGameObject();
+                GetSelected() = gameObject->AddGameObject();
             } else {
-                root->AddGameObject();
+                GetSelected() = root->AddGameObject();
             }
         }
         if (ImGui::MenuItem("Remove", nullptr, nullptr, (bool)gameObject)) {
@@ -166,6 +170,40 @@ void HierarchyPanel::ShowContents() {
         ImGui::EndPopup();
     } else {
         menu = false;
+    }
+
+    if (ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        if (ImGui::IsKeyPressed(GLFW_KEY_X)) {
+            if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+                gameObject = (GameObject *)GetSelected();
+                GetCopyedType() = GameObject::StaticType();
+                GameObject::ToJson(GetCopyed(), gameObject);
+                gameObject->Remove();
+                GetSelected() = nullptr;
+            }
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_C)) {
+            if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+                gameObject = (GameObject *)GetSelected();
+                GetCopyedType() = GameObject::StaticType();
+                GameObject::ToJson(GetCopyed(), gameObject);
+            }
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_V)) {
+            if (GetCopyedType() == GameObject::StaticType()) {
+                if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+                    gameObject = (GameObject *)GetSelected();
+                    GetSelected() = gameObject->AddGameObject(GetCopyed());
+                } else {
+                    GetSelected() = root->AddGameObject(GetCopyed());
+                }
+            }
+        }
+    }
+    if (ImGui::IsKeyPressed(GLFW_KEY_DELETE)) {
+        if (GetSelected() && GetSelected()->GetType() == GameObject::StaticType()) {
+            gameObject = (GameObject *)GetSelected();
+            gameObject->Remove();
+            GetSelected() = nullptr;
+        }
     }
 
     ImGui::EndChild();
@@ -180,8 +218,4 @@ void HierarchyPanel::ShowContents() {
         }
         ImGui::EndDragDropTarget();
     }
-}
-
-void HierarchyPanel::Clear() {
-    copyed.clear();
 }

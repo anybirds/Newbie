@@ -23,3 +23,12 @@ void Widget::Update() {
         IsRenaming() = false;
     }
 }
+
+void Widget::Clear() {
+    GetSelected() = nullptr;
+    GetLocalSelected() = nullptr;
+    IsRenaming() = false;
+    IsClickedRenamingItem() = false;
+    GetCopyedType() = nullptr;
+    GetCopyed().clear();
+}

@@ -12,13 +12,7 @@ public:
     static AssetPanel &GetInstance() { static AssetPanel assetPanel; return assetPanel; }
 
 private:
-    AssetPanel() : Panel("Asset"), menu(false), copyedType(nullptr) {}
-
-    std::string search;
-    std::string searchAdd;
-    bool menu;
-    Type *copyedType;
-    nlohmann::json copyed;
+    AssetPanel() : Panel("Asset") {}
 
 public:
     AssetPanel(const AssetPanel &) = delete;
@@ -26,5 +20,4 @@ public:
     
     virtual void ShowContents() override;
     void ShowAsset(Asset *asset);
-    void Clear();
 };

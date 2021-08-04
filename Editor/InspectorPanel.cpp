@@ -688,6 +688,7 @@ void InspectorPanel::ShowContents() {
                 ImGui::PopID();
             }
 
+            static bool menu;
             if (ImGui::BeginPopupContextWindow())
             {
                 static Component *component;
@@ -695,24 +696,25 @@ void InspectorPanel::ShowContents() {
                     component = hovered;
                 }
                 if (ImGui::MenuItem("Cut", nullptr, nullptr, component && component->GetType() != Transform::StaticType())) {
-                    copyedType = component->GetType();
-                    copyedType->Serialize(copyed, component);
+                    GetCopyedType() = component->GetType();
+                    GetCopyedType()->Serialize(GetCopyed(), component);
                     component->Remove();
                 }
                 if (ImGui::MenuItem("Copy", nullptr, nullptr, component && component->GetType() != Transform::StaticType())) {
-                    copyedType = component->GetType();
-                    copyedType->Serialize(copyed, component);
+                    GetCopyedType() = component->GetType();
+                    GetCopyedType()->Serialize(GetCopyed(), component);
                 }
-                if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
-                    gameObject->AddComponent(copyedType, copyed);
+                if (ImGui::MenuItem("Paste", nullptr, nullptr, Type::IsBaseOf(Component::StaticType(), GetCopyedType()) && !GetCopyed().empty())) {
+                    gameObject->AddComponent(GetCopyedType(), GetCopyed());
                 }
                 ImGui::Separator();
                 if (ImGui::BeginMenu("Add Component")) {
                     // prefix-search asset types
+                    static string search;
                     ImGui::Text(ICON_FA_SEARCH);
                     ImGui::SameLine();
                     ImGui::PushItemWidth(-FLT_MIN);
-                    ImGui::InputText("##Search", &searchAdd);
+                    ImGui::InputText("##Search", &search);
                     ImGui::PopItemWidth();
                     ImGui::Separator();
 
@@ -720,16 +722,19 @@ void InspectorPanel::ShowContents() {
                     for (auto &p : Type::GetAllTypes()) {
                         Type *type = p.second;
                         if (!type->IsAbstract() && type != Transform::StaticType() && Type::IsBaseOf(Component::StaticType(), type)) {
-                            trie.insert(type->GetName(), type);   
+                            trie.insert(type->GetName(), type);
                         }
                     }
-                    auto range = trie.equal_prefix_range(searchAdd);
+                    auto range = trie.equal_prefix_range(search);
                     
                     for (auto it = range.first; it != range.second; it++) {
                         Type *type = *it;
                         if (ImGui::MenuItem((GetIconCharacter(type) + type->GetName()).c_str())) {
                             gameObject->AddComponent(type);
                         }
+                    }
+                    if (range.first == range.second) {
+                        ImGui::MenuItem("Nothing Found", nullptr, nullptr, false);
                     }
                     ImGui::EndMenu();
                 }
@@ -768,9 +773,4 @@ void InspectorPanel::ShowContents() {
             }
         }
     }
-}
-
-void InspectorPanel::Clear() {
-    copyedType = nullptr;
-    copyed.clear();
 }

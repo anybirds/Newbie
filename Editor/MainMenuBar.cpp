@@ -2,6 +2,7 @@
 
 #include <Project.hpp>
 #include <Scene.hpp>
+#include <Graphics/Window.hpp>
 #include <MainMenuBar.hpp>
 #include <FileDialog.hpp>
 #include <SceneDialog.hpp>
@@ -15,6 +16,7 @@
 using namespace std;
 
 void MainMenuBar::Show() {
+    Project &project = Project::GetInstance();
     if (ImGui::BeginMainMenuBar())
     {
         bool project_new = false;
@@ -22,7 +24,6 @@ void MainMenuBar::Show() {
         bool scene_new = false;
         bool scene_open = false;
 
-        Project &project = Project::GetInstance();
         GamePanel &gamePanel = GamePanel::GetInstance();
         if (ImGui::BeginMenu("Project"))
         {
@@ -94,6 +95,12 @@ void MainMenuBar::Show() {
 
         ImGui::EndMainMenuBar();
     }
+
+    if (ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && ImGui::IsKeyPressed(GLFW_KEY_S)) {
+        if (project.IsLoaded() && !gamePlaying) {
+            project.Save();
+        }
+    }
 }
 
 void MainMenuBar::ShowReload() {
@@ -112,15 +119,10 @@ void MainMenuBar::ShowReload() {
         if (sceneLoaded) {
             scene.LoadImmediate(scenePath);
         }
-        // clear temporary copies
-        AssetPanel::GetInstance().Clear();
-        HierarchyPanel::GetInstance().Clear();
-        InspectorPanel::GetInstance().Clear();
-
-        GetLocalSelected() = nullptr;
-        GetSelected() = nullptr; // nothing should be selected after the project loads
+        Widget::Clear();
         StopGamePlay();
     }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Save & Reload");
 }
 
 void MainMenuBar::ShowPlayPause() {

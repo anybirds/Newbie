@@ -112,6 +112,14 @@ void Mesh::Apply() {
     }
 
     const aiScene *scene = GetModel()->importer->GetScene();
+    if (GetIndex() >= scene->mNumMeshes) {
+        cerr << '[' << __FUNCTION__ << ']' << "index out of range in Mesh: " << GetName() << '\n';
+        *this = backup;
+        backup.vao = 0;
+        backup.vbo = 0;
+        backup.ebo = 0;
+        throw exception();
+    }
     aiMesh *aimesh = scene->mMeshes[GetIndex()];
     unsigned base;
 

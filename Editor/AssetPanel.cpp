@@ -23,6 +23,7 @@ void AssetPanel::ShowContents() {
     ImGui::BeginChild("Asset", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
 
     // prefix-search assets
+    static string search;
     ImGui::Text(ICON_FA_SEARCH);
     ImGui::SameLine();
     ImGui::PushItemWidth(-FLT_MIN);
@@ -68,6 +69,7 @@ void AssetPanel::ShowContents() {
         }
     }
     
+    static bool menu;
     if (ImGui::BeginPopupContextWindow())
     {
         if (!menu) {
@@ -75,19 +77,20 @@ void AssetPanel::ShowContents() {
         }
         Asset *asset = (Asset *)GetSelected();
         if (ImGui::MenuItem("Copy", nullptr, nullptr, (bool)asset)) {
-            copyedType = asset->GetType();
-            copyedType->Serialize(copyed, asset);
+            GetCopyedType() = asset->GetType();
+            GetCopyedType()->Serialize(GetCopyed(), asset);
         }
-        if (ImGui::MenuItem("Paste", nullptr, nullptr, !copyed.empty())) {
-            project.AddAsset(copyedType, copyed);
+        if (ImGui::MenuItem("Paste", nullptr, nullptr, Type::IsBaseOf(Asset::StaticType(), GetCopyedType()) && !GetCopyed().empty())) {
+            GetSelected() = project.AddAsset(GetCopyedType(), GetCopyed());
         }
         ImGui::Separator();
         if (ImGui::BeginMenu("Add Asset")) {
             // prefix-search asset types
+            static string search;
             ImGui::Text(ICON_FA_SEARCH);
             ImGui::SameLine();
             ImGui::PushItemWidth(-FLT_MIN);
-            ImGui::InputText("##Search", &searchAdd);
+            ImGui::InputText("##Search", &search);
             ImGui::PopItemWidth();
             ImGui::Separator();
 
@@ -98,13 +101,16 @@ void AssetPanel::ShowContents() {
                     trie.insert(type->GetName(), type);   
                 }
             }
-            auto range = trie.equal_prefix_range(searchAdd);
+            auto range = trie.equal_prefix_range(search);
             
             for (auto it = range.first; it != range.second; it++) {
                 Type *type = *it;
                 if (ImGui::MenuItem((GetIconCharacter(type) + type->GetName()).c_str())) {
-                    project.AddAsset(type);
+                    GetSelected() = project.AddAsset(type);
                 }
+            }
+            if (range.first == range.second) {
+                ImGui::MenuItem("Nothing Found", nullptr, nullptr, false);
             }
             ImGui::EndMenu();
         }
@@ -117,6 +123,28 @@ void AssetPanel::ShowContents() {
         ImGui::EndPopup();
     } else {
         menu = false;
+    }
+
+    Asset *asset;
+    if (ImGui::IsKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+        if (ImGui::IsKeyPressed(GLFW_KEY_C)) {
+            if (GetSelected() && Type::IsBaseOf(Asset::StaticType(), GetSelected()->GetType())) {
+                asset = (Asset *)GetSelected();
+                GetCopyedType() = asset->GetType();
+                GetCopyedType()->Serialize(GetCopyed(), asset);
+            }
+        } else if (ImGui::IsKeyPressed(GLFW_KEY_V)) {
+            if (Type::IsBaseOf(Asset::StaticType(), GetCopyedType())) {
+                GetSelected() = project.AddAsset(GetCopyedType(), GetCopyed());
+            }
+        }
+    }
+    if (ImGui::IsKeyPressed(GLFW_KEY_DELETE)) {
+        if (GetSelected() && Type::IsBaseOf(Asset::StaticType(), GetSelected()->GetType())) {
+            asset = (Asset *)GetSelected();
+            asset->Remove();
+            GetSelected() = nullptr;
+        }
     }
 
     ImGui::EndChild();
@@ -170,9 +198,4 @@ void AssetPanel::ShowAsset(Asset *asset) {
         ImGui::Text(source->GetName().c_str());
         ImGui::EndDragDropSource();
     }
-}
-
-void AssetPanel::Clear() {
-    copyedType = nullptr;
-    copyed.clear();
 }

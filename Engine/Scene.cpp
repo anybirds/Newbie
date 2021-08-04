@@ -128,7 +128,9 @@ void Scene::Close() {
         }
     }
 
-    DestroyGarbages();
+    for (Component *component : garbages) {
+        delete component;
+    }
 
     *this = Scene();
 }
@@ -279,13 +281,6 @@ void Scene::Render() {
             } catch(...) {}
         }
     }
-}
-
-void Scene::DestroyGarbages() {
-    for (Component *component : garbages) {
-        delete component;
-    }
-    garbages.clear();
 }
 
 void Scene::Loop() {

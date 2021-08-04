@@ -55,7 +55,7 @@ void Generator::Serialize() {
             }
 
             cout << "void " << cs->name << "::Serialize(json &js, const Entity *entity) {\n";
-            cout << "  js.clear();\n";
+            cout << "  js = \"[]\"_json;\n";
             
             if (!cs->base.empty()) {
                 cout << "  " << cs->base << "::StaticType()->Serialize(js, entity);\n";

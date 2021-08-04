@@ -9,7 +9,7 @@ using namespace std;
 using json = nlohmann::json;
 
 void GameObject::ToJson(json &js, const GameObject *gameObject) {
-    js.clear();
+    js = "{}"_json;
 
     // write root
     js["root"] = gameObject;

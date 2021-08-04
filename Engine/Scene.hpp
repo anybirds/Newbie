@@ -63,8 +63,6 @@ private:
     void Update();
     void Render();
 
-    void DestroyGarbages();
-
 public:
     Scene(const Scene &) = delete;
 
