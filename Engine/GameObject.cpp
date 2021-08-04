@@ -24,9 +24,9 @@ void GameObject::ToJson(json &js, const GameObject *gameObject) {
 
         for (Component *component : gameObject->components) {
             Type *type = component->GetType();
-                type->Serialize(
-                    entities[type->GetName()][to_string((uintptr_t)component)],
-                    component); 
+            type->Serialize(
+                entities[type->GetName()][to_string((uintptr_t)component)],
+                component); 
         }
 
         GameObject::StaticType()->Serialize(

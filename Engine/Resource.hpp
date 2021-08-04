@@ -6,8 +6,6 @@
 #include <EngineExport.hpp>
 #include <Asset.hpp>
 
-#include <iostream>
-
 CLASS_RESOURCE_ATTR(Resource, Entity, ENGINE_EXPORT) {
     TYPE(Resource);
 

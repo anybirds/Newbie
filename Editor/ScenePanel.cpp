@@ -271,7 +271,7 @@ void ScenePanel::ShowContents() {
     }
 
     // gizmo control
-    if (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) {
+    if (ImGui::IsWindowFocused() && !control) {
         if (ImGui::IsKeyPressed(GLFW_KEY_T)) {
             gizmoOperation = ImGuizmo::TRANSLATE;
         } else if (ImGui::IsKeyPressed(GLFW_KEY_R)) {

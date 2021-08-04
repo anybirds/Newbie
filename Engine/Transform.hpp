@@ -13,12 +13,12 @@ class Prefab;
 CLASS_FINAL_ATTR(Transform, Component, ENGINE_EXPORT) {
     TYPE(Transform);
 
-    PROPERTY_NONE(std::vector<Transform *>, children);
-    PROPERTY_NONE(Transform *, parent);
+    PROPERTY_NONE(std::vector<Transform *>, children, Children);
+    PROPERTY_NONE(Transform *, parent, Parent);
     PROPERTY(glm::vec3, localPosition, LocalPosition);
     PROPERTY(glm::vec3, localEulerAngles, LocalEulerAngles);
     PROPERTY(glm::vec3, localScale, LocalScale);
-    PROPERTY_NONE(glm::quat, localRotation);
+    PROPERTY_NONE(glm::quat, localRotation, LocalRotation);
 
 private:
     mutable bool dirty;

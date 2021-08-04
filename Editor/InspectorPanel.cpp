@@ -769,3 +769,8 @@ void InspectorPanel::ShowContents() {
         }
     }
 }
+
+void InspectorPanel::Clear() {
+    copyedType = nullptr;
+    copyed.clear();
+}

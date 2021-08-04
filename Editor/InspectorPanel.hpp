@@ -23,4 +23,5 @@ public:
     InspectorPanel &operator=(const InspectorPanel &) = delete;
 
     virtual void ShowContents() override;
+    void Clear();
 };

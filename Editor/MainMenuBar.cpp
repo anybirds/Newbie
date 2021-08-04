@@ -69,6 +69,7 @@ void MainMenuBar::Show() {
             } 
             ImGui::EndMenu();
         }
+        ShowReload();
         ShowPlayPause();
 
         ProjectDialog &projectDialog = ProjectDialog::GetInstance();
@@ -92,6 +93,33 @@ void MainMenuBar::Show() {
         sceneDialog.Show();
 
         ImGui::EndMainMenuBar();
+    }
+}
+
+void MainMenuBar::ShowReload() {
+    Project &project = Project::GetInstance();
+    Scene &scene = Scene::GetInstance();
+    ImGuiSelectableFlags flags = ImGuiSelectableFlags_None;
+    if (!project.IsLoaded()) {
+        flags = ImGuiSelectableFlags_Disabled;
+    }
+    if (ImGui::Selectable(ICON_FA_SYNC_ALT, false, flags, ImVec2(16.0f, 0.0f))) {
+        string projectPath = project.GetPath();
+        string scenePath = scene.GetPath();
+        bool sceneLoaded = scene.IsLoaded();
+        project.Save();
+        project.Load(projectPath);
+        if (sceneLoaded) {
+            scene.LoadImmediate(scenePath);
+        }
+        // clear temporary copies
+        AssetPanel::GetInstance().Clear();
+        HierarchyPanel::GetInstance().Clear();
+        InspectorPanel::GetInstance().Clear();
+
+        GetLocalSelected() = nullptr;
+        GetSelected() = nullptr; // nothing should be selected after the project loads
+        StopGamePlay();
     }
 }
 

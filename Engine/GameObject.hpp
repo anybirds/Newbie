@@ -13,7 +13,7 @@ class Prefab;
 CLASS_FINAL_ATTR(GameObject, Entity, ENGINE_EXPORT) {
     TYPE(GameObject);
 
-    PROPERTY_NONE(std::vector<Component *>, components);
+    PROPERTY_NONE(std::vector<Component *>, components, Components);
     PROPERTY_GET(Transform *, transform, Transform);
     PROPERTY(std::string, name, Name);
 

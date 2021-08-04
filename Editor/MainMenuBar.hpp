@@ -22,5 +22,6 @@ public:
     void StartGamePlay() { gamePlaying = true; gamePaused = false; }
     void StopGamePlay() { gamePlaying = false; gamePaused = false; }
     virtual void Show() override;
+    void ShowReload();
     void ShowPlayPause();
 };

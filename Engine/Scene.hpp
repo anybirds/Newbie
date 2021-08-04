@@ -49,6 +49,7 @@ private:
     std::vector<Transform *> removeTrans;
     std::vector<Component *> enables;
     std::vector<Component *> disables;
+    std::vector<Component *> garbages;
 
     void Flags();
     
@@ -59,8 +60,10 @@ private:
     void Remove();
     void Destroy();
 
-    void Render();
     void Update();
+    void Render();
+
+    void DestroyGarbages();
 
 public:
     Scene(const Scene &) = delete;

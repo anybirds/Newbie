@@ -215,6 +215,17 @@ void Generator::TypeInit() {
             }
             cout << "  " << name << "::StaticType()->SetVisualize(" << name << "::Visualize);\n";
             cout << "  " << name << "::StaticType()->SetAbstract(std::is_abstract<" << name << ">::value);\n";
+            
+            // class blueprint
+            cout << "  {\n";
+            for (Property *p : cs->properties) {
+                cout << "  " << p->type << ' ' << p->memberName << "{};\n"; 
+            }
+            cout << "  " << name << "::StaticType()->blueprint = {\n";
+            for (Property *p : cs->properties) {
+                cout << "  { \"" << p->type << "\", \"" << p->propertyName << "\", " << p->memberName << " },\n";
+            }
+            cout << "  };\n  }\n";
         }
     };
 
@@ -263,6 +274,7 @@ void Generator::Generate() {
         cout << "#include \"" << file << "\"\n";
     }
     
+    cout << "#include <Visualize.hpp>\n";
     cout << "#include <nlohmann/json.hpp>\n";
     cout << "using json = nlohmann::json;\n";
 

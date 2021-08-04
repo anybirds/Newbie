@@ -1,5 +1,8 @@
 #include "SampleScript.hpp"
 
+#include <Time.hpp>
+#include <Transform.hpp>
+
 using namespace std;
 using namespace glm;
 

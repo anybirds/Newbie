@@ -20,7 +20,7 @@
 CLASS_FINAL_ATTR(ProjectSetting, Entity, ENGINE_EXPORT) {
     TYPE(ProjectSetting);
 
-    PROPERTY_NONE(uint64_t, serial);
+    PROPERTY_NONE(uint64_t, serial, Serial);
     PROPERTY(std::string, startScene, StartScene);
     
 public:
@@ -36,6 +36,8 @@ public:
 private:
     Project() : loaded(false), lib(nullptr), init(nullptr), clear(nullptr), setting(nullptr) {}
     Project &operator=(const Project &) = default;
+
+    void WriteBlueprints(nlohmann::json &blueprints);
 
     bool loaded;
     typedef void (*func)();
@@ -57,6 +59,7 @@ private:
     ProjectSetting *setting;
     std::unordered_set<std::string> scenes;
     std::unordered_map<uint64_t, Asset *> assets;
+    nlohmann::json blueprints;
 
 public:
     Project(const Project &) = delete;
@@ -67,8 +70,10 @@ public:
 
     bool IsLoaded() const { return loaded; }
     const std::string &GetName() const { return name; }
+    const std::string &GetPath() const { return path; }
     const std::string &GetDirectoy() const { return directory; }
     ProjectSetting *GetSetting() const { return setting; }
+    nlohmann::json &GetClassBlueprints() {  return blueprints; }
 
     const std::unordered_set<std::string> &GetAllScenes() const { return scenes; }
     void AddScene(const std::string &path) { scenes.insert(path); }

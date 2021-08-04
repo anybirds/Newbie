@@ -15,27 +15,10 @@
 #include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
-#include <Type.hpp>
-
-/* serialize and deserialize glm types */
-namespace glm {
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec2 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec3 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec4 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat2 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat3 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat4 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::quat &q);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec2 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec3 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec4 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat2 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat3 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat4 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::quat &q);
-}
+#include <EngineExport.hpp>
 
 class Entity;
+class Type;
 class Resource;
 
 template <typename T,

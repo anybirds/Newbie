@@ -13,8 +13,8 @@
 #include <Graphics/Drawer.hpp>
 #include <Graphics/Renderer.hpp>
 
-using json = nlohmann::json;
 using namespace std;
+using json = nlohmann::json;
 
 void Scene::ToBackup() {
     Scene &scene = GetInstance();
@@ -127,6 +127,8 @@ void Scene::Close() {
             delete batch.second;
         }
     }
+
+    DestroyGarbages();
 
     *this = Scene();
 }
@@ -279,6 +281,13 @@ void Scene::Render() {
     }
 }
 
+void Scene::DestroyGarbages() {
+    for (Component *component : garbages) {
+        delete component;
+    }
+    garbages.clear();
+}
+
 void Scene::Loop() {
     Flags();
 
@@ -299,4 +308,6 @@ void Scene::PauseLoop() {
     Remove();
     Track();
     Render();
+
+    garbages.insert(garbages.end(), removeComps.begin(), removeComps.end());
 }

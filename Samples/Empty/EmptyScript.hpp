@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine.hpp>
+#include <Script.hpp>
 
 CLASS(EmptyScript, Script) {
     TYPE(EmptyScript);

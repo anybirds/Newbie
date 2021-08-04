@@ -11,10 +11,11 @@
 #include <NewDialog.hpp>
 #include <AssetPanel.hpp>
 #include <HierarchyPanel.hpp>
+#include <InspectorPanel.hpp>
 #include <MainMenuBar.hpp>
 
-using json = nlohmann::json;
 using namespace std;
+using json = nlohmann::json;
 
 const string &ProjectDialog::GetProjectsPath() {
     static std::string projectsPath(std::string(NEWBIE_PATH) + "/build/Editor/projects.json"); 
@@ -63,15 +64,18 @@ void ProjectDialog::LoadProject(const string &dir) {
     // clear temporary copies
     AssetPanel::GetInstance().Clear();
     HierarchyPanel::GetInstance().Clear();
+    InspectorPanel::GetInstance().Clear();
+    
+    GetLocalSelected() = nullptr;
+    GetSelected() = nullptr; // nothing should be selected after the project loads
+    MainMenuBar::GetInstance().StopGamePlay();
 
     Project &project = Project::GetInstance();
     if (project.Load(GetProjectFile(dir))) {
         Window &window = Window::GetInstance();
         window.SetTitle(string("Newbie - ") + project.GetName());
     }
-    GetLocalSelected() = nullptr;
-    GetSelected() = nullptr; // nothing should be selected after the project loads
-    MainMenuBar::GetInstance().StopGamePlay();
+    
     ImGui::CloseCurrentPopup();
 }
 

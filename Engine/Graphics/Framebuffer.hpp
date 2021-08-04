@@ -33,7 +33,7 @@ CLASS_RESOURCE_ATTR(Framebuffer, Resource, ENGINE_EXPORT) {
     PROPERTY(int, width, Width);
     PROPERTY(int, height, Height);
     PROPERTY_GET(GLuint, fbo, Id);
-    PROPERTY_NONE(GLuint, rbo);
+    PROPERTY_NONE(GLuint, rbo, Rbo);
 
 public: 
     static void Blit(const std::shared_ptr<Framebuffer> &src, const std::shared_ptr<Framebuffer> &dest, unsigned mask = GL_COLOR_BUFFER_BIT, unsigned filter = GL_NEAREST);

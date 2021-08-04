@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <string>
 #include <functional>
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
 #include <EngineExport.hpp>
@@ -11,10 +13,10 @@
 #define GET(Type, Member, Property) template <typename T = Type> T const &Get##Property() const { return Member; }
 #define SET(Type, Member, Property) template <typename T = Type> void Set##Property(T const &Member) { this->Member = Member; }
 
-#define PROPERTY_NONE_ACCESS_ATTR(Type, Member, MemberAccess, Attr) MemberAccess: Attr Type Member
-#define PROPERTY_NONE_ACCESS(Type, Member, MemberAccess) PROPERTY_NONE_ACCESS_ATTR(Type, Member, MemberAccess, )
-#define PROPERTY_NONE_ATTR(Type, Member, Attr) PROPERTY_NONE_ACCESS_ATTR(Type, Member, private, Attr)
-#define PROPERTY_NONE(Type, Member) PROPERTY_NONE_ACCESS(Type, Member, private)
+#define PROPERTY_NONE_ACCESS_ATTR(Type, Member, Property, MemberAccess, Attr) MemberAccess: Attr Type Member
+#define PROPERTY_NONE_ACCESS(Type, Member, Property, MemberAccess) PROPERTY_NONE_ACCESS_ATTR(Type, Member, Property, MemberAccess, )
+#define PROPERTY_NONE_ATTR(Type, Member, Property, Attr) PROPERTY_NONE_ACCESS_ATTR(Type, Member, Property, private, Attr)
+#define PROPERTY_NONE(Type, Member, Property) PROPERTY_NONE_ACCESS(Type, Member, Property, private)
 
 #define PROPERTY_GET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, Attr) GetAccess: GET(Type, Member, Property) MemberAccess: Attr Type Member
 #define PROPERTY_GET_ACCESS(Type, Member, Property, MemberAccess, GetAccess) PROPERTY_GET_ACCESS_ATTR(Type, Member, Property, MemberAccess, GetAccess, )
@@ -58,7 +60,7 @@
     static void Serialize(nlohmann::json &, const Entity *); \
     static size_t Deserialize(const nlohmann::json &, Entity *); \
     static void Visualize(Entity *) \
-    
+
 class Entity;
 
 class ENGINE_EXPORT Type final {
@@ -87,6 +89,7 @@ private:
     bool abstract;
     std::string name;
     Type *base;
+    nlohmann::json blueprint;
     std::function<Entity *()> instantiate;
     std::function<void(nlohmann::json &, const Entity *)> serialize;
     std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
@@ -106,6 +109,7 @@ public:
     bool IsAbstract() const { return abstract; }
     const std::string &GetName() const { return name; }
     Type *GetBase() const { return base; }
+    const nlohmann::json &GetBlueprint() const { return blueprint; }
 
     Entity *Instantiate() const { return instantiate(); }
     void Serialize(nlohmann::json &js, const Entity *entity) const { serialize(js, entity); }
@@ -114,3 +118,21 @@ public:
 
     friend void ::type_init();
 };
+
+/* serialize and deserialize glm types */
+namespace glm {
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec2 &v);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec3 &v);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec4 &v);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat2 &m);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat3 &m);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat4 &m);
+    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::quat &q);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec2 &v);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec3 &v);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec4 &v);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat2 &m);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat3 &m);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat4 &m);
+    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::quat &q);
+}

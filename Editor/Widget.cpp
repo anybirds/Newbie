@@ -19,7 +19,7 @@ void Widget::Update() {
     if (IsSelected() && ImGui::IsKeyPressed(GLFW_KEY_F2)) {
         IsRenaming() = true;
     }
-    if (IsRenaming() && (ImGui::IsKeyPressed(GLFW_KEY_ENTER) || ImGui::IsMouseClicked(0) && !IsClickedRenamingItem())) {
+    if (IsRenaming() && (ImGui::IsKeyPressed(GLFW_KEY_ENTER) || ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1) && !IsClickedRenamingItem())) {
         IsRenaming() = false;
     }
 }

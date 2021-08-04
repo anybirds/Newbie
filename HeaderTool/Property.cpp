@@ -55,7 +55,5 @@ Property::Property(const string &macro) {
     
     type = args[0];
     memberName = args[1];
-    if (mod != NONE) {
-        propertyName = args[2];
-    }
+    propertyName = args[2];
 }

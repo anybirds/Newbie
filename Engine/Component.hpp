@@ -11,7 +11,7 @@ CLASS_ATTR(Component, Entity, ENGINE_EXPORT) {
     TYPE(Component);
 
     PROPERTY_BOOL(bool, localEnabled, LocalEnabled);
-    PROPERTY_NONE(GameObject *, gameObject);
+    PROPERTY_NONE(GameObject *, gameObject, GameObject);
     
 private:
     enum : uint8_t {

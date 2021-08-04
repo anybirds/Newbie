@@ -101,6 +101,7 @@ int main(int argc, char **argv) {
     
     assetPanel.Clear();
     hierarchyPanel.Clear();
+    inspectorPanel.Clear();
     Project::GetInstance().Close();
     
     gamePanel.Close();

@@ -17,14 +17,15 @@ const string &SceneDialog::GetEmptyScenePath() {
 }
 
 void SceneDialog::LoadScene(const std::string &path) {
+    GetLocalSelected() = nullptr;
+    GetSelected() = nullptr; // nothing should be selected after the project loads
+    MainMenuBar::GetInstance().StopGamePlay();
+
     Scene &scene = Scene::GetInstance();
     if (scene.LoadImmediate(path)) {
         Window &window = Window::GetInstance();
         window.SetTitle(window.GetTitle() + " - " + scene.GetName());
     }
-    GetLocalSelected() = nullptr;
-    GetSelected() = nullptr; // nothing should be selected after the scece loads
-    MainMenuBar::GetInstance().StopGamePlay();
     ImGui::CloseCurrentPopup();
 }
 
