@@ -7,6 +7,7 @@
 using namespace std;
 using namespace tsl;
 using namespace glm;
+using json = nlohmann::json;
 
 InspectorPanel::InspectorPanel() : Panel("Inspector") {
     GetVisualizeProperty() = [](const string &name, const function<void(void *)> &visualize, void *pointer) {
@@ -384,7 +385,35 @@ InspectorPanel::InspectorPanel() : Panel("Inspector") {
         GetVisualize<shared_ptr<Resource>, true>()(p);
         ImGui::PopDisabled();
     };
-    
+    GetVisualize<enum_type, true>() = [](void *p){
+        pair<Type *, void *> &v = *(pair<Type *, void *> *)p;
+        Type *type = v.first;
+        uint64_t &e = *(uint64_t *)v.second;
+        string name;
+        // additional constraint : enum values defined in a single type should be unique
+        for (json::const_iterator it = type->GetBlueprint().begin(); it != type->GetBlueprint().end(); it++) {
+            if (e == it.value().get<uint64_t>()) {
+                name = it.key();
+                break;
+            }
+        }
+        if (ImGui::BeginCombo("", name.c_str())) {
+            for (json::const_iterator it = type->GetBlueprint().begin(); it != type->GetBlueprint().end(); it++) {
+                uint64_t value = it.value().get<uint64_t>();
+                if (ImGui::Selectable(it.key().c_str(), e == value)) {
+                    e = value;
+                }
+                if (e == value) { ImGui::SetItemDefaultFocus(); }
+            }
+            ImGui::EndCombo();
+        }
+    };
+    GetVisualize<enum_type, false>() = [](void *p) {
+        ImGui::PushDisabled(true);
+        GetVisualize<enum_type, true>()(p);
+        ImGui::PopDisabled();
+    };
+
     GetVisualize<pair, true>() = [](const vector<function<void(void *)>> &f, void *p) {
         pair<void *, void *> &v = *(pair<void *, void *> *)p;
         if (ImGui::BeginTable("##", 2, ImGuiTableFlags_None)) {

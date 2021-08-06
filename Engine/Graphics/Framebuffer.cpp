@@ -111,6 +111,6 @@ void Framebuffer::ReadPixels(void *data, int x, int y, int width, int height) {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glReadPixels(x, y, width, height, colorTexture->GetFormat(), colorTexture->GetDataType(), data);
+    glReadPixels(x, y, width, height, (GLenum)colorTexture->GetFormat(), (GLenum)colorTexture->GetDataType(), data);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -66,11 +66,11 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     whiteFramebufferResource = dynamic_pointer_cast<Framebuffer>(whiteFramebuffer->GetResource());
     
     whiteVertexShader = new AShader();
-    whiteVertexShader->SetShaderType(Shader::VERTEX);
+    whiteVertexShader->SetShaderType(ShaderType::VERTEX_SHADER);
     whiteVertexShader->SetPath(GetWhiteVertexShader());
 
     whiteFragmentShader = new AShader();
-    whiteFragmentShader->SetShaderType(Shader::FRAGMENT);
+    whiteFragmentShader->SetShaderType(ShaderType::FRAGMENT_SHADER);
     whiteFragmentShader->SetPath(GetWhiteFragmentShader());
 
     whiteMaterial = new AMaterial();
@@ -88,11 +88,11 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     copyFramebufferResource = dynamic_pointer_cast<Framebuffer>(copyFramebuffer->GetResource());
 
     outlineVertexShader = new AShader();
-    outlineVertexShader->SetShaderType(Shader::VERTEX);
+    outlineVertexShader->SetShaderType(ShaderType::VERTEX_SHADER);
     outlineVertexShader->SetPath(GetOutlineVertexShader());
 
     outlineFragmentShader = new AShader();
-    outlineFragmentShader->SetShaderType(Shader::FRAGMENT);
+    outlineFragmentShader->SetShaderType(ShaderType::FRAGMENT_SHADER);
     outlineFragmentShader->SetPath(GetOutlineFragmentShader());
 
     outlineMaterial = new AMaterial();
@@ -116,9 +116,9 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     selectTexture = new ATexture();
     selectTexture->SetWidth(window.GetMonitorWidth());
     selectTexture->SetHeight(window.GetMonitorHeight());
-    selectTexture->SetInternalFormat(Texture::R32I);
-    selectTexture->SetFormat(Texture::RED_INTEGER);
-    selectTexture->SetDataType(Texture::INT);
+    selectTexture->SetInternalFormat(TextureFormat::R32I);
+    selectTexture->SetFormat(TextureFormat::RED_INTEGER);
+    selectTexture->SetDataType(TextureDataType::INT);
     
     selectFramebuffer = new AFramebuffer();
     selectFramebuffer->SetColorTexture(selectTexture);
@@ -126,11 +126,11 @@ ScenePanel::ScenePanel() : Panel("Scene"),
     selectFramebufferResource = dynamic_pointer_cast<Framebuffer>(selectFramebuffer->GetResource());
     
     selectVertexShader = new AShader();
-    selectVertexShader->SetShaderType(Shader::VERTEX);
+    selectVertexShader->SetShaderType(ShaderType::VERTEX_SHADER);
     selectVertexShader->SetPath(GetSelectVertexShader());
 
     selectFragmentShader = new AShader();
-    selectFragmentShader->SetShaderType(Shader::FRAGMENT);
+    selectFragmentShader->SetShaderType(ShaderType::FRAGMENT_SHADER);
     selectFragmentShader->SetPath(GetSelectFragmentShader());
 
     selectMaterial = new AMaterial();

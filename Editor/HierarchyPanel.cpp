@@ -213,7 +213,7 @@ void HierarchyPanel::ShowContents() {
             IM_ASSERT(payload->DataSize == sizeof(Asset *));
             Asset *asset = *(Asset **)payload->Data;
             if (asset->GetType() == APrefab::StaticType()) {
-                root->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
+                GetSelected() = root->AddGameObject(dynamic_pointer_cast<Prefab>(asset->GetResource()));
             }
         }
         ImGui::EndDragDropTarget();

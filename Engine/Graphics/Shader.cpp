@@ -8,7 +8,7 @@
 
 using namespace std;
 
-AShader::AShader() : shaderType(Shader::VERTEX) {}
+AShader::AShader() : shaderType(ShaderType::VERTEX_SHADER) {}
 
 shared_ptr<Resource> AShader::GetResource() {
     shared_ptr<Resource> sp;
@@ -36,7 +36,7 @@ void Shader::Apply() {
     path = ashader->GetPath();
     shaderType = ashader->GetShaderType();
 
-    id = glCreateShader(GetShaderType());
+    id = glCreateShader((unsigned)GetShaderType());
     if (!id) {
         cerr << '[' << __FUNCTION__ << ']' << " failed to create new Shader" << '\n';
         *this = backup;

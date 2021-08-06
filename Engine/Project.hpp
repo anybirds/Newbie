@@ -60,6 +60,7 @@ private:
     std::unordered_set<std::string> scenes;
     std::unordered_map<uint64_t, Asset *> assets;
     nlohmann::json blueprints;
+    std::vector<Asset *> garbages;
 
 public:
     Project(const Project &) = delete;

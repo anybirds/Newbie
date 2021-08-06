@@ -55,8 +55,8 @@ void Material::Apply() {
         backup.program = 0;
         throw exception();
     }
-    if (vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
-        fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
+    if ((unsigned)vertexShader->GetShaderType() != GL_VERTEX_SHADER ||
+        (unsigned)fragmentShader->GetShaderType() != GL_FRAGMENT_SHADER) {
         cerr << '[' << __FUNCTION__ << ']' << " shader type mismatch in Material: " << GetName() << '\n';
         *this = backup;
         backup.program = 0;

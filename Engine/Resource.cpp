@@ -15,7 +15,10 @@ void from_json(const json &js, shared_ptr<Resource> &resource) {
     uint64_t key = js.get<uint64_t>();
     if (key) {
         Project &project = Project::GetInstance();
-        resource = project.GetAsset(key)->GetResource();
+        Asset *asset = project.GetAsset(key);
+        if (asset) {
+            resource = asset->GetResource();
+        }
     } else {
         resource = nullptr;
     }

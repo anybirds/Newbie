@@ -14,8 +14,8 @@ GamePanel::GamePanel() : Panel("Game") {
     gameTexture = new ATexture();
     gameTexture->SetWidth(window.GetMonitorWidth());
     gameTexture->SetHeight(window.GetMonitorHeight());
-    gameTexture->SetHorizontalWrap(Texture::CLAMP_TO_BORDER);
-    gameTexture->SetVerticalWrap(Texture::CLAMP_TO_BORDER);
+    gameTexture->SetHorizontalWrap(TextureWrapMode::CLAMP_TO_BORDER);
+    gameTexture->SetVerticalWrap(TextureWrapMode::CLAMP_TO_BORDER);
 
     gameFramebuffer = new AFramebuffer();
     gameFramebuffer->SetColorTexture(gameTexture);

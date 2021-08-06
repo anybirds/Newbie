@@ -8,6 +8,7 @@
 namespace HeaderTool {
 
     class Class;
+    class Enum;
 
     class Namespace final {
     private:
@@ -15,6 +16,7 @@ namespace HeaderTool {
         std::vector<std::string> args;
         std::vector<Namespace *> namespaces;
         std::vector<Class *> classes;
+        std::vector<Enum *> enums;
 
     public:
         Namespace(const std::string &macro);

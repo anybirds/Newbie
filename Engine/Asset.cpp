@@ -14,7 +14,9 @@ void Asset::Apply() {
 }
 
 void Asset::Remove() {
-    Project::GetInstance().assets.erase(serial);
+    Project &project = Project::GetInstance();
+    project.assets.erase(serial);
+    project.garbages.push_back(this);
 }
 
 bool Asset::IsRemoved() {

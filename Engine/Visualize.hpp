@@ -32,6 +32,8 @@ Entity *instantiate() {
     return nullptr;
 }
 
+enum class enum_type {};
+
 template <typename T, template<typename...> typename R>
 struct is_specialization : std::false_type {};
 
@@ -54,6 +56,8 @@ void visualize(void *p);
 template <typename T, bool E = !std::is_const<T>::value, std::enable_if_t<std::is_pointer<T>::value, bool> = true>
 void visualize(void *p);
 template <typename T, bool E = !std::is_const<T>::value, std::enable_if_t<is_specialization<T, std::shared_ptr>::value, bool> = true>
+void visualize(void *p);
+template <typename T, bool E = !std::is_const<T>::value, std::enable_if_t<std::is_enum<T>::value, bool> = true>
 void visualize(void *p);
 template <typename T, bool E = !std::is_const<T>::value, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::pair>::value, bool> = true>
 void visualize(void *p);
@@ -92,6 +96,15 @@ void visualize(void *p) {
     using P = typename std::remove_cv_t<T>::element_type;
     std::pair<Type *, void *> arg{P::asset_type::StaticType(), p};
     GetVisualize<std::shared_ptr<Resource>, E>()(&arg);
+}
+
+template <typename T, bool E, std::enable_if_t<std::is_enum<T>::value, bool>>
+void visualize(void *p) {
+    using U = std::underlying_type_t<T>;
+    uint64_t e = static_cast<uint64_t>(*static_cast<U *>(p));
+    std::pair<Type *, void *> arg{GetType<T>(), &e};
+    GetVisualize<enum_type, E>()(&arg);
+    *static_cast<U *>(p) = static_cast<U>(e);
 }
 
 template <typename T, bool E, std::enable_if_t<is_specialization<std::remove_cv_t<T>, std::pair>::value, bool>>

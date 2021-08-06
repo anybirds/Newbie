@@ -49,13 +49,14 @@
 #define CLASS_RESOURCE_ATTR(Derived, Base, Attr) CLASS_ATTR(Derived, Base, Attr)
 #define CLASS_RESOURCE(Derived, Base) CLASS(Derived, Base)
 
+#define ENUM(Derived, Base) enum class Derived : Base
+
 #define NAMESPACE_ATTR(Name, Attr) namespace Attr Name 
 #define NAMESPACE(Name) NAMESPACE_ATTR(Name, )
 
 #define TYPE(T) \
     public: \
-    static Type *&StaticType() { static Type *type; return type; } \
-    static void SetType(Type *type) { StaticType() = type; } \
+    static Type *StaticType() { return ::GetType<T>(); } \
     virtual Type *GetType() const { return T::StaticType(); } \
     static void Serialize(nlohmann::json &, const Entity *); \
     static size_t Deserialize(const nlohmann::json &, Entity *); \
@@ -86,6 +87,7 @@ public:
     }
 
 private:
+    bool enumeration;
     bool abstract;
     std::string name;
     Type *base;
@@ -95,6 +97,7 @@ private:
     std::function<size_t(const nlohmann::json &, Entity *)> deserialize;
     std::function<void(Entity *)> visualize;
 
+    void SetEnum(bool enumeration) { this->enumeration = enumeration; }
     void SetAbstract(bool abstract) { this->abstract = abstract; }
     void SetBase(Type *base) { this->base = base; }
     void SetInstantiate(const std::function<Entity *()> &instantiate) { this->instantiate = instantiate; }
@@ -106,6 +109,7 @@ public:
     Type(const std::string &name);
     ~Type();
 
+    bool IsEnum() const { return enumeration; }
     bool IsAbstract() const { return abstract; }
     const std::string &GetName() const { return name; }
     Type *GetBase() const { return base; }
@@ -119,20 +123,34 @@ public:
     friend void ::type_init();
 };
 
+template <typename T>
+Type *&GetType() { static Type *type; return type; }
+
 /* serialize and deserialize glm types */
 namespace glm {
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec2 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec3 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::vec4 &v);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat2 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat3 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::mat4 &m);
-    ENGINE_EXPORT void to_json(nlohmann::json &js, const glm::quat &q);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec2 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec3 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::vec4 &v);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat2 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat3 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::mat4 &m);
-    ENGINE_EXPORT void from_json(const nlohmann::json &js, glm::quat &q);
+    void to_json(nlohmann::json &js, const glm::vec2 &v);
+    void to_json(nlohmann::json &js, const glm::vec3 &v);
+    void to_json(nlohmann::json &js, const glm::vec4 &v);
+    void to_json(nlohmann::json &js, const glm::mat2 &m);
+    void to_json(nlohmann::json &js, const glm::mat3 &m);
+    void to_json(nlohmann::json &js, const glm::mat4 &m);
+    void to_json(nlohmann::json &js, const glm::quat &q);
+    void from_json(const nlohmann::json &js, glm::vec2 &v);
+    void from_json(const nlohmann::json &js, glm::vec3 &v);
+    void from_json(const nlohmann::json &js, glm::vec4 &v);
+    void from_json(const nlohmann::json &js, glm::mat2 &m);
+    void from_json(const nlohmann::json &js, glm::mat3 &m);
+    void from_json(const nlohmann::json &js, glm::mat4 &m);
+    void from_json(const nlohmann::json &js, glm::quat &q);
+}
+
+/* serialize and deserialize enums */
+template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true> 
+void to_json(nlohmann::json &js, const T &t) {
+    js = static_cast<std::underlying_type_t<T>>(t);
+}
+
+template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true> 
+void from_json(const nlohmann::json &js, T &t) {
+    t = static_cast<T>(js.get<std::underlying_type_t<T>>());
 }

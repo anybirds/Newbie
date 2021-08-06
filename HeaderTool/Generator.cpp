@@ -4,6 +4,7 @@
 #include <Generator.hpp>
 #include <Namespace.hpp>
 #include <Class.hpp>
+#include <Enum.hpp>
 #include <Property.hpp>
 
 using namespace std;
@@ -168,7 +169,7 @@ void Generator::TypeInit() {
             instantiate(n);
             stack.pop_back();
         }
-        if (ns->classes.empty()) {
+        if (ns->classes.empty() && ns->enums.empty()) {
             return;
         }
 
@@ -179,17 +180,20 @@ void Generator::TypeInit() {
         }
         for (Class *cs : ns->classes) {
             string name = prefix + cs->name;
-            cout << "  " << name << "::SetType(new Type(\"" << name << "\"));\n";
+            cout << "  GetType<" << name << ">() = new Type(\"" << name << "\");\n";
+        }
+        for (Enum *e : ns->enums) {
+            string name = prefix + e->name;
+            cout << "  GetType<" << name << ">() = new Type(\"" << name << "\");\n";
         }
     };
-
-    function<void(Namespace *)> config = [&config, &stack](Namespace *ns) {
+    function<void(Namespace *)> write = [&write, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
             stack.push_back(n);
-            config(n);
+            write(n);
             stack.pop_back();
         }
-        if (ns->classes.empty()) {
+        if (ns->classes.empty() && ns->enums.empty()) {
             return;
         }
 
@@ -227,6 +231,23 @@ void Generator::TypeInit() {
             }
             cout << "  };\n  }\n";
         }
+        for (Enum *e : ns->enums) {
+            string name = prefix + e->name;
+
+            cout << "  GetType<" << name << ">()->SetEnum(true);\n";
+            // enum blueprint
+            cout << "  GetType<" << name << ">()->blueprint = {\n";
+            string base = "0";
+            uint64_t cnt = 0;
+            for (auto &p : e->enums) {
+                if (!p.second.empty()) {
+                    base = p.second;
+                    cnt = 0;
+                }
+                cout << "  { \"" << p.first << "\", static_cast<" << e->base << ">(" << base << " + " << cnt++ << ") },\n";
+            }
+            cout << "  };\n";
+        }
     };
 
     cout << "void type_init() {\n";
@@ -234,20 +255,20 @@ void Generator::TypeInit() {
         instantiate(ns);
     }
     for (Namespace *ns : namespaces) {
-        config(ns);
+        write(ns);
     }
     cout << "}\n";
 }
 
 void Generator::TypeClear() {
     vector<Namespace *> stack;
-    function<void(Namespace *)> clear = [&clear, &stack](Namespace *ns) {
+    function<void(Namespace *)> write = [&write, &stack](Namespace *ns) {
         for (Namespace *n : ns->namespaces) {
             stack.push_back(n);
-            clear(n);
+            write(n);
             stack.pop_back();
         }
-        if (ns->classes.empty()) {
+        if (ns->classes.empty() && ns->enums.empty()) {
             return;
         }
 
@@ -260,11 +281,15 @@ void Generator::TypeClear() {
             string name = prefix + cs->name;
             cout << "  delete " << name << "::StaticType();\n";
         }
+        for (Enum *e : ns->enums) {
+            string name = prefix + e->name;
+            cout << "  delete GetType<" << name << ">();\n";
+        }
     };
 
     cout << "void type_clear() {\n";
     for (Namespace *ns : namespaces) {
-        clear(ns);
+        write(ns);
     }
     cout << "}\n";
 }

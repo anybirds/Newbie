@@ -111,6 +111,10 @@ bool Project::Load(const string &path) {
         unordered_map<string, vector<pair<bool, json>>> diff; // { <TypeName, <TargetExists, Default/Index> ... > ... }
         for (auto &p : Type::GetAllTypes()) {
             Type *type = p.second;
+            if (type->IsEnum()) {
+                continue;
+            }
+
             auto &diffVector = diff[type->GetName()];
             
             // get base classes of the type
@@ -360,7 +364,11 @@ void Project::Close() {
 #else
         dlclose(lib);
 #endif
-    }  
+    }
+
+    for (Asset *garbage : garbages) {
+        delete garbage;
+    }
 
     *this = Project();
 
@@ -371,6 +379,10 @@ void Project::WriteBlueprints(json &blueprints) {
     blueprints.clear();
     for (auto &p : Type::GetAllTypes()) {
         Type *type = p.second;
+        if (type->IsEnum()) {
+            continue;
+        }
+
         json &blueprint = blueprints[type->GetName()];
         Type *temp = type;
         int base = 0;

@@ -1,19 +1,12 @@
 #include <cassert>
 #include <sstream>
 
-#include <Class.hpp>
 #include <Enum.hpp>
-#include <Namespace.hpp>
 
 using namespace std;
 using namespace HeaderTool;
 
-Namespace::Namespace(const string &macro) {
-    // global namespace
-    if (macro.empty()) {
-        return;
-    }
-    
+Enum::Enum(const std::string &macro) {
     stringstream ss;
     ss << macro;
     char c;
@@ -33,27 +26,18 @@ Namespace::Namespace(const string &macro) {
         args.push_back(arg);
     } while (!ss.eof() && c != ')');
     assert(!ss.eof());
-
+    
     name = args[0];
+    base = args[1];
 }
 
-Namespace::~Namespace() {
-    for (Class *cs : classes) {
-        delete cs;
-    }
-    for (Namespace *ns : namespaces) {
-        delete ns;
-    }
-}
-
-ifstream &HeaderTool::operator>>(ifstream &ifs, Namespace &ns) {
+ifstream &HeaderTool::operator>>(ifstream &ifs, Enum &e) {
     while (!ifs.eof()) {
         char c;
         string str, temp;
-        int cnt;
 
         ifs >> c;
-        if (c == '}') {
+        if (c == ';') {
             break;
         }
         switch (c) {
@@ -63,7 +47,7 @@ ifstream &HeaderTool::operator>>(ifstream &ifs, Namespace &ns) {
                 } while (temp.back() == '\\');
                 break;
             default:
-                for (; !ifs.eof() && c != '{' && c != ';'; ifs >> c) {
+                for (; !ifs.eof() && c != '}' && c != ','; ifs >> c) {
                     switch (c) {
                         case '/':
                             c = ifs.get();
@@ -105,41 +89,19 @@ ifstream &HeaderTool::operator>>(ifstream &ifs, Namespace &ns) {
                 }
                 assert(!ifs.eof());
 
+                size_t offset = str.find('=');
                 switch (c) {
-                    case '{':
-                        if (str.substr(0, 9) == "NAMESPACE") {
-                            Namespace *n = new Namespace(str);
-                            ns.namespaces.push_back(n);
-                            ifs >> *n;
-                        } else if (str.substr(0, 5) == "CLASS") {
-                            Class *cs = new Class(str);
-                            ns.classes.push_back(cs);
-                            ifs >> *cs;
-                        } else if (str.substr(0, 4) == "ENUM") {
-                            Enum *e = new Enum(str);
-                            ns.enums.push_back(e);
-                            ifs >> *e;
-                        } else {
-                            cnt = 1;
-                            do {
-                                c = ifs.get();
-                                if (c == '{') {
-                                    cnt++;
-                                } else if (c == '}') {
-                                    cnt--;
-                                }
-                            } while (!ifs.eof() && cnt > 0);
-                            assert(!ifs.eof());
-                        } 
-                        break;
-                    case ';':
+                    case ',':
+                    case '}':
+                        if (!str.empty()) {
+                            e.enums.push_back({str.substr(0, offset), str.substr(offset + 1)});
+                        }
                         break;
                     default:
                         assert(false);
                         break;
                 }
-                break;
-        }
+        } 
     }
 
     return ifs;

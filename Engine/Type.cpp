@@ -5,7 +5,7 @@ using namespace std;
 using namespace glm;
 using json = nlohmann::json;
 
-Type::Type(const string &name) : abstract(false), name(name), base(nullptr) {
+Type::Type(const string &name) : enumeration(false), abstract(false), name(name), base(nullptr) {
     GetAllTypes().insert({name, this});
 }
 

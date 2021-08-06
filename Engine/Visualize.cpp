@@ -44,6 +44,8 @@ template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<Entity *, tru
 template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<Entity *, false>();
 template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<shared_ptr<Resource>, true>();
 template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<shared_ptr<Resource>, false>();
+template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<enum_type, true>();
+template ENGINE_EXPORT inline function<void(void *)> &GetVisualize<enum_type, false>();
 
 template ENGINE_EXPORT inline function<void(const vector<function<void(void *)>> &, void *)> &GetVisualize<pair, true>();
 template ENGINE_EXPORT inline function<void(const vector<function<void(void *)>> &, void *)> &GetVisualize<pair, false>();
