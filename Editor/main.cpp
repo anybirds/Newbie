@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
         inspectorPanel.Show();
         Widget::Update();
 
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
 
         // render
         ImGui::Render();
