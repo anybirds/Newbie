@@ -7,7 +7,8 @@ Can one undergraduate student make a fully-functional game engine? Let's do this
 * Make a GUI editor that allows users to inspect and modify objects handily.
 * Create a simple 3D game with this engine. 
 
-## Feature
+## Video
+[![Video Label](https://img.youtube.com/vi/4M7l060QaOs/0.jpg)](https://youtu.be/4M7l060QaOs)
 
 ## Install
 ### Windows
